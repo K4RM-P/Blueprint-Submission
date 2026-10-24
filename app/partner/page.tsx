@@ -7,6 +7,9 @@ import { getPartnerContext, listBatches } from "@/lib/queries/partner";
 import { getPartnerImpact } from "@/lib/queries/impact";
 import { labels, type RecipientCategory } from "@/lib/domain";
 import { hasFullDashboard } from "@/lib/pricing";
+import { DevicesAreaChart } from "@/components/charts/area";
+import { BarsChart } from "@/components/charts/bars";
+import { lastMonths, monthlySeries } from "@/lib/impact";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -58,6 +61,52 @@ export default async function PartnerDashboard() {
         <StatPebble label="Recycled responsibly" value={t.devicesRecycled} />
         <StatPebble label="kg kept out of landfill" value={t.kgDiverted} decimals={1} suffix="kg" />
       </div>
+
+      {full ? (
+        <section aria-labelledby="esg" className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          <div className="flat p-6">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 id="esg" className="font-semibold">
+                Devices over time
+              </h2>
+              <p className="text-small text-ink-2">
+                <span className="font-semibold text-ink tnum">{t.co2eAvoidedKg.toLocaleString("en-CA")} kg</span> CO₂e avoided ·{" "}
+                <span className="font-semibold text-ink tnum">{t.volunteerHours}</span> volunteer hours supported
+              </p>
+            </div>
+            <div className="mt-4">
+              <DevicesAreaChart
+                label="Devices received and reused per month"
+                data={monthlySeries(
+                  impact.devices.map((d) => ({ receivedAt: d.received_at ?? d.created_at, soldAt: d.sold_at })),
+                  lastMonths(new Date(), 6),
+                )}
+              />
+            </div>
+          </div>
+          <div className="flat p-6">
+            <h2 className="font-semibold">Reused vs. recycled</h2>
+            <div className="mt-4">
+              <BarsChart
+                label="Device outcomes"
+                height={200}
+                data={[
+                  { label: "Reused", value: t.devicesReused },
+                  { label: "Recycled", value: t.devicesRecycled, highlight: false },
+                  { label: "In progress", value: t.devicesInProgress, highlight: false },
+                ]}
+              />
+            </div>
+            <p className="mt-3 text-[0.8125rem] text-ink-3">
+              Impact factors are placeholders marked TO VERIFY. See the{" "}
+              <a href="/impact#methodology" className="underline">
+                methodology
+              </a>
+              .
+            </p>
+          </div>
+        </section>
+      ) : null}
 
       {!full ? (
         <ClayCard tint="apricot" className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
