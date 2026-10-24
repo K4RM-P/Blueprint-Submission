@@ -62,7 +62,7 @@ function DialogContent({
         data-slot="dialog-content"
         data-tint="porcelain"
         className={cn(
-          "clay fixed bottom-0 left-1/2 z-50 grid max-h-[92dvh] w-full -translate-x-1/2 gap-5 overflow-y-auto !rounded-b-none !rounded-t-[var(--r-xl)] p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-ink duration-200 outline-none sm:top-1/2 sm:bottom-auto sm:max-w-lg sm:-translate-y-1/2 sm:!rounded-[var(--r-xl)] sm:p-8 data-open:animate-in data-open:fade-in-0 data-open:slide-in-from-bottom-8 sm:data-open:slide-in-from-bottom-0 sm:data-open:zoom-in-[0.96] data-closed:animate-out data-closed:fade-out-0 sm:data-closed:zoom-out-[0.96]",
+          "clay-glass fixed bottom-0 left-1/2 z-50 grid max-h-[92dvh] w-full -translate-x-1/2 gap-5 overflow-y-auto !rounded-b-none !rounded-t-[var(--r-xl)] p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-ink duration-200 outline-none sm:top-1/2 sm:bottom-auto sm:max-w-lg sm:-translate-y-1/2 sm:!rounded-[var(--r-xl)] sm:p-8 data-open:animate-in data-open:fade-in-0 data-open:slide-in-from-bottom-8 sm:data-open:slide-in-from-bottom-0 sm:data-open:zoom-in-[0.96] data-closed:animate-out data-closed:fade-out-0 sm:data-closed:zoom-out-[0.96]",
           className
         )}
         {...props}

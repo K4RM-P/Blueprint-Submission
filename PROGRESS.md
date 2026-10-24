@@ -30,3 +30,8 @@ Log of each build stage: what was done, what was deferred, and decisions made. N
 - Public pages use `getClaims()` (cheap) for the header's "Dashboard" link, which points to `/dashboard` and redirects by role.
 - Demo cards: the whole card is the press target, not three primary buttons, to keep "one primary per view" (§12.10).
 - Until Stage 7 builds the remaining public routes, e2e ignores 404 link-prefetch console errors (`tests/e2e/helpers.ts`).
+
+## Stage 3: Partner Portal
+**Done:** PP-01 (`/become-a-partner`), PP-02 (onboarding at `/partner/settings?welcome=1` with logo upload), PP-03/04/05 (4-step wizard: live Batch Value Score meter, capacity glasses, pickup locked for Community, server recomputes the score), PP-06/07 (batch list and detail, status timeline, device journeys table), PP-13 P1 (org settings, opt-ins, colleague invites). Edit and withdraw only while `submitted`. Dashboard v1 (impact so far, pebbles, recent batches, upgrade card for Community).
+**Decisions:** Added migration 0005 with `approved_at`/`scheduled_at`/`declined_at` so the timeline shows real dates. The shared-element card→detail morph is deferred: Next route transitions make it costly for little gain.
+**UI direction change (from user feedback):** a bit of clay-glassmorphism. `.glass` / `.clay-glass` utilities, frosted floating sidebar, header, dock and dialogs, static ambient mint/apricot light on the canvas, and mono eyebrows. **Testing is now lean:** typecheck, lint and build on every stage; Playwright only for key flows.

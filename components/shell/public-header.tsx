@@ -18,8 +18,8 @@ const LINKS = [
 export function PublicHeader({ dashboardHref }: { dashboardHref: string | null }) {
   const pathname = usePathname();
   return (
-    <header className="no-print sticky top-0 z-40 border-b border-line/70 bg-canvas/90 backdrop-blur-[2px]">
-      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">
+    <header className="no-print sticky top-3 z-40 px-3 sm:px-4">
+      <div className="glass mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 rounded-full pl-4 pr-2.5 sm:pl-5">
         <Logo sub="Free Geek Toronto" />
         <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
           {LINKS.map((l) => (

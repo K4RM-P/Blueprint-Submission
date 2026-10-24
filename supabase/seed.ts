@@ -393,6 +393,9 @@ async function main() {
           data_handling_ack: true,
           created_at: daysAgo(b.createdDaysAgo).toISOString(),
           received_at: received?.toISOString() ?? null,
+          approved_at: ["approved", "scheduled", "received", "in_refurbishment", "completed"].includes(b.status) ? daysAgo(b.createdDaysAgo - 1).toISOString() : null,
+          scheduled_at: ["scheduled", "received", "in_refurbishment", "completed"].includes(b.status) ? daysAgo(Math.max(b.createdDaysAgo - 2, 0.5)).toISOString() : null,
+          declined_at: b.status === "declined" ? daysAgo(b.createdDaysAgo - 1).toISOString() : null,
         })
         .select("id")
         .single(),

@@ -20,7 +20,7 @@ interface LiquidMeterProps {
 export function LiquidMeter({ value, max = 100, title, verdict, tint = "mint", className, children, compact }: LiquidMeterProps) {
   const pct = max > 0 ? value / max : 0;
   return (
-    <div data-tint={tint} className={cn("clay flex items-center gap-5", compact ? "rounded-full p-2 pr-5" : "p-6", className)}>
+    <div data-tint={tint} className={cn("clay-glass hairline-top flex items-center gap-5", compact ? "rounded-full p-2 pr-5" : "p-6", className)}>
       <div className={cn("shrink-0", compact ? "h-10 w-9" : "h-32 w-28")}>
         <LiquidFill value={pct} shape="vessel" className="size-full" calm={compact} />
       </div>

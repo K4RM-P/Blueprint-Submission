@@ -67,7 +67,7 @@ export function AppShell({ role, userName, orgName, children }: AppShellProps) {
 
   return (
     <div data-expression={meta.expression} className="flex min-h-full flex-1">
-      <aside className="no-print sticky top-0 hidden h-[calc(100dvh-var(--banner-h))] w-64 shrink-0 flex-col border-r border-line bg-canvas px-4 py-5 lg:flex">
+      <aside className="no-print sticky top-3 m-3 mr-0 hidden h-[calc(100dvh-var(--banner-h)-24px)] w-64 shrink-0 flex-col rounded-[var(--r-xl)] px-4 py-5 glass lg:flex">
         <Logo href={items[0].href} sub={meta.title} className="px-2" />
         <nav aria-label={meta.title} className="mt-8 flex-1">
           <ul className="flex flex-col gap-1">
@@ -94,7 +94,7 @@ export function AppShell({ role, userName, orgName, children }: AppShellProps) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="no-print sticky top-0 z-30 flex h-16 items-center justify-between border-b border-line bg-canvas/95 px-4 lg:hidden">
+        <header className="no-print glass sticky top-2 z-30 mx-2 mt-2 flex h-16 items-center justify-between rounded-[22px] px-3 lg:hidden">
           <Logo href={items[0].href} sub={meta.title} />
           <UserMenu userName={userName} orgName={orgName} compact />
         </header>

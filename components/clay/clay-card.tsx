@@ -10,14 +10,16 @@ interface ClayCardProps extends ComponentPropsWithoutRef<"div"> {
   href?: string;
   size?: "md" | "lg" | "xl";
   as?: "div" | "section" | "article";
+  /** "glass" = frosted clay skin (chrome, cards over imagery). */
+  material?: "clay" | "glass";
   children?: ReactNode;
 }
 
 const pad = { md: "p-6", lg: "p-6 sm:p-8", xl: "p-7 sm:p-10" } as const;
 
-export function ClayCard({ tint = "porcelain", href, size = "md", as: TagName = "div", className, children, ...rest }: ClayCardProps) {
+export function ClayCard({ tint = "porcelain", href, size = "md", material = "clay", as: TagName = "div", className, children, ...rest }: ClayCardProps) {
   const Tag = TagName as "div";
-  const classes = cn("clay relative", size === "xl" && "rounded-[var(--r-xl)]", pad[size], className);
+  const classes = cn(material === "glass" ? "clay-glass hairline-top relative" : "clay relative", size === "xl" && "rounded-[var(--r-xl)]", pad[size], className);
   if (href) {
     return (
       <Tag data-tint={tint} className={cn(classes, "lift group")} {...rest}>

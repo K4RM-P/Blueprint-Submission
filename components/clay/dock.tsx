@@ -13,7 +13,7 @@ export function Dock({ items, label }: { items: NavItem[]; label: string }) {
   const { t } = useMotionPrefs();
   return (
     <nav aria-label={`${label} (mobile)`} className="no-print fixed inset-x-3 bottom-[max(12px,env(safe-area-inset-bottom))] z-40 lg:hidden">
-      <ul data-tint="porcelain" className="clay mx-auto flex h-16 max-w-md items-center justify-around rounded-full px-2">
+      <ul className="glass mx-auto flex h-16 max-w-md items-center justify-around rounded-full px-2">
         {items.map((item) => {
           const active = isActive(pathname, item, items);
           const Icon = item.icon;

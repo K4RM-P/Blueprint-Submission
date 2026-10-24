@@ -50,7 +50,7 @@ export function StatPebble({ label, value, decimals = 0, suffix, prefix, delta, 
   const numberSize = size === "lg" ? "text-[3.25rem] sm:text-[4.5rem]" : size === "sm" ? "text-[1.75rem]" : "text-[2.25rem] sm:text-[2.75rem]";
 
   return (
-    <div ref={ref} data-tint={tint} className={cn("clay flex flex-col justify-between gap-3", size === "sm" ? "rounded-[22px] p-5" : "p-6", className)}>
+    <div ref={ref} data-tint={tint} className={cn("clay-glass hairline-top flex flex-col justify-between gap-3", size === "sm" ? "rounded-[22px] p-5" : "p-6", className)}>
       <p className="eyebrow !text-ink-2">{label}</p>
       <div>
         <p className={cn("font-display tnum leading-none text-ink", numberSize)} aria-label={`${prefix ?? ""}${fmt(value, decimals)}${suffix ? ` ${suffix}` : ""}`}>

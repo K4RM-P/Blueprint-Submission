@@ -440,10 +440,12 @@ export type Database = {
       }
       donation_batches: {
         Row: {
+          approved_at: string | null
           completed_at: string | null
           created_at: string
           data_handling_ack: boolean
           decline_reason: string | null
+          declined_at: string | null
           id: string
           logistics: Database["public"]["Enums"]["logistics_type"]
           notes: string | null
@@ -452,16 +454,19 @@ export type Database = {
           preferred_week: string
           received_at: string | null
           schedule_override_note: string | null
+          scheduled_at: string | null
           scheduled_week: string | null
           status: Database["public"]["Enums"]["batch_status"]
           submitted_by: string | null
           value_score: number
         }
         Insert: {
+          approved_at?: string | null
           completed_at?: string | null
           created_at?: string
           data_handling_ack?: boolean
           decline_reason?: string | null
+          declined_at?: string | null
           id?: string
           logistics?: Database["public"]["Enums"]["logistics_type"]
           notes?: string | null
@@ -470,16 +475,19 @@ export type Database = {
           preferred_week: string
           received_at?: string | null
           schedule_override_note?: string | null
+          scheduled_at?: string | null
           scheduled_week?: string | null
           status?: Database["public"]["Enums"]["batch_status"]
           submitted_by?: string | null
           value_score?: number
         }
         Update: {
+          approved_at?: string | null
           completed_at?: string | null
           created_at?: string
           data_handling_ack?: boolean
           decline_reason?: string | null
+          declined_at?: string | null
           id?: string
           logistics?: Database["public"]["Enums"]["logistics_type"]
           notes?: string | null
@@ -488,6 +496,7 @@ export type Database = {
           preferred_week?: string
           received_at?: string | null
           schedule_override_note?: string | null
+          scheduled_at?: string | null
           scheduled_week?: string | null
           status?: Database["public"]["Enums"]["batch_status"]
           submitted_by?: string | null
