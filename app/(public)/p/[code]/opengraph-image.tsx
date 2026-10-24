@@ -3,7 +3,7 @@ import { getPassport } from "@/lib/queries/passport";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "GeekLoop Device Passport";
+export const alt = "Relay Device Passport";
 
 export default async function OgImage({ params }: { params: Promise<{ code: string }> }) {
   const p = await getPassport((await params).code);
@@ -19,7 +19,7 @@ export default async function OgImage({ params }: { params: Promise<{ code: stri
           <div style={{ fontSize: 96, fontWeight: 700, letterSpacing: -3, lineHeight: 1 }}>{name}</div>
           <div style={{ fontSize: 34, marginTop: 24, color: "#4A544F" }}>Donated · data wiped & verified · refurbished in Toronto</div>
         </div>
-        <div style={{ display: "flex", fontSize: 30, color: "#0B5E42" }}>GeekLoop · Free Geek Toronto</div>
+        <div style={{ display: "flex", fontSize: 30, color: "#0B5E42" }}>Relay · Free Geek Toronto</div>
       </div>
     ),
     size,

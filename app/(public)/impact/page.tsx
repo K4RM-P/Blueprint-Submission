@@ -41,7 +41,7 @@ export default async function ImpactPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-small text-ink-3">Categories only — GeekLoop never records who bought a device.</p>
+          <p className="mt-3 text-small text-ink-3">Categories only — Relay never records who bought a device.</p>
         </section>
       ) : null}
 

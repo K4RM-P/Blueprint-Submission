@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-/** GeekLoop wordmark: a liquid loop + Bricolage name. Not Free Geek's branding. */
+/** Relay wordmark: a liquid loop + Bricolage name. Not Free Geek's branding. */
 export function LoopMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={cn("size-8", className)} aria-hidden>
@@ -17,7 +17,7 @@ export function Logo({ href = "/", sub, className }: { href?: string; sub?: stri
     <Link href={href} className={cn("inline-flex items-center gap-2.5 rounded-full", className)}>
       <LoopMark />
       <span className="flex flex-col leading-none">
-        <span className="font-display text-[1.25rem] tracking-[-0.03em] text-ink">GeekLoop</span>
+        <span className="font-display text-[1.25rem] tracking-[-0.03em] text-ink">Relay</span>
         {sub ? <span className="mt-0.5 text-[0.6875rem] font-medium uppercase tracking-[0.06em] text-ink-3">{sub}</span> : null}
       </span>
     </Link>

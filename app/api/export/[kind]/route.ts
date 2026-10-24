@@ -46,6 +46,6 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ kin
     }));
   }
   return new NextResponse(csv(rows), {
-    headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="geekloop-${parsed.data}-${new Date().toISOString().slice(0, 10)}.csv"` },
+    headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="relay-${parsed.data}-${new Date().toISOString().slice(0, 10)}.csv"` },
   });
 }

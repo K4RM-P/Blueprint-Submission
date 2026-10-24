@@ -56,7 +56,7 @@ export function renderImpactCard({ orgName, tierLabel, periodLabel, totals: t }:
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 24, color: "#4A544F" }}>
           <div style={{ display: "flex" }}>Data wiped & verified · refurbished by volunteers in Toronto</div>
-          <div style={{ display: "flex", color: "#0B5E42", fontWeight: 700 }}>Free Geek Toronto × GeekLoop</div>
+          <div style={{ display: "flex", color: "#0B5E42", fontWeight: 700 }}>Free Geek Toronto × Relay</div>
         </div>
       </div>
     ),

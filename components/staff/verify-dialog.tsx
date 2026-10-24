@@ -28,7 +28,7 @@ export function VerifyDialog({ ids, open, onOpenChange, onDone, defaultReference
         <DialogHeader>
           <DialogTitle>Verify {bulk ? `${ids.length} data wipes` : "this data wipe"}</DialogTitle>
           <DialogDescription>
-            Check {bulk ? "each report" : "the report"} in Free Geek Toronto&apos;s sanitization software first. GeekLoop records the result; it doesn&apos;t perform the wipe.
+            Check {bulk ? "each report" : "the report"} in Free Geek Toronto&apos;s sanitization software first. Relay records the result; it doesn&apos;t perform the wipe.
           </DialogDescription>
         </DialogHeader>
         <Field label="Sanitization method" required>

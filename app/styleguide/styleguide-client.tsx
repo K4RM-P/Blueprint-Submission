@@ -77,7 +77,7 @@ export function StyleguideClient() {
     <main id="main" data-expression="3" className="mx-auto w-full max-w-[1200px] px-4 pb-32 sm:px-6">
       <header className="flex flex-col gap-6 py-14 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="eyebrow">GeekLoop design system</p>
+          <p className="eyebrow">Relay design system</p>
           <h1 className="font-display mt-3 text-[3rem] leading-none sm:text-display-l">Tactile. Flowing. Precise.</h1>
           <p className="measure mt-4 text-body-l text-ink-2">Every token and component, in every state. Later screens reuse only what lives here.</p>
         </div>

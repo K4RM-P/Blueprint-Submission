@@ -1,4 +1,4 @@
-# GeekLoop demo script (about 3 minutes of the 8-minute presentation)
+# Relay demo script (about 3 minutes of the 8-minute presentation)
 
 **Before recording**
 - Run `pnpm seed` against the demo project to reset the data. It's idempotent, and the passport codes come out the same every time.
@@ -13,7 +13,7 @@ Times are cumulative.
 ### 0:00 – 0:20 · The public face (landing)
 1. `/`: hold on the hero ("Old laptops. New loops."). Point to the live **devices back in use** counter.
 2. Scroll slowly through **The Loop**: the liquid fills Donated → Wiped & verified → Refurbished → In someone's hands, and each station shows a real number.
-3. Say: *"Free Geek Toronto has zero corporate partners. GeekLoop gives businesses a reason to send uniform laptops, and shows everyone where they go."*
+3. Say: *"Free Geek Toronto has zero corporate partners. Relay gives businesses a reason to send uniform laptops, and shows everyone where they go."*
 
 ### 0:20 – 0:55 · F1: a partner donates (Partner)
 4. `/demo` → **Explore as a Partner** (Maple Ledger Accounting, Impact tier).

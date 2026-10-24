@@ -120,7 +120,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
 
       <FlatCard className="overflow-x-auto">
         <h2 className="text-title font-semibold">Impact factors</h2>
-        <p className="text-small text-ink-2">Used by every impact number in GeekLoop. Replace “TO VERIFY” with a cited source before publishing.</p>
+        <p className="text-small text-ink-2">Used by every impact number in Relay. Replace “TO VERIFY” with a cited source before publishing.</p>
         <table className="data-table mt-4 min-w-[860px]">
           <thead>
             <tr>

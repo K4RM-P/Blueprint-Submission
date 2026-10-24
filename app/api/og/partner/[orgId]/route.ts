@@ -26,6 +26,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ orgId: s
   const download = new URL(req.url).searchParams.has("download");
   const image = renderImpactCard({ orgName: org.name, tierLabel: labels.tier[org.tier as PartnerTier], periodLabel: period.label, totals: t });
   image.headers.set("Cache-Control", "private, no-store");
-  if (download) image.headers.set("Content-Disposition", `attachment; filename="geekloop-impact-card.png"`);
+  if (download) image.headers.set("Content-Disposition", `attachment; filename="relay-impact-card.png"`);
   return image;
 }

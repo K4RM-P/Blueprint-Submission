@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { DemoCards } from "@/components/auth/demo-cards";
 import { env } from "@/lib/env";
 
-export const metadata: Metadata = { title: "Demo", description: "Explore GeekLoop as a partner, staff member or volunteer — no sign-up needed." };
+export const metadata: Metadata = { title: "Demo", description: "Explore Relay as a partner, staff member or volunteer — no sign-up needed." };
 
 /** One-click demo role switcher (AUTH-06). Only exists in demo mode. */
 export default function DemoPage() {

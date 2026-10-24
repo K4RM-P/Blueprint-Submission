@@ -1,6 +1,6 @@
-# GeekLoop
+# Relay
 
-**GeekLoop makes the value Free Geek Toronto creates visible.** Businesses donate batches of retired laptops and get a data-wipe certificate plus a live impact dashboard. Every refurbished device gets a public **Device Passport** (scan the QR code). Volunteers build a **Skills Wallet** of verified hands-on work. Built for the FUSE Society Blueprint 2026 hackathon, with Free Geek Toronto (FGT) as the partner business.
+**Relay makes the value Free Geek Toronto creates visible.** Businesses donate batches of retired laptops and get a data-wipe certificate plus a live impact dashboard. Every refurbished device gets a public **Device Passport** (scan the QR code). Volunteers build a **Skills Wallet** of verified hands-on work. Built for the FUSE Society Blueprint 2026 hackathon, with Free Geek Toronto (FGT) as the partner business.
 
 - **Live demo:** _add the Vercel URL here after deploying_ → open **`/demo`** for one-click sign-in
 - **Demo accounts:** `demo-partner@geekloop.test`, `demo-staff@geekloop.test`, `demo-volunteer@geekloop.test`. The shared password is shown on `/demo` in demo mode. Every organization and person in the data is fictional.
@@ -87,7 +87,7 @@ pnpm seed                       # fictional demo data (idempotent: safe to re-ru
 pnpm dev                        # http://localhost:3000/demo
 ```
 
-Stripe (optional): set `PAYMENT_PROVIDER=stripe`, `STRIPE_SECRET_KEY=sk_test_…` and `STRIPE_WEBHOOK_SECRET`. GeekLoop refuses to start a Stripe checkout with anything other than a test key and rejects live-mode webhook events.
+Stripe (optional): set `PAYMENT_PROVIDER=stripe`, `STRIPE_SECRET_KEY=sk_test_…` and `STRIPE_WEBHOOK_SECRET`. Relay refuses to start a Stripe checkout with anything other than a test key and rejects live-mode webhook events.
 
 ## Tests
 
@@ -107,4 +107,4 @@ This project was built by our two-person team with **Claude Code** (Anthropic) a
 
 ## License
 
-GPL-3.0, in keeping with Free Geek Toronto's open-source values. GeekLoop is a tool built *for* Free Geek Toronto; it doesn't use Free Geek's branding.
+GPL-3.0, in keeping with Free Geek Toronto's open-source values. Relay is a tool built *for* Free Geek Toronto; it doesn't use Free Geek's branding.

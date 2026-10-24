@@ -1,4 +1,4 @@
-# GeekLoop build progress
+# Relay build progress
 
 Log of each build stage: what was done, what was deferred, and decisions made. Newest entries at the bottom.
 

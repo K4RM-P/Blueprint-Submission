@@ -13,7 +13,7 @@ import { logoUrl } from "@/lib/queries/common";
 import type { PartnerTier } from "@/lib/domain";
 
 export const metadata: Metadata = {
-  title: { absolute: "GeekLoop · Old laptops. New loops." },
+  title: { absolute: "Relay · Old laptops. New loops." },
   description: "Free Geek Toronto turns business laptops into affordable computers for students, newcomers and families — and shows every step.",
 };
 
@@ -30,7 +30,7 @@ export default async function Landing() {
       {/* 1 · Hero */}
       <section className="relative mx-auto grid max-w-[1200px] items-center gap-12 px-4 pb-20 pt-14 sm:px-6 md:grid-cols-12 md:pb-28 md:pt-20">
         <div className="md:col-span-7">
-          <p className="eyebrow">Free Geek Toronto × GeekLoop</p>
+          <p className="eyebrow">Free Geek Toronto × Relay</p>
           <h1 className="font-display mt-5 text-[3.25rem] leading-[0.92] sm:text-[4.5rem] lg:text-display-xl">
             Old laptops.
             <br />

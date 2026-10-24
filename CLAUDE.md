@@ -3,7 +3,7 @@
 Hackathon project, built by two collaborators who both use Claude Code on this repo at the same time. Staying in sync matters more than anything else.
 
 ## Project overview
-GeekLoop: a web app for Free Geek Toronto. It has a Partner Portal (businesses donate laptop batches and get certificates and ESG impact), a Staff Console, a Volunteer Bench with a Skills Wallet, and a public Device Passport for each device.
+Relay: a web app for Free Geek Toronto. It has a Partner Portal (businesses donate laptop batches and get certificates and ESG impact), a Staff Console, a Volunteer Bench with a Skills Wallet, and a public Device Passport for each device.
 Sources of truth: `PRD.md` (what to build), `UI_UX_DESIGN.md` (look and motion; supersedes PRD §15), `KICKOFF_PROMPT.md` (stages). Never edit those three files.
 
 - **Stack:** Next.js 16 (App Router, Turbopack, `proxy.ts` instead of middleware, cacheComponents OFF), TypeScript strict, Tailwind v4, shadcn primitives (radix) restyled to tokens, `motion`, Supabase (`@supabase/ssr`), Zod, React Hook Form, Recharts, qrcode, @react-pdf/renderer, Vitest, Playwright, pnpm.

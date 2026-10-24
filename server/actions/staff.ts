@@ -233,7 +233,7 @@ export async function setPrice(input: unknown): Promise<ActionResult<null>> {
     const { error } = await s.supabase.from("devices").update({ price_cents: priceCents }).eq("id", id);
     if (error) throw error;
     refresh("/staff");
-    return ok(null, "Price saved. GeekLoop only displays the prices FGT sets.");
+    return ok(null, "Price saved. Relay only displays the prices FGT sets.");
   });
 }
 

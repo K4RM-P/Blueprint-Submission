@@ -59,7 +59,7 @@ const fmt = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("en-
 
 export function CertificateDocument({ data }: { data: CertificateData }) {
   return (
-    <Document title={`Data-Sanitization Certificate ${data.number}`} author="Free Geek Toronto" creator="GeekLoop">
+    <Document title={`Data-Sanitization Certificate ${data.number}`} author="Free Geek Toronto" creator="Relay">
       <Page size="LETTER" style={s.page}>
         <View style={s.header}>
           <View>
@@ -67,7 +67,7 @@ export function CertificateDocument({ data }: { data: CertificateData }) {
             <Text style={s.small}>180 Sudbury Street, Unit C3, Toronto, ON</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
-            <Text style={[s.brand, { color: LOOP }]}>GeekLoop</Text>
+            <Text style={[s.brand, { color: LOOP }]}>Relay</Text>
             <Text style={s.small}>Chain-of-custody record</Text>
           </View>
         </View>
@@ -116,7 +116,7 @@ export function CertificateDocument({ data }: { data: CertificateData }) {
         <Text style={s.statement}>
           Statement of process: each storage device listed above was received with its drive intact and sanitized by Free Geek Toronto using its data-sanitization software, which
           produces a report for every device. A Free Geek Toronto staff member verified each sanitization report before the device could be refurbished, sold or recycled. Devices
-          that could not be reused were recycled responsibly. Every step is recorded in an append-only chain of custody. GeekLoop records sanitization; Free Geek Toronto&apos;s
+          that could not be reused were recycled responsibly. Every step is recorded in an append-only chain of custody. Relay records sanitization; Free Geek Toronto&apos;s
           sanitization software remains the system of record. [Process wording to be confirmed by Free Geek Toronto.]
         </Text>
 

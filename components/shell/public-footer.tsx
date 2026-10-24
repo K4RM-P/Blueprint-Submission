@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LoopMark } from "./logo";
 
-/** Honest footer: FGT is independent; GeekLoop is a tool built for it (DP-03, §9.1.6). */
+/** Honest footer: FGT is independent; Relay is a tool built for it (DP-03, §9.1.6). */
 export function PublicFooter() {
   return (
     <footer className="no-print mt-auto border-t border-line bg-canvas">
@@ -9,11 +9,11 @@ export function PublicFooter() {
         <div className="max-w-md">
           <div className="flex items-center gap-2.5">
             <LoopMark />
-            <span className="font-display text-xl">GeekLoop</span>
+            <span className="font-display text-xl">Relay</span>
           </div>
           <p className="mt-4 text-small text-ink-2">
             Free Geek Toronto is an independent non-profit at 180 Sudbury Street, Unit C3, Toronto. Free Geek locations in other cities run separately,
-            so products, prices and services differ. GeekLoop is an open-source tool built for Free Geek Toronto.
+            so products, prices and services differ. Relay is an open-source tool built for Free Geek Toronto.
           </p>
         </div>
         <nav aria-label="Learn" className="flex flex-col gap-2 text-small">
@@ -33,7 +33,7 @@ export function PublicFooter() {
           ) : null}
         </nav>
       </div>
-      <p className="border-t border-line px-4 py-5 text-center text-[0.8125rem] text-ink-3">GeekLoop · GPL-3.0 · Demo data is fictional.</p>
+      <p className="border-t border-line px-4 py-5 text-center text-[0.8125rem] text-ink-3">Relay · GPL-3.0 · Demo data is fictional.</p>
     </footer>
   );
 }

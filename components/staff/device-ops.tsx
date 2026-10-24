@@ -115,7 +115,7 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Set price</DialogTitle>
-            <DialogDescription>Free Geek Toronto sets every price. GeekLoop only displays it.</DialogDescription>
+            <DialogDescription>Free Geek Toronto sets every price. Relay only displays it.</DialogDescription>
           </DialogHeader>
           <Field label="Price (CAD)">{({ id: fid }) => <Input id={fid} inputMode="decimal" value={price} onChange={(e) => setPriceVal(e.target.value)} />}</Field>
           <DialogFooter>

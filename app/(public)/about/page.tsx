@@ -61,7 +61,7 @@ export default function AboutPage() {
               );
             })}
           </ol>
-          <p className="mt-4 text-small text-ink-3">GeekLoop records sanitization; Free Geek Toronto&apos;s own software remains the system of record.</p>
+          <p className="mt-4 text-small text-ink-3">Relay records sanitization; Free Geek Toronto&apos;s own software remains the system of record.</p>
         </section>
 
         <ClayCard tint="butter" className="flex flex-col gap-4 lg:col-span-5" id="volunteer">

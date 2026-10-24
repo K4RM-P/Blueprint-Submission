@@ -7,7 +7,7 @@ import { ClayVessel } from "@/components/illustrations/clay-vessel";
 
 export function ErrorState({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
-    console.warn("[GeekLoop] page error", error.digest ?? error.message);
+    console.warn("[Relay] page error", error.digest ?? error.message);
   }, [error]);
   return (
     <div role="alert" className="flex flex-col items-start gap-5 py-16">

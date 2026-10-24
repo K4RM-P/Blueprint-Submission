@@ -8,7 +8,7 @@ import { PaymentConfigError, type CheckoutPurpose, type PaymentProvider } from "
 export function stripeKey(): string {
   const key = process.env.STRIPE_SECRET_KEY ?? "";
   if (!key) throw new PaymentConfigError("STRIPE_SECRET_KEY is not set. Use PAYMENT_PROVIDER=mock for the demo.");
-  if (!key.startsWith("sk_test_")) throw new PaymentConfigError("GeekLoop only runs Stripe in test mode. Use an sk_test_ key.");
+  if (!key.startsWith("sk_test_")) throw new PaymentConfigError("Relay only runs Stripe in test mode. Use an sk_test_ key.");
   return key;
 }
 

@@ -35,7 +35,7 @@ describe("LinkedIn card text (PP-11)", () => {
     expect(topRecipients(totals).map((r) => r.category)).toEqual(["student", "newcomer", "low_income_household"]);
   });
   it("writes a specific post with real numbers and no hype words", () => {
-    const post = suggestedPost("Maple Ledger Accounting", totals, "https://geekloop.example/partners");
+    const post = suggestedPost("Maple Ledger Accounting", totals, "https://relay.example/partners");
     expect(post).toContain("Maple Ledger Accounting gave 20 retired devices");
     expect(post).toContain("16 are back in use");
     expect(post).toContain("students, newcomers and low-income households");

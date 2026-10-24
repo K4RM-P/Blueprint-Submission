@@ -13,10 +13,10 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: "GeekLoop · Free Geek Toronto", template: "%s · GeekLoop" },
+  title: { default: "Relay · Free Geek Toronto", template: "%s · Relay" },
   description:
-    "GeekLoop shows the full journey of every refurbished computer at Free Geek Toronto — from the business that donated it to the person now using it.",
-  openGraph: { siteName: "GeekLoop", type: "website", locale: "en_CA" },
+    "Relay shows the full journey of every refurbished computer at Free Geek Toronto — from the business that donated it to the person now using it.",
+  openGraph: { siteName: "Relay", type: "website", locale: "en_CA" },
 };
 
 export const viewport: Viewport = {

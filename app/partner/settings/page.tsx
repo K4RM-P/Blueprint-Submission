@@ -15,7 +15,7 @@ export default async function PartnerSettingsPage({ searchParams }: { searchPara
   return (
     <>
       <PageHeader
-        eyebrow={welcome ? "Welcome to GeekLoop" : "Settings"}
+        eyebrow={welcome ? "Welcome to Relay" : "Settings"}
         title={welcome ? `Let's set up ${org.name}.` : "Organization settings"}
         description={welcome ? "A few details for your certificates, then you're ready to send your first batch." : "Your profile, logo and how you're recognized in public."}
       />

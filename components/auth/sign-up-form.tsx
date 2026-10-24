@@ -27,7 +27,7 @@ export function SignUpForm({ invited, email }: { invited?: boolean; email?: stri
       else setError("email", { message: res.error });
       return;
     }
-    toast.success(res.message ?? (invited ? "Welcome to GeekLoop." : "Welcome, Reuse Partner. Let's finish your profile."));
+    toast.success(res.message ?? (invited ? "Welcome to Relay." : "Welcome, Reuse Partner. Let's finish your profile."));
     router.replace(res.data.redirectTo);
     router.refresh();
   });

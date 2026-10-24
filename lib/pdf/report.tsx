@@ -110,7 +110,7 @@ export function ReportDocument({ data }: { data: ReportData }) {
   const t = data.totals;
   const people = t.devicesReused;
   return (
-    <Document title={`${data.orgName} — Annual Impact Report`} author="Free Geek Toronto" creator="GeekLoop">
+    <Document title={`${data.orgName} — Annual Impact Report`} author="Free Geek Toronto" creator="Relay">
       <Page size="LETTER" style={s.page}>
         <View style={s.header}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -123,7 +123,7 @@ export function ReportDocument({ data }: { data: ReportData }) {
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={s.brand}>Free Geek Toronto</Text>
-            <Text style={[s.small, { color: LOOP }]}>Reuse Partnership · GeekLoop</Text>
+            <Text style={[s.small, { color: LOOP }]}>Reuse Partnership · Relay</Text>
           </View>
         </View>
 
@@ -219,7 +219,7 @@ export function ReportDocument({ data }: { data: ReportData }) {
         </View>
 
         <View style={s.footer} fixed>
-          <Text>{`Prepared for ${data.orgName} by GeekLoop · ${data.generatedAt}`}</Text>
+          <Text>{`Prepared for ${data.orgName} by Relay · ${data.generatedAt}`}</Text>
         </View>
         
       </Page>

@@ -1,5 +1,5 @@
 /**
- * GeekLoop demo seed (PRD §16). Idempotent: wipes demo data and rebuilds it.
+ * Relay demo seed (PRD §16). Idempotent: wipes demo data and rebuilds it.
  * Run with `pnpm seed`. Uses the service-role key — server-side only.
  *
  * All organizations and people are fictional. Impact factors are marked
@@ -651,7 +651,7 @@ async function main() {
 }
 
 function priceFor(category: DeviceCategory, year: number | null): number {
-  // Illustrative prices FGT would set; GeekLoop only displays them (PRD §6.6).
+  // Illustrative prices FGT would set; Relay only displays them (PRD §6.6).
   const age = year ? NOW.getFullYear() - year : 6;
   const base: Record<DeviceCategory, number> = { laptop: 26000, desktop: 18000, monitor: 6000, tablet: 15000, accessory: 1500, other: 2000 };
   return Math.max(2500, Math.round((base[category] - age * 1500) / 500) * 500);

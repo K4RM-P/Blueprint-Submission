@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 
 /* =========================================================================
-   GeekLoop design tokens — UI_UX_DESIGN.md §3–§6
+   Relay design tokens — UI_UX_DESIGN.md §3–§6
    Tactile. Flowing. Precise.
    ========================================================================= */
 
@@ -40,7 +40,7 @@
   --r-lg: 28px;
   --r-xl: 40px;
 
-  /* shadcn token bridge — every shadcn primitive inherits GeekLoop colour */
+  /* shadcn token bridge — every shadcn primitive inherits Relay colour */
   --background: var(--canvas);
   --foreground: var(--ink);
   --card: var(--surface);
