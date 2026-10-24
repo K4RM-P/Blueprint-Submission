@@ -3,11 +3,23 @@
 Hackathon project, built by two collaborators who both use Claude Code on this repo at the same time. Staying in sync matters more than anything else.
 
 ## Project overview
-_Fill in as the project takes shape._
+GeekLoop: a web app for Free Geek Toronto. It has a Partner Portal (businesses donate laptop batches and get certificates and ESG impact), a Staff Console, a Volunteer Bench with a Skills Wallet, and a public Device Passport for each device.
+Sources of truth: `PRD.md` (what to build), `UI_UX_DESIGN.md` (look and motion; supersedes PRD §15), `KICKOFF_PROMPT.md` (stages). Never edit those three files.
 
-- **Stack:** TBD
-- **How to run:** TBD
-- **Key folders:** TBD
+- **Stack:** Next.js 16 (App Router, Turbopack, `proxy.ts` instead of middleware, cacheComponents OFF), TypeScript strict, Tailwind v4, shadcn primitives (radix) restyled to tokens, `motion`, Supabase (`@supabase/ssr`), Zod, React Hook Form, Recharts, qrcode, @react-pdf/renderer, Vitest, Playwright, pnpm.
+- **How to run:** `pnpm install` → copy `.env.example` to `.env.local` → `pnpm dev` → http://localhost:3000/demo
+- **Commands:** `pnpm typecheck` · `pnpm lint` · `pnpm test` (Vitest) · `pnpm test:e2e` (Playwright; starts `pnpm start`, so run `pnpm build` first) · `pnpm build` · `pnpm db:push` (needs `supabase login` + link) · `pnpm db:types` · `pnpm seed` (idempotent, uses the secret key from .env.local)
+- **Key folders:** `app/(public)` public site · `app/partner|staff|volunteer` role apps · `components/clay` + `components/liquid` + `components/illustrations` = design system (see `/styleguide`; reuse, no one-off styles) · `components/ui` restyled shadcn primitives · `lib/` pure tested business logic (batch-score, capacity, impact, status-machine, badges, passport-code, certificate-number) · `server/actions` server actions (Zod-validated) · `supabase/migrations` SQL · `supabase/seed.ts` · `tests/unit`, `tests/e2e`
+
+## Coding rules (from KICKOFF_PROMPT Part A)
+- TypeScript strict, no `any` without a justifying comment. Zod on every server action and route. Loading, empty and error states on every page. Accessible (labels, focus ring, keyboard). No console errors.
+- The secret key is used only in `supabase/seed.ts` and the payment webhook (`lib/supabase/admin.ts`). Permissions are enforced by RLS and in server actions. `device_events` is append-only.
+- Business formulas live once in `lib/` with unit tests. UI calls them and never re-implements them.
+- Reference PRD requirement IDs in commits and tests. Stage commits look like `stage-N: <name> (<IDs>)` and get tagged `stage-N`.
+- Clay goes only on things you can touch, liquid only means fill or flow, max 2 tints and 1 primary button per view (UI_UX_DESIGN §12/§14).
+
+## Current stage
+See `PROGRESS.md` for the stage log, deferred items and decisions. Resume from the next unfinished stage (`git tag` lists completed stages).
 
 ## Sync workflow (required for every task)
 1. **Before any edit:** run `git status`. If there are uncommitted local changes, commit or stash them first. Then run `git pull --rebase` to get the teammate's latest work.

@@ -10,6 +10,7 @@ venv/
 # Secrets
 .env
 .env.*
+.env*.local
 !.env.example
 *.pem
 *.key
@@ -39,3 +40,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+test-results/
+playwright-report/
+*.tsbuildinfo
+next-env.d.ts
+.next/
