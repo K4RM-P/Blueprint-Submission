@@ -17,6 +17,15 @@ _Fill in as the project takes shape._
 5. **Pull again, then push:** run `git pull --rebase` right before `git push`, since the teammate may have pushed while you were working. Then push.
 6. **Report:** tell the user briefly what changed, the commit message, and whether the push succeeded.
 
+## Cloud sessions
+Some tasks run as Claude Code cloud sessions (started with `claude --cloud` or from claude.ai/code) instead of on a laptop. A cloud session has the environment variable `CLAUDE_CODE_REMOTE=true`. In a cloud session, follow these rules instead of pushing straight to `main`:
+- **Work on the session's own branch.** Never push directly to `main`, because several cloud tasks may be running in parallel.
+- **Start from the latest `main`.** Before making changes, fetch and rebase onto `origin/main` so the work builds on the teammate's latest commits.
+- **Finish with a pull request.** Rebase onto `origin/main` again before pushing, then open a PR into `main` with a clear title and summary. One of us reviews and merges it.
+- **Secrets live in the cloud environment settings,** not in the repo.
+
+Local (laptop) sessions keep following the sync workflow above.
+
 ## Conflict and safety rules
 - Never use `git push --force`, `git reset --hard`, or anything else that could delete the teammate's work.
 - If a pull or rebase causes merge conflicts, try to resolve them in a way that keeps both sets of changes. If you aren't sure what the teammate intended, stop and show the user the conflict instead of guessing.
