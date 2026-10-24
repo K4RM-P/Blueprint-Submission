@@ -44,7 +44,12 @@ export async function getPublicImpact(db: DB) {
     recipient: r.recipient,
     count: Number(r.count),
   }));
+  const sum = (pred: (r: (typeof payload.rows)[number]) => boolean) => payload.rows.filter(pred).reduce((a, r) => a + Number(r.count), 0);
   return {
+    stages: {
+      verified: sum((r) => ["wipe_verified", "refurbishing", "ready", "listed", "sold"].includes(r.status)),
+      refurbished: sum((r) => r.refurbished),
+    },
     totals: computeImpact(rows, factors, settings.refurbMinutes),
     factors,
     activePartners: payload.active_partners ?? 0,

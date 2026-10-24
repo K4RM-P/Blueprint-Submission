@@ -48,3 +48,17 @@ Log of each build stage: what was done, what was deferred, and decisions made. N
 ## Stage 6: Certificates & Impact Engine
 **Done:** OPS-08 (issue only when every device is verified or recycled, with the sky stamp animation), CI-01 (formal flat PDF via @react-pdf: number, FGT address, partner, batch, dates, issuer, device table with serial/method/verification/outcome, process statement, QR to verify), CI-02 (`/verify/[number]`, no serials), CI-03 (`lib/impact.ts` is the only formula: partner dashboard, staff overview and public totals all call it), CI-04 (factors stored with source/URL/last-reviewed and editable in settings; shown on `/impact` in Stage 7), PP-08 (download through a 60-second signed URL from the private bucket), PP-09 (Impact/Champion: area chart over 6 months, reused vs recycled, CO₂e, volunteer hours; Community: summary plus upgrade card).
 **Decisions:** Seeded certificates have no stored PDF. The first download renders it from the chain of custody: staff store it, partners get it streamed. This is because @react-pdf can't load under `tsx` in the seed (ESM-only subpath export). **Test:** e2e F4 (issue, download PDF, public verify with no serials).
+
+## Stage 7: Device Passport & public site (IN PROGRESS, handed off to a cloud session)
+**Built (uncommitted until this WIP commit):** landing `/` (hero, scroll-pinned Loop, live impact bento, audience cards, passport lookup, partner wall preview, honest note), `/p/[code]` passport (cover, PIF note, stamp timeline, impact pebbles, money bar with Illustrative tag, why-not-free, network note, CTAs, friendly 404, OG image), `/partners`, `/impact` (+ methodology/factors), `/about`.
+**Known fixes still to do:**
+1. `components/public/the-loop.tsx`: the stations sit at absolute positions on an SVG loop and the left ones spill off-screen. Redesign as a horizontal liquid track (pathLength scroll-filled) over a 4-column station grid; reduce the pinned height from 320vh to about 220vh.
+2. Horizontal overflow on phones (`/p/[code]` scrollWidth 470 at 390px; `/` 384 at 360px), caused by the absolutely positioned LiquidBlobs. Add `overflow-x-clip` to the public layout wrapper.
+3. Remove the prefetch-404 allowance in `tests/e2e/helpers.ts` once every linked public route exists (`/donate` and `/pay-it-forward` are still missing; they come in Stages 8 and 9).
+4. Write e2e F5: the passport renders, opt-in rules are respected, and the serial and `wipe_report_ref` never appear in the HTML.
+
+## Remaining stages
+- **8 (P1):** PIF-01..06, PP-12. Add `lib/payments/{provider,mock,stripe}.ts`. Mock checkout uses an HMAC-signed token handled by `/api/payments/webhook`, which uses the service role (the only allowed place). Stripe test keys only; refuse non-`sk_test_`. Add `/pay-it-forward`, a mock store round-up page, `/staff/fund` ledger, and `/partner/membership` upgrade. The subsidy at sale already works (Stage 4).
+- **9 (P1):** HC-01..04 `/donate` checker (`lib/checker.ts` exists and is tested; log via `log_checker` RPC, rate-limited). PP-10 annual report PDF (`/partner/report`, @react-pdf, same style as the certificate). PP-11 LinkedIn card `/api/og/partner/[orgId]` with next/og 1200×627, plus share link and suggested post text.
+- **10:** hardening (axe check on key pages, toasts, double-submit), README.md for judges, DEMO_SCRIPT.md, final report.
+**Workflow note (user feedback):** move fast, keep tests lean (typecheck + lint + build per stage, e2e only for key flows), and spend effort on modern, clay + a bit of glass UI with no generic "AI slop" look.
