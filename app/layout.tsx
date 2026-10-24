@@ -27,7 +27,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-CA" className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}>
+    <html
+      lang="en-CA"
+      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
+      style={{ ["--banner-h" as string]: process.env.NEXT_PUBLIC_DEMO_MODE === "true" ? "32px" : "0px" }}
+    >
       <body className="flex min-h-full flex-col">
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-white">
           Skip to content

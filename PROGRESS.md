@@ -22,3 +22,11 @@ Log of each build stage: what was done, what was deferred, and decisions made. N
 - `public_impact_totals()` returns grouped raw rows. The impact formula lives only in `lib/impact.ts` (CI-03).
 - Email confirmation is turned off on this demo Supabase project (`supabase config push`) so partner self-signup works without an inbox. Re-enable it for production.
 **Known risk:** `value_score` is computed in the server action. A partner calling the REST API directly could store a fake score, which only affects queue ordering.
+
+## Stage 2: Auth, roles, shells, /demo
+**Done:** AUTH-01 (email/password sign-in and sign-up), AUTH-02 (roles), AUTH-03 (partner sign-up creates the org through a DB trigger), AUTH-04 (staff/volunteer accounts via invites, signed up at `/signup?invite=1`), AUTH-05 (`proxy.ts` role gate plus `requireRole` in layouts), AUTH-06 (`/demo` one-click sign-in and the banner on every page), AUTH-07 (P1: forgot/reset password via `/auth/callback`). Public shell (header, footer with the honest FGT note), app shells with a sliding clay nav pill and a mobile clay dock, loading/error/not-found states. Playwright: each demo role signs in, cross-role redirect, anonymous `next=` redirect, wrong-password message, sign-out.
+**Decisions:**
+- The demo password is shown only on `/demo` in demo mode, as the PRD specifies. Demo sign-in happens server-side with `DEMO_PASSWORD`, so it never reaches the browser bundle.
+- Public pages use `getClaims()` (cheap) for the header's "Dashboard" link, which points to `/dashboard` and redirects by role.
+- Demo cards: the whole card is the press target, not three primary buttons, to keep "one primary per view" (§12.10).
+- Until Stage 7 builds the remaining public routes, e2e ignores 404 link-prefetch console errors (`tests/e2e/helpers.ts`).

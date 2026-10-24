@@ -1,4 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
+import { config } from "dotenv";
+
+config({ path: ".env.local", quiet: true });
 
 const baseURL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
 

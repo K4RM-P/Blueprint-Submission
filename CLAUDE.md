@@ -19,7 +19,7 @@ Sources of truth: `PRD.md` (what to build), `UI_UX_DESIGN.md` (look and motion; 
 - Clay goes only on things you can touch, liquid only means fill or flow, max 2 tints and 1 primary button per view (UI_UX_DESIGN §12/§14).
 
 ## Current stage
-Stage 1 done (database live: migrations pushed, seeded). Supabase CLI is linked; `pnpm db:push`, `pnpm db:types` and `pnpm seed` all work.
+Stage 2 done (auth, shells, /demo). Database live: migrations pushed and seeded. Supabase CLI is linked; `pnpm db:push`, `pnpm db:types` and `pnpm seed` all work.
 See `PROGRESS.md` for the stage log, deferred items and decisions. Resume from the next unfinished stage (`git tag` lists completed stages).
 
 ## Sync workflow (required for every task)
