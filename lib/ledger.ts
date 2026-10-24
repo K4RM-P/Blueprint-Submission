@@ -40,3 +40,35 @@ export function formatCents(cents: number): string {
 
 /** Champion tier credits 10 sponsored laptops (PRD §6.1). Value per laptop is an [ASSUMPTION]. */
 export const CHAMPION_SPONSORED_LAPTOPS = 10;
+
+/** Value credited to the fund per sponsored laptop [ASSUMPTION — validate with FGT]. */
+export const SPONSORED_LAPTOP_CENTS = 7_500;
+
+/** Champion memberships credit this much to the fund in the partner's name (PRD §6.1). */
+export const CHAMPION_SPONSORSHIP_CENTS = CHAMPION_SPONSORED_LAPTOPS * SPONSORED_LAPTOP_CENTS;
+
+/** One-time contribution presets on /pay-it-forward (PIF-01). */
+export const CONTRIBUTION_PRESETS_CENTS = [500, 1_000, 2_500] as const;
+export const CONTRIBUTION_MIN_CENTS = 100;
+export const CONTRIBUTION_MAX_CENTS = 100_000;
+
+export function validateContribution(cents: number): string | null {
+  if (!Number.isInteger(cents)) return "Enter a whole number of cents.";
+  if (cents < CONTRIBUTION_MIN_CENTS) return `The smallest contribution is ${formatCents(CONTRIBUTION_MIN_CENTS)}.`;
+  if (cents > CONTRIBUTION_MAX_CENTS) return `For gifts over ${formatCents(CONTRIBUTION_MAX_CENTS)}, please contact Free Geek Toronto directly.`;
+  return null;
+}
+
+/** Round-ups go to the next multiple of this (PIF-02). */
+export const ROUND_UP_STEP_CENTS = 500;
+
+/**
+ * Round-up amount for a store order (PIF-02): what it takes to reach the next $5,
+ * skipping to the following $5 when that would add less than the $1 minimum.
+ */
+export function roundUpCents(orderTotalCents: number): number {
+  if (!Number.isInteger(orderTotalCents) || orderTotalCents < 0) throw new Error("Order total must be a non-negative whole number of cents.");
+  let extra = ROUND_UP_STEP_CENTS - (orderTotalCents % ROUND_UP_STEP_CENTS);
+  if (extra < CONTRIBUTION_MIN_CENTS) extra += ROUND_UP_STEP_CENTS;
+  return extra;
+}

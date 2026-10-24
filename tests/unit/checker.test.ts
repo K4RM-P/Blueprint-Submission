@@ -16,3 +16,21 @@ describe("household checker (HC-02, HC-03)", () => {
   it("treats unknown age as acceptable", () => expect(evaluateDonation({ ...base, ageYears: null }, R).outcome).toBe("accepted"));
   it("rejects categories with no rule", () => expect(evaluateDonation(base, []).outcome).toBe("not_accepted"));
 });
+
+describe("guessCategory (HC-01 typed model)", () => {
+  it("recognizes common models", async () => {
+    const { guessCategory } = await import("@/lib/checker");
+    expect(guessCategory("Dell Latitude 5420")).toBe("laptop");
+    expect(guessCategory("MacBook Air 2019")).toBe("laptop");
+    expect(guessCategory("iPad 6th gen")).toBe("tablet");
+    expect(guessCategory("HP OptiPlex tower")).toBe("desktop");
+    expect(guessCategory("Samsung 24 inch monitor")).toBe("monitor");
+    expect(guessCategory("old CRT TV")).toBe("other");
+    expect(guessCategory("wireless mouse")).toBe("accessory");
+  });
+  it("returns null when it can't tell", async () => {
+    const { guessCategory } = await import("@/lib/checker");
+    expect(guessCategory("x")).toBeNull();
+    expect(guessCategory("Zorblax 3000")).toBeNull();
+  });
+});

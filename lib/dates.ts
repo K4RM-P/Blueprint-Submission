@@ -37,8 +37,10 @@ export function shortDate(iso: string): string {
 
 export function longDate(value: string | Date | null | undefined): string {
   if (!value) return "—";
+  // Date-only values (YYYY-MM-DD) are calendar days, not instants: don't shift them by time zone.
+  const dateOnly = typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
   const d = typeof value === "string" ? new Date(value) : value;
-  return d.toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric", timeZone: "America/Toronto" });
+  return d.toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric", timeZone: dateOnly ? "UTC" : "America/Toronto" });
 }
 
 /** A Date `days` before now (negative = future). */

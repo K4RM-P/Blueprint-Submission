@@ -28,6 +28,9 @@ export function Segmented<T extends string>({ options, value, onChange, label, c
   const { reduced, t } = useMotionPrefs();
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
 
+  // With nothing selected yet, the first enabled option takes keyboard focus.
+  const tabbable = options.some((o) => o.value === value) ? value : options.find((o) => !o.disabled)?.value;
+
   const onKey = (e: KeyboardEvent, index: number) => {
     const dir = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
     if (!dir) return;
@@ -69,7 +72,7 @@ export function Segmented<T extends string>({ options, value, onChange, label, c
           type="button"
           role="radio"
           aria-checked={o.value === value}
-          tabIndex={o.value === value ? 0 : -1}
+          tabIndex={o.value === tabbable ? 0 : -1}
           disabled={o.disabled}
           onKeyDown={(e) => onKey(e, i)}
           onClick={() => onChange(o.value)}

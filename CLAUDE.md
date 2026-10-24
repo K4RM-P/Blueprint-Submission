@@ -19,8 +19,10 @@ Sources of truth: `PRD.md` (what to build), `UI_UX_DESIGN.md` (look and motion; 
 - Clay goes only on things you can touch, liquid only means fill or flow, max 2 tints and 1 primary button per view (UI_UX_DESIGN §12/§14).
 
 ## Current stage
-Stage 2 done (auth, shells, /demo). Database live: migrations pushed and seeded. Supabase CLI is linked; `pnpm db:push`, `pnpm db:types` and `pnpm seed` all work.
-See `PROGRESS.md` for the stage log, deferred items and decisions. Resume from the next unfinished stage (`git tag` lists completed stages).
+All build stages (0–10) are done. What's left is deployment (Vercel), replacing the TO VERIFY / [ASSUMPTION] values, and the video. The database is live: migrations pushed and seeded, and the Supabase CLI is linked; `pnpm db:push`, `pnpm db:types` and `pnpm seed` all work.
+See `PROGRESS.md` for the stage log, deferred items, decisions and the security review. `README.md` is judge-facing; `DEMO_SCRIPT.md` is the video click path.
+- Payments: `lib/payments/` (mock by default, Stripe test mode only). The webhook is the only service-role path besides the seed.
+- Colour tokens: `--ink-3` is `#5A635E` and the ember button surface is `#C24A16`. Both were darkened from the UI spec values to pass axe/WCAG AA; don't revert them.
 
 ## Sync workflow (required for every task)
 1. **Before any edit:** run `git status`. If there are uncommitted local changes, commit or stash them first. Then run `git pull --rebase` to get the teammate's latest work.

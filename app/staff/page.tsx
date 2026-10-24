@@ -58,8 +58,14 @@ export default async function StaffOverview() {
   const activeVolunteers = new Set((activeVolRes.data ?? []).map((e) => e.actor_id)).size;
   const pipeline = DEVICE_STATUSES.map((s) => ({ label: PIPELINE_SHORT[s], value: devices.filter((d) => d.status === s).length, highlight: s !== "recycled" }));
   const checker = checkerRes.data ?? [];
-  const accepted = checker.filter((c) => c.outcome === "accepted").length;
-  const redirected = checker.length - accepted;
+  const checkerOutcomes = (
+    [
+      ["accepted", "Accepted"],
+      ["recycling_only", "Recycling only"],
+      ["not_accepted", "Not accepted"],
+      ["partner_redirect", "To partner program"],
+    ] as const
+  ).map(([k, label]) => ({ label, value: checker.filter((c) => c.outcome === k).length, highlight: k === "accepted" || k === "partner_redirect" }));
 
   return (
     <>
@@ -149,10 +155,12 @@ export default async function StaffOverview() {
             ))}
           </dl>
           {checker.length > 0 ? (
-            <p className="border-t border-line pt-4 text-small text-ink-2">
-              “Can I donate this?” checker: <span className="font-semibold text-ink">{accepted}</span> accepted, <span className="font-semibold text-ink">{redirected}</span> redirected to
-              recycling or the partner program.
-            </p>
+            <div className="border-t border-line pt-4">
+              <p className="text-small text-ink-2">
+                “Can I donate this?” checker · <span className="font-semibold text-ink">{checker.length}</span> answers
+              </p>
+              <BarsChart label="Checker outcomes" unit="answers" height={200} data={checkerOutcomes} />
+            </div>
           ) : null}
           <p className="text-[0.8125rem] text-ink-3">{labels.deviceStatus.sold} = reused. Factors are placeholders marked TO VERIFY.</p>
         </FlatCard>

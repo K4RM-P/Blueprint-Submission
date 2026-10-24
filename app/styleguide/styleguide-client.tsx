@@ -33,7 +33,7 @@ const colors = [
   ["--surface-flat", "#FFFFFF"],
   ["--ink", "#17201C"],
   ["--ink-2", "#4A544F"],
-  ["--ink-3", "#6F7873"],
+  ["--ink-3", "#5A635E"],
   ["--line", "#E4DED4"],
   ["--loop", "#138A61"],
   ["--loop-deep", "#0B5E42"],

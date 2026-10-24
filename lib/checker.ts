@@ -64,3 +64,29 @@ export const DEFAULT_ACCEPTED_ITEMS: AcceptedItem[] = [
   { category: "accessory", label: "Keyboards, mice and cables", decision: "accepted", maxAgeYears: null, requiresWorking: false, note: "Clean keyboards, mice, cables and chargers are welcome." },
   { category: "other", label: "Other electronics (TVs, printers, CRTs, appliances)", decision: "not_accepted", maxAgeYears: null, requiresWorking: false, note: "We can't take TVs, printers, CRT monitors or appliances. Ontario's approved e-waste depots can recycle them safely." },
 ];
+
+/** Age choices on /donate (HC-01), mapped to a representative age for the rules. */
+export const AGE_BUCKETS = [
+  { value: "0-3", label: "Under 3 years", years: 2 },
+  { value: "3-6", label: "3–6 years", years: 5 },
+  { value: "7-10", label: "7–10 years", years: 9 },
+  { value: "10+", label: "Over 10 years", years: 12 },
+  { value: "unsure", label: "Not sure", years: null },
+] as const satisfies readonly { value: string; label: string; years: number | null }[];
+export type AgeBucket = (typeof AGE_BUCKETS)[number]["value"];
+
+const KEYWORDS: [DeviceCategory, RegExp][] = [
+  ["other", /\b(tv|television|printer|scanner|fax|crt|microwave|fridge|appliance|stereo|vcr|dvd player|game console|xbox|playstation|nintendo)\b/i],
+  ["tablet", /\b(ipad|tablet|galaxy tab|surface go|kindle|fire hd)\b/i],
+  ["monitor", /\b(monitor|display|screen|lcd|led panel)\b/i],
+  ["accessory", /\b(keyboard|mouse|mice|cable|charger|adapter|dock|webcam|headset|speakers?)\b/i],
+  ["laptop", /\b(laptop|notebook|macbook|thinkpad|latitude|elitebook|probook|chromebook|xps|inspiron|pavilion|ideapad|zenbook|vivobook|surface (laptop|pro)|aspire|spectre)\b/i],
+  ["desktop", /\b(desktop|tower|imac|mac mini|optiplex|thinkcentre|prodesk|elitedesk|all-in-one|workstation|pc)\b/i],
+];
+
+/** Best-effort category from a typed model name ("Dell Latitude 5420" → laptop). Null if unsure. */
+export function guessCategory(text: string): DeviceCategory | null {
+  const t = text.trim();
+  if (t.length < 2) return null;
+  return KEYWORDS.find(([, re]) => re.test(t))?.[0] ?? null;
+}
