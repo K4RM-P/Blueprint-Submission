@@ -8,11 +8,11 @@ import { useMotionPrefs } from "@/lib/motion";
 import { GooFilter } from "./goo-filter";
 
 /** Stepper dots; a liquid indicator merges gooey-style into each step as you advance (§7.3). */
-export function Stepper({ steps, current, onStep, maxReached }: { steps: string[]; current: number; onStep?: (i: number) => void; maxReached: number }) {
+export function Stepper({ steps, current, onStep, maxReached, label = "Batch steps" }: { steps: string[]; current: number; onStep?: (i: number) => void; maxReached: number; label?: string }) {
   const id = useId().replace(/:/g, "");
   const { reduced, t } = useMotionPrefs();
   return (
-    <nav aria-label="Batch steps">
+    <nav aria-label={label}>
       <GooFilter id={`goo-step-${id}`} />
       <ol className="relative flex items-center gap-2">
         <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center gap-2" style={reduced ? undefined : { filter: `url(#goo-step-${id})` }}>
