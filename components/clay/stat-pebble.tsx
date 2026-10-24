@@ -53,7 +53,8 @@ export function StatPebble({ label, value, decimals = 0, suffix, prefix, delta, 
     <div ref={ref} data-tint={tint} className={cn("clay-glass hairline-top flex flex-col justify-between gap-3", size === "sm" ? "rounded-[22px] p-5" : "p-6", className)}>
       <p className="eyebrow !text-ink-2">{label}</p>
       <div>
-        <p className={cn("font-display tnum leading-none text-ink", numberSize)} aria-label={`${prefix ?? ""}${fmt(value, decimals)}${suffix ? ` ${suffix}` : ""}`}>
+        <p className={cn("font-display tnum leading-none text-ink", numberSize)}>
+          <span className="sr-only">{`${prefix ?? ""}${fmt(value, decimals)}${suffix ? ` ${suffix}` : ""}`}</span>
           <span aria-hidden>
             {prefix}
             <motion.span>{display}</motion.span>

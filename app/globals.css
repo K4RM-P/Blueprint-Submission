@@ -14,7 +14,8 @@
   --surface-flat: #ffffff;
   --ink: #17201c;
   --ink-2: #4a544f;
-  --ink-3: #6f7873;
+  /* Darkened from #6F7873 (3.6–4:1 on canvas and tints, failed axe) to pass 4.5:1 on every tint. */
+  --ink-3: #5a635e;
   --line: #e4ded4;
   --loop: #138a61;
   --loop-deep: #0b5e42;
@@ -92,7 +93,8 @@
   --clay-drop: rgba(176, 128, 0, 0.22);
 }
 [data-tint="ember"] {
-  --clay-surface: #f26a2e;
+  /* Button surface: a deeper ember so white text passes 4.5:1 (#F26A2E is only 3.05:1). */
+  --clay-surface: #c24a16;
   --clay-shade: rgba(120, 40, 5, 0.32);
   --clay-drop: rgba(201, 80, 28, 0.38);
 }

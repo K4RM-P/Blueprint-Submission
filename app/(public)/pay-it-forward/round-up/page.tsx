@@ -70,7 +70,7 @@ export default async function RoundUpDemo({ searchParams }: { searchParams: Prom
         <aside className="min-w-0 md:col-span-5 md:pt-24">
           <h2 className="text-title font-semibold">For Free Geek Toronto&apos;s store</h2>
           <p className="mt-2 text-ink-2">No plugin needed. Any store platform can show a link on its confirmation page, with the round-up amount filled in:</p>
-          <pre className="mt-4 overflow-x-auto rounded-[var(--r-sm)] bg-ink p-4 font-mono text-[0.8125rem] leading-relaxed text-white">
+          <pre tabIndex={0} aria-label="Round-up link snippet" className="mt-4 overflow-x-auto rounded-[var(--r-sm)] bg-ink p-4 font-mono text-[0.8125rem] leading-relaxed text-white">
             <code>{snippet}</code>
           </pre>
           <p className="mt-4 text-small text-ink-3">Round-ups land in the same ledger as every other contribution and show up on the staff fund page.</p>

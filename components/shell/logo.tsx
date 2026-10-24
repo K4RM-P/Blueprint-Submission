@@ -14,7 +14,7 @@ export function LoopMark({ className }: { className?: string }) {
 
 export function Logo({ href = "/", sub, className }: { href?: string; sub?: string; className?: string }) {
   return (
-    <Link href={href} className={cn("inline-flex items-center gap-2.5 rounded-full", className)} aria-label="GeekLoop home">
+    <Link href={href} className={cn("inline-flex items-center gap-2.5 rounded-full", className)}>
       <LoopMark />
       <span className="flex flex-col leading-none">
         <span className="font-display text-[1.25rem] tracking-[-0.03em] text-ink">GeekLoop</span>
