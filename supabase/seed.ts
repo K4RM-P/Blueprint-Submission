@@ -559,13 +559,20 @@ async function main() {
   }
 
   // Aisha's next device on the bench for flow F3 is claimed live from the queue.
-  await chunked("devices", "devices", devices);
+  // PostgREST bulk inserts need identical keys on every row.
+  const deviceDefaults = {
+    assigned_volunteer_id: null, wipe_method: null, wipe_report_ref: null, wipe_performed_by: null, wipe_performed_at: null,
+    wipe_verified_by: null, wipe_verified_at: null, os_installed: null, is_open_source_os: null, refurbished_by: null,
+    refurbished_at: null, price_cents: null, sold_at: null, sale_channel: null, recipient_category: null,
+    pif_subsidy_cents: 0, recycled_reason: null, weight_kg: null, passport_views: 0,
+  };
+  await chunked("devices", "devices", devices.map((d) => ({ ...deviceDefaults, ...d })));
   await chunked(
     "events",
     "device_events",
     events.map(({ batch: _b, ...e }) => {
       void _b;
-      return e;
+      return { from_status: null, to_status: null, step: null, note: null, ...e };
     }),
     500,
   );
@@ -587,8 +594,8 @@ async function main() {
   }));
   const sponsorship = { type: "sponsorship", amount_cents: 75000, organization_id: orgId.get("brightpath-logistics"), provider: "mock", provider_ref: "seed_champion_brightpath", note: "Champion Partner: 10 sponsored laptops", created_at: daysAgo(165).toISOString() };
   // Insert money in first, subsidies after, so the balance never dips below zero.
-  await chunked("fund in", "fund_transactions", [sponsorship, ...contributions]);
-  await chunked("fund out", "fund_transactions", fund);
+  await chunked("fund in", "fund_transactions", [sponsorship, ...contributions.map((c) => ({ organization_id: null, ...c }))]);
+  await chunked("fund out", "fund_transactions", fund.map((f) => ({ organization_id: null, provider_ref: null, ...f })));
   const memberships = ORGS.filter((o) => o.tier !== "community").map((o) => ({
     organization_id: orgId.get(o.slug),
     tier: o.tier,
@@ -612,7 +619,7 @@ async function main() {
       verifiedWipes: devices.filter((d) => d.wipe_performed_by === id && d.wipe_verified_at).length,
       openSourceInstalls: mine.filter((e) => e.step === "os_installed" && (e.metadata as { is_open_source?: boolean }).is_open_source).length,
     };
-    for (const slug of evaluateBadges(stats)) vb.push({ volunteer_id: id, badge_id: badgeId.get(slug), awarded_at: daysAgo(between(3, 80)).toISOString() });
+    for (const slug of evaluateBadges(stats)) vb.push({ volunteer_id: id, badge_id: badgeId.get(slug), awarded_by: null, awarded_at: daysAgo(between(3, 80)).toISOString() });
     console.log(`  ${u.full_name}: ${JSON.stringify(stats)}`);
   }
   vb.push({ volunteer_id: userId.get(`volunteer-jordan${DOMAIN}`), badge_id: badgeId.get("mentor"), awarded_by: staffId, awarded_at: daysAgo(20).toISOString() });
