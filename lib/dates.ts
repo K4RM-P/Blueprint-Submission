@@ -40,3 +40,8 @@ export function longDate(value: string | Date | null | undefined): string {
   const d = typeof value === "string" ? new Date(value) : value;
   return d.toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric", timeZone: "America/Toronto" });
 }
+
+/** A Date `days` before now (negative = future). */
+export function daysAgo(days: number): Date {
+  return new Date(Date.now() - days * 86_400_000);
+}

@@ -612,3 +612,77 @@ html[data-reduced-motion="true"] .skeleton-clay::after {
 .shake {
   animation: shake 380ms var(--ease-soft);
 }
+
+/* ---------- OPS-09 label sheet: Avery 5160 (US Letter, 3 × 10, 2.625in × 1in) ---------- */
+.label-sheet {
+  width: 8.5in;
+  min-height: 11in;
+  padding: 0.5in 0.1875in;
+  display: grid;
+  grid-template-columns: repeat(3, 2.625in);
+  grid-auto-rows: 1in;
+  column-gap: 0.125in;
+  background: #fff;
+  border: 1px solid var(--line);
+  margin: 0 auto;
+}
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.08in;
+  padding: 0.06in 0.1in;
+  overflow: hidden;
+  color: #000;
+  break-inside: avoid;
+}
+.label-qr {
+  width: 0.82in;
+  height: 0.82in;
+  flex-shrink: 0;
+}
+.label-qr svg {
+  width: 100%;
+  height: 100%;
+}
+.label-text {
+  min-width: 0;
+  line-height: 1.15;
+}
+.label-code {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10.5pt;
+  font-weight: 600;
+}
+.label-model {
+  font-size: 8pt;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.label-org {
+  font-size: 6.5pt;
+  color: #333;
+}
+@media print {
+  @page {
+    size: letter;
+    margin: 0;
+  }
+  aside,
+  nav,
+  header,
+  [role="note"] {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  .label-sheet {
+    border: 0;
+    margin: 0;
+  }
+  .label-sheet-wrap {
+    overflow: visible !important;
+  }
+}
