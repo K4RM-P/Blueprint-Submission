@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PassportQrCard } from "@/components/journey/passport-qr";
 import { DeviceStatusChip } from "@/components/journey/status";
 import { PageHeader } from "@/components/shell/page-header";
 import { Checklist } from "@/components/volunteer/checklist";
@@ -26,6 +27,7 @@ export default async function VolunteerDevicePage({ params }: { params: Promise<
       </p>
       <PageHeader eyebrow={d.passport_code} title={`${d.make} ${d.model}`} description={specs || "Specs are added at intake."} actions={<DeviceStatusChip status={d.status} />} />
       <Checklist deviceId={d.id} initialDone={[...(done.get(d.id) ?? [])]} status={d.status} />
+      <PassportQrCard code={d.passport_code} title="This laptop's passport" className="mt-6" />
     </div>
   );
 }

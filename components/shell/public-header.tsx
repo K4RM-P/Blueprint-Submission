@@ -38,14 +38,14 @@ export function PublicHeader({ dashboardHref }: { dashboardHref: string | null }
         </nav>
         <div className="flex items-center gap-2">
           <Link href={dashboardHref ?? "/login"} className="clay-sm clay-press hidden h-11 items-center rounded-full px-5 text-[0.9375rem] font-semibold text-ink sm:inline-flex" data-tint="porcelain">
-            {dashboardHref ? "Dashboard" : "Sign in"}
+            {dashboardHref ? "Dashboard" : "Sign in / Join"}
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger className="clay-sm grid size-11 place-items-center rounded-full lg:hidden" data-tint="porcelain" aria-label="Open menu">
               <Menu className="size-5" strokeWidth={1.75} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-60">
-              {[...LINKS, { href: dashboardHref ?? "/login", label: dashboardHref ? "Dashboard" : "Sign in" }].map((l) => (
+              {[...LINKS, { href: dashboardHref ?? "/login", label: dashboardHref ? "Dashboard" : "Sign in / Join" }].map((l) => (
                 <DropdownMenuItem key={l.href} asChild className="text-base">
                   <Link href={l.href}>{l.label}</Link>
                 </DropdownMenuItem>

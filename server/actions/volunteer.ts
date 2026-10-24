@@ -119,7 +119,7 @@ export async function inviteVolunteer(input: unknown): Promise<ActionResult<{ li
     const { error } = await s.supabase.from("account_invites").insert({ email, full_name: fullName, role, created_by: s.user.id });
     if (error) return fail(/duplicate/i.test(error.message) ? "That email already has an invite." : "We couldn't create the invite.");
     revalidatePath("/staff/volunteers");
-    return ok({ link: `/signup?invite=1&email=${encodeURIComponent(email)}` }, `Invite created for ${fullName}.`);
+    return ok({ link: `/login?mode=signup&invite=1&email=${encodeURIComponent(email)}` }, `Invite created for ${fullName}.`);
   });
 }
 

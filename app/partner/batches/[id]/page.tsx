@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ClayCard, EmptyState, FlatCard } from "@/components/clay";
 import { PageHeader } from "@/components/shell/page-header";
+import { PassportQrImage } from "@/components/journey/passport-qr";
 import { JourneyTimeline } from "@/components/journey/journey-timeline";
 import { BatchStatusChip, DeviceStatusChip } from "@/components/journey/status";
 import { BatchActions } from "@/components/partner/batch-actions";
@@ -72,7 +73,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
             <h2 id="journeys" className="text-title font-semibold">
               Device journeys
             </h2>
-            <p className="mt-1 text-small text-ink-2">Each device gets a passport. Once sold, you&apos;ll see who it helps — never personal details.</p>
+            <p className="mt-1 text-small text-ink-2">Each device gets a passport with its own QR code. Scan one to see that laptop&apos;s story — once sold, you&apos;ll see who it helps, never personal details.</p>
             <div className="flat mt-4 overflow-x-auto !p-0">
               {devices.length === 0 ? (
                 <div className="px-6">
@@ -85,6 +86,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
                   <caption className="sr-only">Devices in this batch</caption>
                   <thead>
                     <tr>
+                      <th scope="col">QR</th>
                       <th scope="col">Passport</th>
                       <th scope="col">Device</th>
                       <th scope="col">Serial</th>
@@ -95,6 +97,11 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
                   <tbody>
                     {devices.map((d) => (
                       <tr key={d.id}>
+                        <td>
+                          <Link href={`/p/${d.passport_code}`} aria-label={`Open passport ${d.passport_code}`} className="block w-fit">
+                            <PassportQrImage code={d.passport_code} size={64} className="border border-line !p-1.5" />
+                          </Link>
+                        </td>
                         <td>
                           <Link href={`/p/${d.passport_code}`} className="font-mono text-[0.875rem] text-loop-deep underline-offset-4 hover:underline">
                             {d.passport_code}

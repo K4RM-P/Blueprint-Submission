@@ -172,13 +172,13 @@ export async function uploadLogo(formData: FormData): Promise<ActionResult<{ pat
   });
 }
 
-/** PP-13: invite a colleague into the organization (they sign up at /signup?invite=1). */
+/** PP-13: invite a colleague into the organization (they sign up at /login?mode=signup&invite=1). */
 export async function inviteColleague(input: unknown): Promise<ActionResult<{ link: string }>> {
   return runAction(colleagueSchema, input, async ({ fullName, email }) => {
     const s = await partnerOrg();
     const { error } = await s.supabase.from("account_invites").insert({ email, full_name: fullName, role: "partner", organization_id: s.org.id, created_by: s.user.id });
     if (error) return fail(/duplicate/i.test(error.message) ? "That email already has an invite." : "We couldn't create the invite.");
     revalidatePath("/partner/settings");
-    return ok({ link: `/signup?invite=1&email=${encodeURIComponent(email)}` }, `Invite created for ${fullName}.`);
+    return ok({ link: `/login?mode=signup&invite=1&email=${encodeURIComponent(email)}` }, `Invite created for ${fullName}.`);
   });
 }

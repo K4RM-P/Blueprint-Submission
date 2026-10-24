@@ -40,7 +40,7 @@ export default async function Landing() {
             We turn your business&apos;s retired laptops into affordable computers for Toronto students, newcomers and families — and show you every step.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <ClayButton href="/become-a-partner" variant="primary" size="lg">
+            <ClayButton href="/login?mode=signup" variant="primary" size="lg">
               Become a Reuse Partner
             </ClayButton>
             <ClayButton href="#scan" variant="secondary" size="lg">

@@ -25,9 +25,9 @@ export function PublicFooter() {
         </nav>
         <nav aria-label="Take part" className="flex flex-col gap-2 text-small">
           <p className="eyebrow mb-1">Take part</p>
-          <Link className="text-ink-2 hover:text-ink" href="/become-a-partner">Become a Reuse Partner</Link>
+          <Link className="text-ink-2 hover:text-ink" href="/login?mode=signup">Become a Reuse Partner</Link>
           <Link className="text-ink-2 hover:text-ink" href="/donate">Can I donate this?</Link>
-          <Link className="text-ink-2 hover:text-ink" href="/login">Sign in</Link>
+          <Link className="text-ink-2 hover:text-ink" href="/login">Sign in or join</Link>
           {process.env.NEXT_PUBLIC_DEMO_MODE === "true" ? (
             <Link className="text-ink-2 hover:text-ink" href="/demo">Demo accounts</Link>
           ) : null}

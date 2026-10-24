@@ -28,7 +28,7 @@ export default function BecomeAPartnerPage() {
             and families here in the city.
           </p>
           <div className="mt-9 flex flex-wrap gap-4">
-            <ClayButton href="/signup" variant="primary" size="lg">
+            <ClayButton href="/login?mode=signup" variant="primary" size="lg">
               Become a Reuse Partner
             </ClayButton>
             <ClayButton href="/partners" variant="secondary" size="lg">

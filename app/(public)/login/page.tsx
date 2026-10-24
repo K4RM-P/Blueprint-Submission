@@ -1,28 +1,48 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 import { AuthLayout } from "@/components/auth/auth-layout";
-import { SignInForm } from "@/components/auth/sign-in-form";
+import { AuthPanel } from "@/components/auth/auth-panel";
+import { IconTile } from "@/components/clay";
 import { env } from "@/lib/env";
 
-export const metadata: Metadata = { title: "Sign in" };
+export const metadata: Metadata = { title: "Sign in or join" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; check?: string }> }) {
-  const { next, check } = await searchParams;
+/** The single sign-in / sign-up page. `/signup` redirects here with `mode=signup`. */
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; check?: string; mode?: string; invite?: string; email?: string }> }) {
+  const { next, check, mode, invite, email } = await searchParams;
+  const invited = invite === "1";
   return (
     <AuthLayout
-      eyebrow="Sign in"
-      title="Welcome back to the loop."
-      lead={<p>Partners see their batches and impact. Staff run intake. Volunteers pick up where they left off at the bench.</p>}
-      aside={
-        env.demoMode ? (
-          <p className="text-ink-2">
-            Judging or just curious?{" "}
-            <Link href="/demo" className="font-semibold text-loop-deep underline underline-offset-4">
-              Explore with a demo account
-            </Link>
-            .
+      eyebrow={invited ? "You're invited" : "Sign in or join"}
+      title={invited ? "Join the GeekLoop team." : "Step into the loop."}
+      lead={
+        invited ? (
+          <p>Someone at Free Geek Toronto or your organization invited you. Sign up with the email they used.</p>
+        ) : (
+          <p>
+            Partners see their batches and impact. Staff run intake. Volunteers pick up where they left off at the bench. New businesses join free as Community Partners — your first batch is free.
           </p>
-        ) : null
+        )
+      }
+      aside={
+        <div className="flex flex-col gap-5">
+          <div className="flex items-start gap-4">
+            <IconTile tint="sky">
+              <ShieldCheck />
+            </IconTile>
+            <p className="max-w-sm text-small text-ink-2">Leave the drives in. Free Geek Toronto wipes every drive and you get a numbered certificate listing each device.</p>
+          </div>
+          {env.demoMode ? (
+            <p className="text-small text-ink-2">
+              Want the full tour?{" "}
+              <Link href="/demo" className="font-semibold text-loop-deep underline underline-offset-4">
+                See all demo roles
+              </Link>
+              .
+            </p>
+          ) : null}
+        </div>
       }
     >
       {check === "email" ? (
@@ -30,13 +50,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           Check your inbox to confirm your email, then sign in.
         </p>
       ) : null}
-      <SignInForm next={next} />
-      <p className="mt-6 text-small text-ink-2">
-        New business partner?{" "}
-        <Link href="/signup" className="font-semibold text-loop-deep underline underline-offset-4">
-          Create an account
-        </Link>
-      </p>
+      <AuthPanel mode={mode === "signup" ? "signup" : "signin"} next={next} invited={invited} email={email} demo={env.demoMode} />
     </AuthLayout>
   );
 }

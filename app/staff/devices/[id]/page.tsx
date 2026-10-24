@@ -6,6 +6,7 @@ import { ClayCard, FlatCard } from "@/components/clay";
 import { DeviceStatusChip } from "@/components/journey/status";
 import { PageHeader } from "@/components/shell/page-header";
 import { DeviceOps } from "@/components/staff/device-ops";
+import { PassportQrCard } from "@/components/journey/passport-qr";
 import { requireRole } from "@/lib/auth";
 import { listVolunteers, money } from "@/lib/queries/staff";
 import { labels } from "@/lib/domain";
@@ -75,6 +76,7 @@ export default async function StaffDevicePage({ params }: { params: Promise<{ id
           </>
         }
       />
+      <PassportQrCard code={d.passport_code} deviceId={d.id} className="mb-6" />
       <ClayCard material="glass" className="mb-6">
         <DeviceOps
           id={d.id}

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ClayCard, FlatCard, StatPebble } from "@/components/clay";
+import { Printer, QrCode } from "lucide-react";
+import { ClayButton, ClayCard, FlatCard, StatPebble } from "@/components/clay";
+import { PassportQrImage } from "@/components/journey/passport-qr";
 import { CapacityGlasses } from "@/components/liquid";
 import { BarsChart } from "@/components/charts/bars";
 import { PageHeader } from "@/components/shell/page-header";
@@ -32,7 +34,7 @@ export default async function StaffOverview() {
   const since = monthStart();
   const sixtyDays = daysAgo(60).toISOString();
   const settings = await getSettings(supabase);
-  const [calendar, factors, devicesRes, pendingRes, membershipsRes, fundRes, orgsRes, activeVolRes, checkerRes] = await Promise.all([
+  const [calendar, factors, devicesRes, pendingRes, membershipsRes, fundRes, orgsRes, activeVolRes, checkerRes, latestRes] = await Promise.all([
     getCalendar(supabase, settings.weeklyCapacity, 4),
     getFactors(supabase),
     supabase.from("devices").select("status, category, weight_kg, recipient_category, refurbished_at, sold_at, price_cents, batch_line_items(quantity)"),
@@ -42,7 +44,9 @@ export default async function StaffOverview() {
     supabase.from("organizations").select("id, donation_batches(status)"),
     supabase.from("device_events").select("actor_id, profiles!inner(role)").gte("created_at", sixtyDays).eq("profiles.role", "volunteer"),
     supabase.from("checker_logs").select("outcome"),
+    supabase.from("devices").select("id, passport_code, make, model, status").order("created_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
+  const latest = latestRes.data;
   const devices = devicesRes.data ?? [];
   const pending = pendingRes.data ?? [];
   const impact = computeImpact(
@@ -77,6 +81,40 @@ export default async function StaffOverview() {
         <StatPebble label="Revenue this month" value={Math.round((salesCents + membershipCents + pifCents) / 100)} prefix="$" caption={`Sales ${money(salesCents)} · memberships ${money(membershipCents)} · PIF ${money(pifCents)}`} />
         <StatPebble label="Active partners" value={activePartners} caption={`${activeVolunteers} volunteers active in the last 60 days`} />
       </div>
+
+      <section aria-labelledby="passport-qr" className="flat mt-6 grid gap-6 p-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
+        {latest ? <PassportQrImage code={latest.passport_code} size={152} className="border border-line" /> : null}
+        <div className="flex min-w-0 flex-col gap-3">
+          <p className="eyebrow inline-flex items-center gap-1.5">
+            <QrCode className="size-4" aria-hidden /> Device Passports
+          </p>
+          <h2 id="passport-qr" className="font-display text-[1.75rem] leading-tight">
+            Every laptop gets a QR code that tells its story.
+          </h2>
+          <p className="text-ink-2">
+            Stick a label on each device at intake. Anyone who scans it sees where it came from, who refurbished it and who it helps now.
+            {latest ? (
+              <>
+                {" "}
+                Latest: <span className="font-mono text-ink">{latest.passport_code}</span> · {latest.make} {latest.model}.
+              </>
+            ) : null}
+          </p>
+          <div className="flex flex-wrap gap-2.5">
+            <ClayButton href="/staff/labels" variant="primary" size="sm" icon={<Printer />}>
+              Create QR labels
+            </ClayButton>
+            {latest ? (
+              <ClayButton href={`/p/${latest.passport_code}`} size="sm">
+                See a scanned passport
+              </ClayButton>
+            ) : null}
+            <ClayButton href="/staff/devices" variant="ghost" size="sm">
+              Pick devices to label
+            </ClayButton>
+          </div>
+        </div>
+      </section>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <FlatCard>
