@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useFieldArray, useForm, useWatch, type FieldPath } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +10,8 @@ import { ArrowLeft, ArrowRight, HardDrive, Plus, ShieldCheck, Trash2, Truck } fr
 import { toast } from "sonner";
 import { Checkbox, ClayButton, ClayCard, Field, IconTile, Input, Segmented, Select, Textarea } from "@/components/clay";
 import { CapacityGlasses, LiquidFill, LiquidMeter, Stepper } from "@/components/liquid";
+import { BatonFlight, bumpNav, navTarget } from "@/components/liquid/baton-flight";
+import { ClayBaton } from "@/components/illustrations/clay-baton";
 import { computeBatchScore, scoreTip, type ScoreWeights } from "@/lib/batch-score";
 import type { CapacityWeek } from "@/lib/capacity";
 import { DEVICE_CATEGORIES, DEVICE_CONDITIONS, labels, type PartnerTier } from "@/lib/domain";
@@ -405,24 +407,80 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
   );
 }
 
-/** Celebration (§7.4): the vessel fills to the batch's score, then one calm message. */
+/**
+ * Celebration (§7.4) + Baton pass on submit (Signature Moment 7): the vessel fills to
+ * the batch's score, tips and pours into a clay baton, and the baton flies into the
+ * "Batches" nav item, which bulges with a "+1". One time, ~2.4s, never blocks the links.
+ */
 function SubmittedCelebration({ id, score, label }: { id: string; score: number; label: string }) {
   const { reduced, t } = useMotionPrefs();
   const [level, setLevel] = useState(reduced ? score / 100 : 0);
+  const [phase, setPhase] = useState<"fill" | "pour" | "fly" | "done">(reduced ? "done" : "fill");
+  const [flight, setFlight] = useState<{ from: { x: number; y: number }; to: { x: number; y: number } } | null>(null);
+  const batonRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (reduced) {
+      bumpNav({ href: "/partner/batches", label: "+1" });
+      return;
+    }
+    if (phase === "pour") {
+      const a = window.setTimeout(() => setLevel((score / 100) * 0.35), 260);
+      const b = window.setTimeout(() => {
+        const r = batonRef.current?.getBoundingClientRect();
+        const to = navTarget("/partner/batches");
+        if (r && to) {
+          setFlight({ from: { x: r.left + r.width / 2, y: r.top + r.height / 2 }, to });
+          setPhase("fly");
+        } else {
+          bumpNav({ href: "/partner/batches", label: "+1" });
+          setPhase("done");
+        }
+      }, 1000);
+      return () => {
+        window.clearTimeout(a);
+        window.clearTimeout(b);
+      };
+    }
+  }, [phase, reduced, score]);
+
   return (
     <ClayCard size="xl" tint="mint" className="mx-auto flex max-w-2xl flex-col items-center gap-6 text-center">
-      <motion.div
-        className="h-40 w-36"
-        initial={reduced ? false : { scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={t("bouncy")}
-        onAnimationComplete={() => setLevel(score / 100)}
-      >
-        <LiquidFill value={level} shape="vessel" className="size-full" />
-      </motion.div>
+      <div className="relative flex h-40 items-end justify-center">
+        <motion.div
+          className="h-40 w-36 origin-[70%_85%]"
+          initial={reduced ? false : { scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1, rotate: phase === "pour" ? 28 : 0 }}
+          transition={phase === "pour" || phase === "fly" ? t("soft") : t("bouncy")}
+          onAnimationComplete={() => {
+            if (phase !== "fill") return;
+            setLevel(score / 100);
+            window.setTimeout(() => setPhase((p) => (p === "fill" ? "pour" : p)), 1100);
+          }}
+        >
+          <LiquidFill value={level} shape="vessel" className="size-full" />
+        </motion.div>
+        <AnimatePresence>
+          {phase === "pour" ? (
+            <motion.span
+              ref={batonRef}
+              key="baton"
+              aria-hidden
+              className="absolute -right-24 bottom-3 w-20"
+              initial={{ scale: 0.3, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={t("bouncy")}
+            >
+              <ClayBaton core={1} />
+            </motion.span>
+          ) : null}
+        </AnimatePresence>
+      </div>
+      {phase === "fly" && flight ? <BatonFlight from={flight.from} to={flight.to} href="/partner/batches" onDone={() => setPhase("done")} /> : null}
       <div role="status">
         <p className="eyebrow !text-loop-deep">Batch Value Score · {score} · {label}</p>
-        <h2 className="font-display mt-2 text-[2.25rem] leading-tight">Batch sent.</h2>
+        <h2 className="font-display mt-2 text-[2.25rem] leading-tight">Batch sent. The baton&apos;s with us now.</h2>
         <p className="mt-2 text-body-l text-ink-2">We&apos;ll confirm your drop-off week within 2 business days.</p>
       </div>
       <div className={cn("flex flex-wrap justify-center gap-3")}>

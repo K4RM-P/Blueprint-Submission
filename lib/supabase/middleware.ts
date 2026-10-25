@@ -50,7 +50,12 @@ export async function updateSession(request: NextRequest) {
   const role = (profile?.role ?? null) as Role | null;
 
   if (path === "/login" || path === "/signup") {
-    return role ? redirectTo(homeForRole(role)) : response;
+    if (!role) return response;
+    // A revoked session can still carry an unexpired JWT. Pages check with the auth
+    // server, so confirm here too before bouncing away from /login — otherwise the
+    // two disagree and the browser loops between /login and the dashboard.
+    const { error } = await supabase.auth.getUser();
+    return error ? response : redirectTo(homeForRole(role));
   }
   if (needed && role !== needed) {
     return redirectTo(role ? homeForRole(role) : "/login");

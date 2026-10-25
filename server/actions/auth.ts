@@ -68,7 +68,8 @@ export async function demoSignIn(input: unknown): Promise<ActionResult<{ redirec
     const password = process.env.DEMO_PASSWORD;
     if (!password) return fail("Demo accounts aren't configured on this server.");
     const supabase = await createClient();
-    await supabase.auth.signOut();
+    // Local scope: demo accounts are shared, so never revoke other people's sessions.
+    await supabase.auth.signOut({ scope: "local" });
     const { error } = await supabase.auth.signInWithPassword({ email: DEMO_EMAILS[role], password });
     if (error) return fail("The demo account isn't available. Run `pnpm seed` and try again.");
     return ok({ redirectTo: homeForRole(role) });
@@ -77,7 +78,7 @@ export async function demoSignIn(input: unknown): Promise<ActionResult<{ redirec
 
 export async function signOut() {
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  await supabase.auth.signOut({ scope: "local" });
   redirect("/");
 }
 

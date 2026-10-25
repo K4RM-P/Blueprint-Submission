@@ -3,11 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Check, ClipboardCheck, HardDrive, Lock, MonitorCog, Stethoscope } from "lucide-react";
+import { Check, ClipboardCheck, HardDrive, Lock, MonitorCog, ShieldCheck, Stethoscope } from "lucide-react";
 import { toast } from "sonner";
 import { ClayToggle, Field, Input } from "@/components/clay";
 import { FlowLine, HoldToConfirm } from "@/components/liquid";
 import { Stamp } from "@/components/clay/stamp";
+import { Seal } from "@/components/clay/seal";
+import { ClayBaton } from "@/components/illustrations/clay-baton";
 import { CHECKLIST_STEPS, labels, type ChecklistStep, type DeviceStatus } from "@/lib/domain";
 import { useMotionPrefs } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -39,6 +41,8 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
   const [openSource, setOpenSource] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [badges, setBadges] = useState<AwardedBadge[]>([]);
+  // Steps finished in this visit get the stamp moments; steps done earlier just show their state.
+  const [fresh, setFresh] = useState<Set<ChecklistStep>>(new Set());
 
   const next = CHECKLIST_STEPS.find((s) => !done.has(s)) ?? null;
 
@@ -53,6 +57,7 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
       return;
     }
     setDone((d) => new Set(d).add(step));
+    setFresh((f) => new Set(f).add(step));
     toast.success(step === "wipe_performed" ? "Wipe recorded. Staff will verify it." : `${labels.step[step]} done.`);
     if (res.data.badges.length) setBadges(res.data.badges);
     router.refresh();
@@ -105,7 +110,7 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
                       data-tint={isDone ? "mint" : "porcelain"}
                       aria-label={`${labels.step[step]}${isDone ? " — done" : locked ? " — finish the previous step first" : " — tap to complete"}`}
                       className={cn(
-                        "flex min-h-[76px] w-full items-center gap-4 rounded-[var(--r-lg)] px-5 py-4 text-left",
+                        "relative flex min-h-[76px] w-full items-center gap-4 rounded-[var(--r-lg)] px-5 py-4 text-left",
                         isDone ? "clay clay-sunk" : locked ? "border-2 border-dashed border-line bg-surface/60 text-ink-3" : "clay clay-press lift",
                       )}
                     >
@@ -115,7 +120,16 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
                         </span>
                         <span className="block text-small text-ink-2">{isDone ? "Done" : locked ? "Finish the step above first" : busy === step ? "Saving…" : HINT[step]}</span>
                       </span>
-                      {locked ? <Lock className="size-5 shrink-0" aria-hidden /> : isDone ? <Check className="size-6 shrink-0 text-loop-deep" aria-hidden /> : <span className="shrink-0 text-small font-semibold text-loop-deep">Tap to complete</span>}
+                      {locked ? (
+                        <Lock className="size-5 shrink-0" aria-hidden />
+                      ) : isDone && step === "wipe_performed" ? (
+                        // Hold-to-confirm wipe (Signature Moment 10): the liquid becomes a sky seal stamped onto the card.
+                        <Seal rim="DATA WIPED · RELAY · DATA WIPED · " icon={<ShieldCheck />} size={68} tilt={-9} stamp={fresh.has(step)} className="-my-3" />
+                      ) : isDone ? (
+                        <Check className="size-6 shrink-0 text-loop-deep" aria-hidden />
+                      ) : (
+                        <span className="shrink-0 text-small font-semibold text-loop-deep">Tap to complete</span>
+                      )}
                     </button>
                   )}
                 </div>
@@ -125,11 +139,27 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
         </ol>
       </FlowLine>
       {next === null ? (
-        <p role="status" className="glass mt-6 rounded-[20px] p-4 text-ink">
-          {status === "wipe_pending_verification" || done.size === 4
-            ? "All four steps done. Staff will verify the data wipe, then this device is ready for its next owner."
-            : "All steps complete."}
-        </p>
+        <div role="status" className="glass mt-6 flex items-center gap-4 overflow-hidden rounded-[20px] p-4 text-ink">
+          {/* Baton handoff to staff (Signature Moment 12): your leg of the relay, handed on. */}
+          <motion.span
+            aria-hidden
+            className="w-16 shrink-0"
+            initial={fresh.size > 0 && !reduced ? { x: -90, rotate: -14, opacity: 0 } : false}
+            animate={{ x: 0, rotate: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 170, damping: 18, delay: 0.2 }}
+          >
+            <ClayBaton />
+          </motion.span>
+          <p>
+            {status === "wipe_pending_verification" || done.size === 4 ? (
+              <>
+                <span className="font-semibold">Handed to staff.</span> They&apos;ll verify the data wipe, then this device is ready for its next owner.
+              </>
+            ) : (
+              "All steps complete."
+            )}
+          </p>
+        </div>
       ) : null}
       <BadgeCelebration badges={badges} onClose={() => setBadges([])} />
     </>

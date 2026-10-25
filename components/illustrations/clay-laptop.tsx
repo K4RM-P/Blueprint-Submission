@@ -6,7 +6,18 @@ import { cn } from "@/lib/utils";
 import { useMotionPrefs } from "@/lib/motion";
 
 /** Chunky clay laptop drawn in SVG, light from top-left; pointer light on desktop (§6.4, §7.3). */
-export function ClayLaptop({ className, pointerLight = true, tint = "apricot" }: { className?: string; pointerLight?: boolean; tint?: "apricot" | "mint" | "porcelain" }) {
+export function ClayLaptop({
+  className,
+  pointerLight = true,
+  tint = "apricot",
+  opening = false,
+}: {
+  className?: string;
+  pointerLight?: boolean;
+  tint?: "apricot" | "mint" | "porcelain";
+  /** Landing hero only: the lid lifts open on load and a baton runs the on-screen relay lane once (CSS, reduced-motion safe). */
+  opening?: boolean;
+}) {
   const id = useId().replace(/:/g, "");
   const { reduced, lowPower } = useMotionPrefs();
   const mx = useMotionValue(0);
@@ -65,13 +76,22 @@ export function ClayLaptop({ className, pointerLight = true, tint = "apricot" }:
       </defs>
       <ellipse cx="200" cy="270" rx="150" ry="14" fill="#B0602E" opacity="0.12" />
       <g filter={`url(#drop-${id})`}>
-        {/* lid */}
-        <rect x="70" y="28" width="260" height="178" rx="30" fill={`url(#lid-${id})`} />
-        <rect x="88" y="45" width="224" height="144" rx="18" fill={`url(#screen-${id})`} />
-        {/* the tiny liquid loop on screen */}
-        <path d="M168 117 a32 32 0 1 1 32 32" fill="none" stroke={`url(#liq-${id})`} strokeWidth="14" strokeLinecap="round" />
-        <path d="M200 149 l-14 -11 m14 11 l-12 13" fill="none" stroke="#2FBF8A" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-        <rect x="96" y="52" width="80" height="10" rx="5" fill="#ffffff" opacity="0.08" />
+        {/* lid + screen: a tiny relay lane with three stations and a baton at the finish */}
+        <g className={opening ? "laptop-lid" : undefined}>
+          <rect x="70" y="28" width="260" height="178" rx="30" fill={`url(#lid-${id})`} />
+          <rect x="88" y="45" width="224" height="144" rx="18" fill={`url(#screen-${id})`} />
+          <rect x="116" y="112" width="168" height="12" rx="6" fill="#2B3B34" />
+          <rect className={opening ? "laptop-lane-fill" : undefined} x="116" y="112" width="168" height="12" rx="6" fill={`url(#liq-${id})`} />
+          {[124, 200, 276].map((cx, i) => (
+            <circle key={cx} className={opening ? `laptop-node laptop-node-${i}` : undefined} cx={cx} cy="118" r="9" fill="#2FBF8A" stroke="#17201C" strokeWidth="4" />
+          ))}
+          <g className={opening ? "laptop-baton" : undefined}>
+            <rect x="244" y="98" width="46" height="20" rx="10" fill="#F6F1E9" />
+            <rect x="254" y="103" width="26" height="10" rx="5" fill={`url(#liq-${id})`} />
+            <rect x="249" y="100.5" width="16" height="2.5" rx="1.25" fill="#fff" />
+          </g>
+          <rect x="96" y="52" width="80" height="10" rx="5" fill="#ffffff" opacity="0.08" />
+        </g>
         {/* base */}
         <path d="M44 214 h312 a14 14 0 0 1 13 19 l-6 14 a22 22 0 0 1 -20 13 h-286 a22 22 0 0 1 -20 -13 l-6 -14 a14 14 0 0 1 13 -19 z" fill={`url(#base-${id})`} />
         <rect x="170" y="220" width="60" height="9" rx="4.5" fill={body[2]} opacity="0.45" />

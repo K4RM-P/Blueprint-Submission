@@ -25,9 +25,16 @@ export function PartnerTile({ name, logoUrl, tier, reused, featured }: { name: s
           <p className="font-mono text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">{labels.tier[tier]}</p>
         </div>
       </div>
-      <p className="mt-auto">
-        <span className="font-display text-[2rem] leading-none tnum">{reused}</span> <span className="text-small text-ink-2">devices back in use</span>
-      </p>
+      {reused > 0 ? (
+        <p className="mt-auto">
+          <span className="font-display text-[2rem] leading-none tnum">{reused}</span> <span className="text-small text-ink-2">{reused === 1 ? "device" : "devices"} back in use</span>
+        </p>
+      ) : (
+        <p className="mt-auto flex items-center gap-2 text-small font-medium text-ink-2">
+          <span aria-hidden className="size-2 rounded-full bg-loop-light" />
+          New to the relay · first batch on its way
+        </p>
+      )}
     </div>
   );
 }

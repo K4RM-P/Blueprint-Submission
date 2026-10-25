@@ -3,9 +3,10 @@ import { ArrowRight, PackagePlus } from "lucide-react";
 import { ClayButton, ClayCard, EmptyState, FlatCard, StatPebble } from "@/components/clay";
 import { PageHeader } from "@/components/shell/page-header";
 import { BatchCard } from "@/components/partner/batch-card";
+import { PeoplePebbles } from "@/components/partner/people-pebbles";
 import { getPartnerContext, listBatches } from "@/lib/queries/partner";
 import { getPartnerImpact } from "@/lib/queries/impact";
-import { labels, type RecipientCategory } from "@/lib/domain";
+import { recipientNoun, type RecipientCategory } from "@/lib/domain";
 import { hasFullDashboard } from "@/lib/pricing";
 import { DevicesAreaChart } from "@/components/charts/area";
 import { BarsChart } from "@/components/charts/bars";
@@ -27,7 +28,7 @@ export default async function PartnerDashboard() {
       <PageHeader
         eyebrow={org.name}
         title={`Hi ${firstName}.`}
-        description={t.devicesReceived > 0 ? `Your ${t.devicesReceived} donated devices are moving through the loop.` : "Send your first batch and watch its journey here."}
+        description={t.devicesReceived > 0 ? `Your ${t.devicesReceived} donated devices are on their next leg.` : "Send your first batch and watch its journey here."}
         actions={
           <ClayButton href="/partner/batches/new" variant="primary" icon={<PackagePlus />}>
             New batch
@@ -35,20 +36,22 @@ export default async function PartnerDashboard() {
         }
       />
 
-      <div className="grid gap-5 md:grid-cols-4">
-        <ClayCard tint="mint" size="lg" className="flex flex-col justify-between gap-6 md:col-span-2 md:row-span-2">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
+        <ClayCard tint="mint" size="lg" className="col-span-2 flex flex-col justify-between gap-6 md:row-span-2">
           <div>
             <p className="eyebrow !text-loop-deep">Impact so far</p>
             <p className="font-display mt-3 text-[2.25rem] leading-[1.05] sm:text-[3rem]">
               Your laptops are now helping <span className="tnum">{people}</span> {people === 1 ? "person" : "people"}.
             </p>
+            <div className="mt-5">
+              <PeoplePebbles count={people} />
+            </div>
           </div>
           {recipients.length > 0 ? (
             <ul className="flex flex-wrap gap-2" aria-label="Who your devices help">
               {recipients.map(([k, n]) => (
                 <li key={k} data-tint="porcelain" className="clay-sm rounded-full px-4 py-2 text-small">
-                  <span className="font-semibold tnum">{n}</span> {labels.recipient[k].toLowerCase()}
-                  {n === 1 ? "" : "s"}
+                  <span className="font-semibold tnum">{n}</span> {recipientNoun(k, n)}
                 </li>
               ))}
             </ul>

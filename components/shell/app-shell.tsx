@@ -13,6 +13,8 @@ import { signOut } from "@/server/actions/auth";
 import { Logo } from "./logo";
 import { NAV, SHELL_META, isActive } from "./nav-config";
 import { Dock } from "@/components/clay/dock";
+import { NavBumpChip, useNavBump } from "@/components/liquid/baton-flight";
+import type { NavItem } from "./nav-config";
 
 interface AppShellProps {
   role: Role;
@@ -58,12 +60,32 @@ function UserMenu({ userName, orgName, compact }: { userName: string; orgName?: 
   );
 }
 
+function SideItem({ item, active }: { item: NavItem; active: boolean }) {
+  const { t } = useMotionPrefs();
+  const { controls, label } = useNavBump(item.href);
+  const Icon = item.icon;
+  return (
+    <motion.li className="relative" animate={controls}>
+      {active ? <motion.span layoutId="nav-pill" transition={t("liquid")} data-tint="porcelain" className="clay-sm absolute inset-0 rounded-full" aria-hidden /> : null}
+      <Link
+        href={item.href}
+        data-nav-href={item.href}
+        aria-current={active ? "page" : undefined}
+        className={cn("relative flex h-11 items-center gap-3 rounded-full px-4 text-[0.9375rem] font-medium transition-colors", active ? "text-ink" : "text-ink-2 hover:bg-white/45 hover:text-ink")}
+      >
+        <Icon className={cn("size-[19px]", active ? "text-loop-deep" : "")} strokeWidth={1.75} aria-hidden />
+        {item.label}
+      </Link>
+      <NavBumpChip label={label} />
+    </motion.li>
+  );
+}
+
 /** Role app shell: slim flat sidebar with a sliding clay pill on desktop; floating clay dock on mobile (§8). */
 export function AppShell({ role, userName, orgName, children }: AppShellProps) {
   const pathname = usePathname();
   const items = NAV[role];
   const meta = SHELL_META[role];
-  const { t } = useMotionPrefs();
 
   return (
     <div data-expression={meta.expression} className="flex min-h-full flex-1">
@@ -71,23 +93,9 @@ export function AppShell({ role, userName, orgName, children }: AppShellProps) {
         <Logo href={items[0].href} sub={meta.title} className="px-2" />
         <nav aria-label={meta.title} className="mt-8 flex-1">
           <ul className="flex flex-col gap-1">
-            {items.map((item) => {
-              const active = isActive(pathname, item, items);
-              const Icon = item.icon;
-              return (
-                <li key={item.href} className="relative">
-                  {active ? <motion.span layoutId="nav-pill" transition={t("liquid")} data-tint="porcelain" className="clay-sm absolute inset-0 rounded-full" aria-hidden /> : null}
-                  <Link
-                    href={item.href}
-                    aria-current={active ? "page" : undefined}
-                    className={cn("relative flex h-11 items-center gap-3 rounded-full px-4 text-[0.9375rem] font-medium", active ? "text-ink" : "text-ink-2 hover:text-ink")}
-                  >
-                    <Icon className={cn("size-[19px]", active ? "text-loop-deep" : "")} strokeWidth={1.75} aria-hidden />
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
+            {items.map((item) => (
+              <SideItem key={item.href} item={item} active={isActive(pathname, item, items)} />
+            ))}
           </ul>
         </nav>
         <UserMenu userName={userName} orgName={orgName} />

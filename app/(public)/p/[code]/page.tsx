@@ -6,6 +6,8 @@ import { ClayButton, ClayCard, IconTile, StatPebble } from "@/components/clay";
 import { LiquidBlob } from "@/components/liquid";
 import { ClayLaptop } from "@/components/illustrations/clay-laptop";
 import { JourneyTimeline } from "@/components/journey/journey-timeline";
+import { LegCounter } from "@/components/journey/leg-counter";
+import { PassportBooklet } from "@/components/journey/passport-booklet";
 import { MoneyBar } from "@/components/public/money-bar";
 import { getPassport } from "@/lib/queries/passport";
 import { deviceImpact } from "@/lib/impact";
@@ -47,17 +49,34 @@ export default async function PassportPage({ params }: { params: Promise<{ code:
     },
   ];
 
+  // The relay in three legs: business → Free Geek, the bench, the next owner.
+  const legs = [
+    { label: "Handed over", done: true },
+    { label: "On the bench", done: steps[1].done && steps[2].done },
+    { label: "Next owner", done: steps[3].done },
+  ];
+  const legStatus = p.timeline.in_new_home
+    ? "Now with its next owner"
+    : p.status === "recycled"
+      ? "Recycled responsibly"
+      : ready
+        ? "Waiting for its next owner"
+        : steps[1].done
+          ? "On the volunteer bench"
+          : "Arrived at Free Geek Toronto";
+
   return (
     <main className="mx-auto w-full max-w-[880px] px-4 pb-24 pt-8 sm:px-6 sm:pt-12">
       {/* 1 · Passport cover */}
       <section className="relative" aria-labelledby="device-name">
         <LiquidBlob className="-right-24 -top-10 size-[380px]" tone="apricot" />
         <LiquidBlob className="-left-24 top-40 size-[300px]" tone="mint" duration={24} />
+        <PassportBooklet code={p.code}>
         <div data-tint="apricot" className="clay relative overflow-hidden !rounded-[var(--r-xl)] bg-gradient-to-br from-[#FFE0CB] via-[#FCEEE3] to-[#FBF9F5] p-6 sm:p-10">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-mono text-small tracking-[0.12em] text-ink-2">DEVICE PASSPORT</p>
-              <p className="mt-1 font-mono text-lg tracking-wider text-ink">{p.code}</p>
+              <p className="whitespace-nowrap font-mono text-[0.75rem] tracking-[0.14em] text-ink-2">DEVICE PASSPORT</p>
+              <p className="mt-1 whitespace-nowrap font-mono text-lg tracking-wider text-ink">{p.code}</p>
             </div>
             <span className="chip bg-white/75 text-loop-deep">{p.status === "sold" ? "In a new home" : p.status === "recycled" ? "Recycled" : ready ? "Ready" : "Being refurbished"}</span>
           </div>
@@ -80,6 +99,7 @@ export default async function PassportPage({ params }: { params: Promise<{ code:
             Refurbished by <span className="font-semibold text-ink">Free Geek Toronto</span>, an independent non-profit.
           </p>
         </div>
+        </PassportBooklet>
       </section>
 
       {p.pif_subsidized ? (
@@ -96,8 +116,13 @@ export default async function PassportPage({ params }: { params: Promise<{ code:
         <h2 id="journey" className="font-display text-[2rem] leading-tight">
           Its second life
         </h2>
-        <div className="flat mt-6 p-6 sm:p-8">
-          <JourneyTimeline steps={steps} label="Device journey" />
+        <p className="mt-2 text-ink-2">Every handoff in this laptop&apos;s relay, stamped as it happened.</p>
+        <div className="mt-6">
+          <LegCounter legs={legs} status={legStatus}>
+            <div className="flat p-6 sm:p-8">
+              <JourneyTimeline steps={steps} label="Device journey" />
+            </div>
+          </LegCounter>
         </div>
       </section>
 
@@ -106,14 +131,14 @@ export default async function PassportPage({ params }: { params: Promise<{ code:
         <h2 id="impact" className="font-display text-[2rem] leading-tight">
           What reusing it saves
         </h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           <StatPebble tint="mint" label="kept out of landfill" value={impact.kg} decimals={1} suffix="kg" />
           <StatPebble label="CO₂e avoided (est.)" value={impact.co2eKg} suffix="kg" />
-          <div data-tint="butter" className="clay-glass hairline-top flex flex-col justify-between gap-3 p-6">
+          <div data-tint="butter" className="clay-glass hairline-top col-span-2 flex flex-col justify-between gap-3 p-6 sm:col-span-1">
             <p className="eyebrow !text-ink-2">Software</p>
             <p className="flex items-center gap-2 text-lg font-semibold">
               <Terminal className="size-5 text-loop-deep" aria-hidden />
-              {p.os_installed ? `Running ${p.is_open_source_os ? "open-source " : ""}${p.os_installed}` : "OS installed at refurbishment"}
+              {p.os_installed ? `Running ${p.is_open_source_os ? "open-source " : ""}${p.os_installed}` : "Fresh software goes on at the bench"}
             </p>
           </div>
         </div>

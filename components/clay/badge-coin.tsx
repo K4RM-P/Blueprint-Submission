@@ -35,18 +35,26 @@ export function BadgeCoin({ slug, name, unlocked, progress = 0, threshold = 1, s
   const Icon = icons[slug as BadgeIcon] ?? (slug === "sparkle" ? Sparkle : Award);
   const { reduced, t } = useMotionPrefs();
   const pct = Math.max(0, Math.min(1, threshold > 0 ? progress / threshold : 0));
+  const live = Boolean(celebrate) && !reduced;
   const r = size / 2 - 4;
   const c = 2 * Math.PI * r;
 
   return (
     <figure className={cn("flex flex-col items-center gap-2 text-center", className)}>
+      {/* Coin mint (Signature Moment 11): drops in, spins once on its edge, lands with a squash. */}
       <motion.div
         className="relative"
-        style={{ width: size, height: size }}
-        initial={celebrate && !reduced ? { y: -80, opacity: 0, scaleY: 1 } : false}
-        animate={celebrate && !reduced ? { y: 0, opacity: 1, scaleY: [1, 0.86, 1] } : undefined}
-        transition={celebrate ? t("bouncy") : undefined}
+        style={{ width: size, height: size, transformPerspective: 600 }}
+        initial={live ? { y: -110, opacity: 0, rotateY: 0 } : false}
+        animate={live ? { y: 0, opacity: 1, rotateY: 360 } : undefined}
+        transition={live ? { y: t("bouncy"), opacity: { duration: 0.15 }, rotateY: { duration: 0.85, ease: [0.25, 0.1, 0.2, 1] } } : undefined}
       >
+        <motion.div
+          className="size-full origin-bottom"
+          initial={false}
+          animate={live ? { scaleY: [1, 1, 0.84, 1.04, 1], scaleX: [1, 1, 1.1, 0.98, 1] } : undefined}
+          transition={live ? { duration: 0.9, times: [0, 0.42, 0.56, 0.76, 1], ease: "easeOut" } : undefined}
+        >
         {unlocked ? (
           <div data-tint="butter" className="clay-sm grid size-full place-items-center rounded-full">
             <div className="grid place-items-center rounded-full border border-[rgba(176,128,0,.18)]" style={{ width: size - 18, height: size - 18 }}>
@@ -62,13 +70,14 @@ export function BadgeCoin({ slug, name, unlocked, progress = 0, threshold = 1, s
             <Lock className="text-ink-3" style={{ width: size * 0.26, height: size * 0.26 }} strokeWidth={1.75} aria-hidden />
           </div>
         )}
-        {celebrate && !reduced ? (
+        </motion.div>
+        {live ? (
           <motion.span
             aria-hidden
             className="absolute inset-0 rounded-full border-2 border-loop-light"
-            initial={{ scale: 1, opacity: 0.8 }}
-            animate={{ scale: 1.7, opacity: 0 }}
-            transition={{ duration: 0.9, delay: 0.35 }}
+            initial={{ scale: 1, opacity: 0 }}
+            animate={{ scale: [1, 1.8], opacity: [0.8, 0] }}
+            transition={{ duration: 0.9, delay: 0.5, ease: [0.2, 0, 0, 1] }}
           />
         ) : null}
       </motion.div>

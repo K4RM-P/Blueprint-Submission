@@ -51,7 +51,7 @@ export default async function PartnerReportPage() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatPebble tint="mint" label="Devices back in use" value={t.devicesReused} />
         <StatPebble label="Devices donated" value={t.devicesReceived} />
         <StatPebble label="kg kept out of landfill" value={t.kgDiverted} suffix="kg" />

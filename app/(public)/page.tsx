@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Building2, HeartHandshake, Laptop, Wrench } from "lucide-react";
+import { ArrowRight, Building2, HeartHandshake, Wrench } from "lucide-react";
 import { ClayButton, ClayCard, IconTile, StatPebble } from "@/components/clay";
 import { LiquidBlob } from "@/components/liquid";
+import { LiquidDigits } from "@/components/liquid/liquid-digits";
 import { ClayLaptop } from "@/components/illustrations/clay-laptop";
 import { PassportLookup } from "@/components/public/passport-lookup";
 import { PartnerTile } from "@/components/public/partner-tile";
-import { TheLoop } from "@/components/public/the-loop";
+import { BatonRun } from "@/components/public/baton-run";
 import { createClient } from "@/lib/supabase/server";
 import { getPublicImpact } from "@/lib/queries/impact";
 import { logoUrl } from "@/lib/queries/common";
 import type { PartnerTier } from "@/lib/domain";
 
 export const metadata: Metadata = {
-  title: { absolute: "Relay · Old laptops. New loops." },
+  title: { absolute: "Relay · Pass it on." },
   description: "Free Geek Toronto turns business laptops into affordable computers for students, newcomers and families — and shows every step.",
 };
 
@@ -23,21 +24,22 @@ export default async function Landing() {
   const supabase = await createClient();
   const [impact, { data: wall }] = await Promise.all([getPublicImpact(supabase), supabase.rpc("partner_wall")]);
   const t = impact.totals;
-  const partners = (wall ?? []).slice(0, 6);
+  // Lead with partners whose devices are already back in use; newcomers fill the rest.
+  const partners = [...(wall ?? [])].sort((a, b) => Number(b.devices_reused) - Number(a.devices_reused)).slice(0, 6);
 
   return (
     <main>
       {/* 1 · Hero */}
-      <section className="relative mx-auto grid max-w-[1200px] items-center gap-12 px-4 pb-20 pt-14 sm:px-6 md:grid-cols-12 md:pb-28 md:pt-20">
+      <section className="relative mx-auto grid max-w-[1200px] items-center gap-12 px-4 pb-10 pt-12 sm:px-6 md:grid-cols-12 md:pb-14 md:pt-20">
         <div className="md:col-span-7">
           <p className="eyebrow">Free Geek Toronto × Relay</p>
-          <h1 className="font-display mt-5 text-[3.25rem] leading-[0.92] sm:text-[4.5rem] lg:text-display-xl">
-            Old laptops.
+          <h1 className="font-display mt-5 text-[3rem] leading-[0.94] tracking-[-0.045em] sm:text-[4.5rem] lg:text-display-xl">
+            Every laptop has
             <br />
-            <span className="text-loop-deep">New loops.</span>
+            <span className="text-loop-deep">another leg to run.</span>
           </h1>
           <p className="measure mt-7 text-body-l text-ink-2">
-            We turn your business&apos;s retired laptops into affordable computers for Toronto students, newcomers and families — and show you every step.
+            Relay hands your business&apos;s retired laptops to Free Geek Toronto&apos;s volunteers, then on to students, newcomers and families who need them. You see every handoff.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <ClayButton href="/login?mode=signup" variant="primary" size="lg">
@@ -51,25 +53,25 @@ export default async function Landing() {
         <div className="relative md:col-span-5">
           <LiquidBlob className="-left-16 -top-16 size-[420px]" tone="mint" />
           <LiquidBlob className="-bottom-20 -right-10 size-[360px]" tone="apricot" duration={24} />
-          <ClayLaptop className="relative mx-auto max-w-[460px] drop-shadow-sm" />
-          <div className="glass relative mx-auto -mt-4 flex w-fit items-center gap-3 rounded-full py-2 pl-2 pr-5">
-            <span className="grid size-10 place-items-center rounded-full bg-mint text-loop-deep">
-              <Laptop className="size-5" strokeWidth={1.75} aria-hidden />
-            </span>
-            <p className="text-small">
-              <span className="font-display text-xl tnum">{fmt(t.devicesReused)}</span> <span className="text-ink-2">devices back in use</span>
+          <ClayLaptop className="relative mx-auto max-w-[460px]" opening />
+          <div className="glass relative mx-auto -mt-2 flex w-fit items-center gap-4 rounded-[26px] py-3 pl-3 pr-5">
+            <LiquidDigits value={t.devicesReused} label={`${fmt(t.devicesReused)} devices back in use`} className="text-[2.5rem]" />
+            <p className="text-small leading-snug text-ink-2" aria-hidden>
+              devices back
+              <br />
+              in use
             </p>
           </div>
         </div>
       </section>
 
-      {/* 2 · The loop (pinned, scroll-driven) */}
-      <TheLoop
+      {/* 2 · The Baton Run (pinned, scroll-linked) */}
+      <BatonRun
         stations={[
-          { title: "Donated", body: "Businesses send retired laptops — drives intact, no shredding.", stat: fmt(t.devicesReceived), statLabel: "devices received" },
-          { title: "Wiped & verified", body: "Every drive is wiped, then checked by a staff member.", stat: fmt(impact.stages.verified), statLabel: "wipes verified" },
-          { title: "Refurbished by volunteers", body: "Tested, rebuilt with open-source software, quality-checked.", stat: fmt(impact.stages.refurbished), statLabel: "refurbished" },
-          { title: "In someone's hands", body: "Sold at prices tied to ability to pay, to people who need them.", stat: fmt(t.devicesReused), statLabel: "people reached" },
+          { hand: "A Toronto business", title: "Handed over", body: "Retired laptops arrive with drives intact. No shredding, no drawer.", stat: fmt(t.devicesReceived), statLabel: "devices received" },
+          { hand: "Free Geek staff", title: "Wiped & verified", body: "Every drive is wiped, then a staff member checks the report.", stat: fmt(impact.stages.verified), statLabel: "wipes verified" },
+          { hand: "A volunteer", title: "Rebuilt on the bench", body: "Tested, refurbished and set up with open-source software.", stat: fmt(impact.stages.refurbished), statLabel: "refurbished" },
+          { hand: "Its next owner", title: "In someone's hands", body: "Sold at prices tied to ability to pay, to people who need one.", stat: fmt(t.devicesReused), statLabel: "people reached" },
         ]}
       />
 
@@ -83,8 +85,8 @@ export default async function Landing() {
             How we calculate this
           </Link>
         </div>
-        <div className="mt-10 grid gap-5 md:grid-cols-4 md:grid-rows-2">
-          <StatPebble className="md:col-span-2 md:row-span-2" size="lg" tint="mint" label="kg of e-waste kept out of landfill" value={t.kgDiverted} decimals={0} suffix="kg" caption="Reused or responsibly recycled devices." />
+        <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4 md:grid-rows-2 md:gap-5">
+          <StatPebble className="col-span-2 md:row-span-2" size="lg" tint="mint" label="kg of e-waste kept out of landfill" value={t.kgDiverted} decimals={0} suffix="kg" caption="Reused or responsibly recycled devices." />
           <StatPebble label="Devices back in use" value={t.devicesReused} />
           <StatPebble label="kg CO₂e avoided (est.)" value={t.co2eAvoidedKg} />
           <StatPebble label="Volunteer hours" value={t.volunteerHours} />
@@ -157,7 +159,7 @@ export default async function Landing() {
         <section aria-labelledby="wall" className="mx-auto max-w-[1200px] px-4 py-24 sm:px-6 md:py-32">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <h2 id="wall" className="font-display text-[2.25rem] leading-tight sm:text-display-m">
-              Toronto businesses in the loop
+              Toronto businesses in the relay
             </h2>
             <Link href="/partners" className="text-small font-semibold text-loop-deep underline-offset-4 hover:underline">
               Full Partner Wall

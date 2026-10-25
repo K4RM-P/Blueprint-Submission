@@ -54,7 +54,7 @@ export default async function WalletPage() {
           )
         }
       />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatPebble label="Devices refurbished" value={stats.finalQa} tint="butter" size="lg" className="sm:row-span-2" caption="Each one passed final QA." />
         <StatPebble label="Hours contributed (est.)" value={hours} decimals={hours % 1 ? 1 : 0} />
         <StatPebble label="Hardware tests" value={byStep("hardware_test")} />

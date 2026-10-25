@@ -33,7 +33,7 @@ export default async function StaffFund({ searchParams }: { searchParams: Promis
   return (
     <>
       <PageHeader eyebrow="Staff Console" title="Pay-It-Forward fund" description="Every dollar in and every subsidy out. Subsidies are applied when you record a sale." actions={<FundEntry partners={orgs ?? []} />} />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatPebble tint="apricot" label="Balance available" value={Math.round(balance / 100)} prefix="$" caption={formatCents(balance)} />
         <StatPebble label="Raised all time" value={Math.round(raised / 100)} prefix="$" />
         <StatPebble label="Applied as subsidies" value={Math.round(spent / 100)} prefix="$" />

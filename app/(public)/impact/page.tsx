@@ -3,7 +3,7 @@ import { StatPebble } from "@/components/clay";
 import { createClient } from "@/lib/supabase/server";
 import { getPublicImpact } from "@/lib/queries/impact";
 import { getSettings } from "@/lib/queries/common";
-import { labels, type RecipientCategory } from "@/lib/domain";
+import { labels, recipientNoun, type RecipientCategory } from "@/lib/domain";
 import { longDate } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Impact & methodology", description: "Live impact numbers from Free Geek Toronto, and exactly how they're calculated." };
@@ -36,8 +36,7 @@ export default async function ImpactPage() {
           <ul className="mt-5 flex flex-wrap gap-3">
             {recipients.map(([k, n]) => (
               <li key={k} className="glass rounded-full px-4 py-2">
-                <span className="font-semibold tnum">{n}</span> {labels.recipient[k].toLowerCase()}
-                {n === 1 ? "" : "s"}
+                <span className="font-semibold tnum">{n}</span> {recipientNoun(k, n)}
               </li>
             ))}
           </ul>

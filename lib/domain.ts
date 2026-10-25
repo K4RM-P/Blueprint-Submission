@@ -85,3 +85,14 @@ export const labels = {
   } satisfies Record<RecipientCategory, string>,
   step: { hardware_test: "Hardware test", wipe_performed: "Data wipe performed", os_installed: "OS installed", final_qa: "Final QA" } satisfies Record<ChecklistStep, string>,
 };
+
+/** "1 student", "6 small businesses", "5 low-income households" — lower-case, correctly pluralised. */
+export function recipientPhrase(category: RecipientCategory, n: number): string {
+  return `${n} ${recipientNoun(category, n)}`;
+}
+
+export function recipientNoun(category: RecipientCategory, n: number): string {
+  const one = labels.recipient[category].toLowerCase();
+  if (n === 1) return one;
+  return /(s|sh|ch|x)$/.test(one) ? `${one}es` : `${one}s`;
+}
