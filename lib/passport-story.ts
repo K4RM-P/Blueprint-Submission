@@ -50,7 +50,8 @@ export interface PassportStoryData {
   recycled: boolean;
 }
 
-export type StoryTint = "porcelain" | "apricot" | "sky" | "butter" | "mint";
+/** Pastel tints, plus `forest`: a deep green full-bleed "drench" for the big reveals. */
+export type StoryTint = "porcelain" | "apricot" | "sky" | "butter" | "mint" | "forest";
 export type SlideKey =
   | "cover"
   | "origin"
@@ -65,6 +66,7 @@ export type SlideKey =
   | "your_turn"
   | "next_leg"
   | "recycled"
+  | "persona"
   | "finale";
 
 export interface StorySlide {
@@ -104,7 +106,17 @@ export interface PassportStory {
   priceBreakdownConfirmed: boolean;
   /** Which leg of three the device is on (1 = business, 2 = bench, 3 = next owner). */
   leg: 1 | 2 | 3;
+  persona: Persona;
   slides: StorySlide[];
+}
+
+/** The device's "personality", Wrapped-style. Derived only from real story data. */
+export interface Persona {
+  key: "phoenix" | "sprinter" | "veteran" | "free_spirit" | "gift" | "comeback";
+  name: string;
+  tagline: string;
+  /** Up to four short, true facts shown as chips. */
+  traits: string[];
 }
 
 export const ANON_BUSINESS = "a Toronto business";
@@ -144,12 +156,13 @@ const BASE: Record<SlideKey, Omit<StorySlide, "key">> = {
   bench: { tint: "butter", durationMs: 7500, title: "Back to life" },
   speed: { tint: "mint", durationMs: 5500, title: "Ready, fast" },
   software: { tint: "porcelain", durationMs: 5500, title: "Open source" },
-  numbers: { tint: "mint", durationMs: 7000, title: "The numbers" },
+  numbers: { tint: "forest", durationMs: 7000, title: "The numbers" },
   money: { tint: "porcelain", durationMs: 8500, title: "Where your money goes" },
   why: { tint: "sky", durationMs: 9000, title: "Why it isn't free" },
   your_turn: { tint: "apricot", durationMs: 6000, title: "Your turn" },
   next_leg: { tint: "apricot", durationMs: 6000, title: "The next leg" },
   recycled: { tint: "mint", durationMs: 7000, title: "Recycled responsibly" },
+  persona: { tint: "forest", durationMs: 7000, title: "Its personality" },
   finale: { tint: "porcelain", durationMs: null, title: "Your laptop's story" },
 };
 
@@ -205,11 +218,22 @@ export function buildPassportStory(p: PassportStoryData): PassportStory {
     keys.push("why");
     keys.push(stage === "in_progress" ? "next_leg" : "your_turn");
   }
-  keys.push("finale");
+  keys.push("persona", "finale");
 
   const specs = [labels(p.category), p.approx_year ? `${p.approx_year}` : null, p.cpu, p.ram_gb ? `${p.ram_gb} GB RAM` : null, p.storage_gb ? `${p.storage_gb} GB` : null].filter(
     (x): x is string => Boolean(x),
   );
+
+  const persona = personaFor({
+    stage,
+    daysToReady,
+    openSource: Boolean(os?.openSource),
+    pifSubsidized: p.pif_subsidized,
+    ageAtDonation: p.approx_year ? new Date(received).getUTCFullYear() - p.approx_year : null,
+    wiped: Boolean(wipeVerified),
+    kg: impact.kg,
+    leg,
+  });
 
   return {
     code: p.code,
@@ -229,8 +253,42 @@ export function buildPassportStory(p: PassportStoryData): PassportStory {
     priceBreakdown: p.price_breakdown,
     priceBreakdownConfirmed: p.price_breakdown_confirmed,
     leg,
+    persona,
     slides: keys.map(slide),
   };
+}
+
+export interface PersonaInput {
+  stage: StoryStage;
+  daysToReady: number | null;
+  openSource: boolean;
+  pifSubsidized: boolean;
+  /** Years between its approximate build year and the donation. */
+  ageAtDonation: number | null;
+  wiped: boolean;
+  kg: number;
+  leg: 1 | 2 | 3;
+}
+
+/** Picks the first archetype the data earns, in a fixed order, so the same device always gets the same one. */
+export function personaFor(i: PersonaInput): Persona {
+  const traits = [
+    i.wiped ? "Wiped clean" : null,
+    i.daysToReady !== null ? `Ready in ${i.daysToReady} day${i.daysToReady === 1 ? "" : "s"}` : null,
+    i.openSource ? "Open source" : null,
+    i.pifSubsidized ? "Paid forward" : null,
+    i.ageAtDonation !== null && i.ageAtDonation >= 5 ? `${i.ageAtDonation} years young` : null,
+    i.kg > 0 ? `${i.kg} kg saved` : null,
+    i.stage === "recycled" ? "Recycled" : `Leg ${i.leg} of 3`,
+  ].filter((t): t is string => Boolean(t));
+  const pick = (key: Persona["key"], name: string, tagline: string): Persona => ({ key, name, tagline, traits: traits.slice(0, 4) });
+
+  if (i.stage === "recycled") return pick("phoenix", "The Phoenix", "Its parts rise again in something new.");
+  if (i.daysToReady !== null && i.daysToReady <= 10) return pick("sprinter", "The Sprinter", "Donation to ready faster than most deliveries.");
+  if (i.ageAtDonation !== null && i.ageAtDonation >= 6) return pick("veteran", "The Veteran", "Years of service behind it. Plenty still ahead.");
+  if (i.openSource) return pick("free_spirit", "The Free Spirit", "Running free, open software. No licence fees, ever.");
+  if (i.pifSubsidized) return pick("gift", "The Gift", "A stranger chipped in so it could go further.");
+  return pick("comeback", "The Comeback Kid", "Written off by one desk, brought back by many hands.");
 }
 
 function labels(c: DeviceCategory): string {

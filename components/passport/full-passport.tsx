@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle2, HandCoins, HardDrive, Leaf, Package, Play, Recycle, ShieldCheck, Terminal, Wrench } from "lucide-react";
+import { CheckCircle2, HandCoins, Sparkles, HardDrive, Leaf, Package, Play, Recycle, ShieldCheck, Terminal, Wrench } from "lucide-react";
 import { ClayButton, ClayCard, IconTile, StatPebble } from "@/components/clay";
 import { LiquidBlob } from "@/components/liquid";
 import { ClayLaptop } from "@/components/illustrations/clay-laptop";
@@ -76,7 +76,12 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
               <p className="whitespace-nowrap font-mono text-[0.75rem] tracking-[0.14em] text-ink-2">DEVICE PASSPORT</p>
               <p className="mt-1 whitespace-nowrap font-mono text-lg tracking-wider text-ink">{p.code}</p>
             </div>
-            <span className="chip bg-white/75 text-loop-deep">{p.status === "sold" ? "In a new home" : p.status === "recycled" ? "Recycled" : ready ? "Ready" : "Being refurbished"}</span>
+            <span className="flex flex-col items-end gap-2">
+              <span className="chip bg-white/75 text-loop-deep">{p.status === "sold" ? "In a new home" : p.status === "recycled" ? "Recycled" : ready ? "Ready" : "Being refurbished"}</span>
+              <span className="chip gap-1.5 bg-[#0A3D2B] text-[#8FF5C4]" title={story.persona.tagline}>
+                <Sparkles className="size-3.5" aria-hidden /> {story.persona.name}
+              </span>
+            </span>
           </div>
           <div className="mt-8 grid items-end gap-6 sm:grid-cols-[1.4fr_1fr]">
             <div>

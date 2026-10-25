@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { LiquidTransition } from "./liquid-transition";
 import { Eyebrow, Hero } from "./slide-primitives";
 import { ShareActions, storyImagePath } from "./share-actions";
+import { SlideBackdrop } from "./slide-backdrop";
 import { SlideContent } from "./slides";
 import { logStoryEvent } from "./story-analytics";
 import { StoryMotionContext } from "./story-context";
@@ -201,17 +202,20 @@ export function StoryPlayer({ story, initialIndex = 0 }: { story: PassportStory;
 
         <DesktopNav side="left" onClick={prev} disabled={index === 0} label="Previous slide" />
 
-        <div className="story-stage" onPointerDown={onPointerDown} onPointerUp={(e) => endGesture(e)} onPointerCancel={(e) => endGesture(e, true)} onContextMenu={(e) => e.preventDefault()}>
+        <div className="story-stage" data-dark={slide.tint === "forest" ? "true" : undefined} onPointerDown={onPointerDown} onPointerUp={(e) => endGesture(e)} onPointerCancel={(e) => endGesture(e, true)} onContextMenu={(e) => e.preventDefault()}>
           <AnimatePresence initial={false}>
             <LiquidTransition key={`${index}-${replays}`} dir={dir} tint={slide.tint} reduced={reduced}>
               <section className="story-slide" data-tint={slide.tint} data-slide={slide.key} aria-label={`Slide ${index + 1} of ${slides.length}: ${slide.title}`}>
-                <SlideContent k={slide.key} story={story} finale={finale} onBegin={next} />
+                <SlideBackdrop k={slide.key} index={index} />
+                <div className="story-content">
+                  <SlideContent k={slide.key} story={story} finale={finale} onBegin={next} />
+                </div>
               </section>
             </LiquidTransition>
           </AnimatePresence>
 
           {/* chrome */}
-          <div className="story-progress" role="progressbar" aria-label="Story progress" aria-valuemin={1} aria-valuemax={slides.length} aria-valuenow={index + 1} aria-valuetext={`Slide ${index + 1} of ${slides.length}`}>
+          <div className="story-progress story-chrome" role="progressbar" aria-label="Story progress" aria-valuemin={1} aria-valuemax={slides.length} aria-valuenow={index + 1} aria-valuetext={`Slide ${index + 1} of ${slides.length}`}>
             {slides.map((s, i) => (
               <span
                 key={`${s.key}-${i === index ? replays : 0}`}
@@ -229,7 +233,7 @@ export function StoryPlayer({ story, initialIndex = 0 }: { story: PassportStory;
               </span>
             ))}
           </div>
-          <div className="absolute inset-x-[14px] top-[calc(24px+env(safe-area-inset-top))] z-30 flex items-center justify-between">
+          <div className="story-chrome absolute inset-x-[14px] top-[calc(24px+env(safe-area-inset-top))] z-30 flex items-center justify-between">
             <span className="flex items-center gap-2 pl-0.5">
               <LoopMark className="size-7" />
               <span className="font-mono text-[0.625rem] tracking-[0.2em] text-ink-2">RELAY · DEVICE PASSPORT</span>
@@ -265,7 +269,7 @@ export function StoryPlayer({ story, initialIndex = 0 }: { story: PassportStory;
   );
 }
 
-const ambient: Record<string, string> = { porcelain: "#ECE6DC", apricot: "#F6E1D1", sky: "#DFE6F1", butter: "#F3EBCD", mint: "#DCEBE2" };
+const ambient: Record<string, string> = { porcelain: "#ECE6DC", apricot: "#F6E1D1", sky: "#DFE6F1", butter: "#F3EBCD", mint: "#DCEBE2", forest: "#1E4A3A" };
 
 function DesktopNav({ side, onClick, disabled, label }: { side: "left" | "right"; onClick: () => void; disabled: boolean; label: string }) {
   return (

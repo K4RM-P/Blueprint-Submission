@@ -5,7 +5,7 @@ import { useEffect, type ReactNode } from "react";
 import { springs } from "@/lib/motion";
 import type { StoryTint } from "@/lib/passport-story";
 
-const TINT_HEX: Record<StoryTint, string> = { porcelain: "#F4F0E9", apricot: "#FFE0CB", sky: "#DCEAFE", butter: "#FFF1BF", mint: "#D7F1E4" };
+const TINT_HEX: Record<StoryTint, string> = { porcelain: "#F4F0E9", apricot: "#FFE0CB", sky: "#DCEAFE", butter: "#FFF1BF", mint: "#D7F1E4", forest: "#0A3D2B" };
 
 /** A wide, soft wave band, 200 units across so it reads as liquid, not a zigzag. */
 const WAVE = "M0 22 C 25 6, 50 6, 75 20 S 125 36, 150 20 S 190 8, 200 16 V 44 H 0 Z";

@@ -44,7 +44,7 @@ const keys = (p: PassportStoryData) => buildPassportStory(p).slides.map((s) => s
 
 describe("buildPassportStory", () => {
   it("tells the full relay for a sold device, ending on the card", () => {
-    expect(keys(sold)).toEqual(["cover", "origin", "handoff", "erased", "bench", "speed", "software", "numbers", "money", "why", "your_turn", "finale"]);
+    expect(keys(sold)).toEqual(["cover", "origin", "handoff", "erased", "bench", "speed", "software", "numbers", "money", "why", "your_turn", "persona", "finale"]);
     const s = buildPassportStory(sold);
     expect(s.leg).toBe(3);
     expect(s.donor).toEqual({ label: "Maple Ledger Accounting", named: true, household: false });
@@ -79,7 +79,7 @@ describe("buildPassportStory", () => {
       timeline: { ...sold.timeline, ready_at: null, refurbished_at: null, in_new_home: false },
       milestones: sold.milestones.filter((m) => !["final_qa", "ready", "listed", "sold"].includes(m.kind)),
     };
-    expect(keys(p)).toEqual(["cover", "origin", "handoff", "erased", "bench", "software", "numbers", "money", "why", "next_leg", "finale"]);
+    expect(keys(p)).toEqual(["cover", "origin", "handoff", "erased", "bench", "software", "numbers", "money", "why", "next_leg", "persona", "finale"]);
     const s = buildPassportStory(p);
     expect(s.leg).toBe(2);
     expect(s.daysToReady).toBeNull();
@@ -95,7 +95,7 @@ describe("buildPassportStory", () => {
       milestones: [{ kind: "received", at: "2026-05-18T14:00:00Z" }],
       price_breakdown: [],
     };
-    expect(keys(p)).toEqual(["cover", "origin", "handoff", "numbers", "why", "next_leg", "finale"]);
+    expect(keys(p)).toEqual(["cover", "origin", "handoff", "numbers", "why", "next_leg", "persona", "finale"]);
     expect(buildPassportStory(p).leg).toBe(1);
   });
 
@@ -112,7 +112,7 @@ describe("buildPassportStory", () => {
         { kind: "recycled", at: "2026-05-22T12:00:00Z" },
       ],
     };
-    expect(keys(p)).toEqual(["cover", "origin", "handoff", "bench", "recycled", "numbers", "finale"]);
+    expect(keys(p)).toEqual(["cover", "origin", "handoff", "bench", "recycled", "numbers", "persona", "finale"]);
     const s = buildPassportStory(p);
     expect(s.impact.co2eKg).toBeNull();
     expect(s.impact.kg).toBe(2.1);
@@ -121,7 +121,7 @@ describe("buildPassportStory", () => {
 
   it("gives each slide exactly one tint and only waits on the cover and finale", () => {
     for (const sl of buildPassportStory(sold).slides) {
-      expect(["porcelain", "apricot", "sky", "butter", "mint"]).toContain(sl.tint);
+      expect(["porcelain", "apricot", "sky", "butter", "mint", "forest"]).toContain(sl.tint);
       if (sl.key === "cover" || sl.key === "finale") expect(sl.durationMs).toBeNull();
       else expect(sl.durationMs).toBeGreaterThanOrEqual(5000);
     }

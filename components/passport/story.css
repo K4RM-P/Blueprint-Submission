@@ -6,6 +6,7 @@
   --story-sky: #dceafe;
   --story-butter: #fff1bf;
   --story-mint: #d7f1e4;
+  --story-forest: #0a3d2b;
   position: fixed;
   inset: var(--banner-h, 0px) 0 0 0;
   z-index: 60;
@@ -69,6 +70,27 @@
 }
 .story-slide[data-tint="mint"] {
   --slide-bg: var(--story-mint);
+}
+/* The drench: a deep green full-bleed slide for the big reveals. Re-points the
+   ink tokens so every primitive (lines, subs, chips) flips to light-on-dark. */
+.story-slide[data-tint="forest"] {
+  --slide-bg: var(--story-forest);
+  --ink: #f6f3ec;
+  --ink-2: #b9e6d2;
+  --loop-deep: #8ff5c4;
+  background-image:
+    radial-gradient(110cqw 70cqh at 0% 0%, rgba(47, 191, 138, 0.35), transparent 60%),
+    radial-gradient(90cqw 60cqh at 110% 110%, rgba(0, 0, 0, 0.35), transparent 60%);
+}
+
+/* Slide content sits above the backdrop geometry. */
+.story-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
 }
 
 /* Type scale tied to the stage, not the window, so the card and the phone match. */
@@ -160,6 +182,22 @@
   }
 }
 
+/* Chrome over a drench slide flips to light. */
+.story-stage[data-dark="true"] .story-chrome {
+  --ink: #f6f3ec;
+  --ink-2: #b9e6d2;
+}
+.story-stage[data-dark="true"] .story-chip-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.story-stage[data-dark="true"] .story-seg {
+  background: rgba(255, 255, 255, 0.2);
+}
+.story-stage[data-dark="true"] .story-seg-fill {
+  background: linear-gradient(180deg, #8ff5c4, #2fbf8a);
+}
+
 /* ---------- Chrome buttons (pause, close) ---------- */
 .story-chip-btn {
   display: inline-grid;
@@ -199,6 +237,299 @@
   transition: background-color 900ms var(--ease-soft);
 }
 
+/* ---------- Backdrop geometry (Wrapped-style, decorative) ---------- */
+.story-backdrop {
+  --shape: rgba(23, 32, 28, 0.07);
+  --shape-strong: rgba(19, 138, 97, 0.16);
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.story-slide[data-tint="apricot"] .story-backdrop {
+  --shape: rgba(194, 74, 22, 0.1);
+  --shape-strong: rgba(242, 106, 46, 0.2);
+}
+.story-slide[data-tint="sky"] .story-backdrop {
+  --shape: rgba(46, 104, 196, 0.1);
+  --shape-strong: rgba(46, 104, 196, 0.2);
+}
+.story-slide[data-tint="butter"] .story-backdrop {
+  --shape: rgba(176, 128, 0, 0.12);
+  --shape-strong: rgba(176, 128, 0, 0.22);
+}
+.story-slide[data-tint="forest"] .story-backdrop {
+  --shape: rgba(143, 245, 196, 0.1);
+  --shape-strong: rgba(143, 245, 196, 0.22);
+}
+.story-backdrop[data-still="true"] *,
+.story-backdrop[data-still="true"] *::before {
+  animation: none !important;
+}
+
+/* Giant outlined slide number, bottom right. */
+.story-ghost-num {
+  position: absolute;
+  right: 3cqw;
+  bottom: calc(-4cqh + env(safe-area-inset-bottom));
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 96;
+  font-weight: 800;
+  font-size: 46cqw;
+  line-height: 0.8;
+  letter-spacing: -0.07em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--shape-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ticker tape: a tilted band of mono text that never stops moving. */
+.story-ticker {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  display: flex;
+  overflow: hidden;
+  padding: 7px 0;
+  background: var(--ink);
+  color: var(--slide-bg);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px -14px rgba(23, 32, 28, 0.6);
+}
+.story-ticker-top {
+  top: calc(128px + env(safe-area-inset-top));
+  transform: rotate(-4deg);
+  opacity: 0.9;
+}
+.story-ticker-bottom {
+  bottom: calc(10cqh + env(safe-area-inset-bottom));
+  transform: rotate(3deg);
+  background: var(--loop);
+  color: #fff;
+  opacity: 0.18;
+}
+.story-slide[data-slide="cover"] .story-ticker-bottom {
+  bottom: auto;
+  top: calc(164px + env(safe-area-inset-top));
+  opacity: 0.95;
+}
+.story-slide[data-slide="erased"] .story-ticker-bottom {
+  bottom: auto;
+  top: 48%;
+}
+.story-ticker-track {
+  display: inline-block;
+  animation: story-marquee 28s linear infinite;
+}
+.story-ticker[data-reverse="true"] .story-ticker-track {
+  animation-direction: reverse;
+}
+@keyframes story-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Rings that drift and breathe. */
+.story-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid var(--shape-strong);
+}
+.story-ring-a {
+  width: 120cqw;
+  aspect-ratio: 1;
+  right: -60cqw;
+  top: -30cqw;
+  animation: story-breathe 9s ease-in-out infinite;
+}
+.story-ring-b {
+  width: 80cqw;
+  aspect-ratio: 1;
+  left: -40cqw;
+  bottom: 8cqh;
+  border-style: dashed;
+  border-width: 2px;
+  animation: story-spin 60s linear infinite;
+}
+@keyframes story-breathe {
+  50% {
+    transform: scale(1.08);
+  }
+}
+@keyframes story-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Diagonal stripes sliding across. */
+.story-stripes {
+  position: absolute;
+  inset: -20%;
+  background: repeating-linear-gradient(-30deg, var(--shape) 0 18px, transparent 18px 46px);
+  mask-image: linear-gradient(180deg, transparent 20%, #000 60%, transparent 95%);
+  animation: story-slide-stripes 6s linear infinite;
+}
+@keyframes story-slide-stripes {
+  to {
+    transform: translateX(53px);
+  }
+}
+
+/* The wipe: a bright beam sweeping down the screen. */
+.story-scan {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 22cqh;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.75) 80%, rgba(46, 104, 196, 0.35) 82%, transparent 84%);
+  animation: story-scan 3.2s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+@keyframes story-scan {
+  from {
+    transform: translateY(-30cqh);
+  }
+  to {
+    transform: translateY(110cqh);
+  }
+}
+
+/* Bench: two dashed gears turning against each other. */
+.story-gear {
+  position: absolute;
+  border-radius: 50%;
+  border: 10px dotted var(--shape-strong);
+}
+.story-gear-a {
+  width: 70cqw;
+  aspect-ratio: 1;
+  right: -26cqw;
+  top: 16cqh;
+  animation: story-spin 24s linear infinite;
+}
+.story-gear-b {
+  width: 42cqw;
+  aspect-ratio: 1;
+  right: 30cqw;
+  top: 4cqh;
+  border-width: 7px;
+  animation: story-spin 16s linear infinite reverse;
+}
+
+/* Speed lines. */
+.story-speed span {
+  position: absolute;
+  left: 0;
+  height: 3px;
+  width: 40cqw;
+  border-radius: 99px;
+  background: linear-gradient(90deg, transparent, var(--shape-strong));
+  top: calc(18cqh + var(--i) * 13cqh);
+  animation: story-zoom calc(1.1s + var(--i) * 0.17s) linear infinite;
+  animation-delay: calc(var(--i) * -0.4s);
+}
+@keyframes story-zoom {
+  from {
+    transform: translateX(-50cqw);
+  }
+  to {
+    transform: translateX(120cqw);
+  }
+}
+
+/* Dot grid, slowly panning. */
+.story-dots {
+  position: absolute;
+  inset: -40px;
+  background-image: radial-gradient(var(--shape-strong) 1.6px, transparent 1.8px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(80% 60% at 80% 85%, #000, transparent);
+  animation: story-pan 14s linear infinite;
+}
+@keyframes story-pan {
+  to {
+    transform: translate(22px, 22px);
+  }
+}
+
+/* Aura: a soft, spinning conic glow (Wrapped's gradient orbs). */
+.story-aura {
+  position: absolute;
+  width: 110cqw;
+  aspect-ratio: 1;
+  right: -35cqw;
+  bottom: -20cqw;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #2fbf8a, #8ff5c4, #ffe0cb, #dceafe, #2fbf8a);
+  filter: blur(48px);
+  opacity: 0.45;
+  animation: story-spin 18s linear infinite;
+}
+.story-aura-lg {
+  width: 150cqw;
+  right: -25cqw;
+  bottom: auto;
+  top: 18cqh;
+  opacity: 0.55;
+}
+.story-aura-soft {
+  opacity: 0.25;
+  top: 10cqh;
+  bottom: auto;
+}
+.story-sparkles span {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #f6f3ec;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  opacity: 0;
+  animation: story-twinkle 2.6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.37s);
+}
+@keyframes story-twinkle {
+  50% {
+    opacity: 0.9;
+    transform: scale(1.4) rotate(45deg);
+  }
+}
+
+/* Persona: holographic name plate. */
+.story-holo {
+  position: relative;
+  border-radius: 28px;
+  padding: 2px;
+  background: conic-gradient(from var(--holo-angle, 0deg), #8ff5c4, #ffe0cb, #dceafe, #fff1bf, #8ff5c4);
+  animation: story-holo 5s linear infinite;
+}
+@property --holo-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes story-holo {
+  to {
+    --holo-angle: 360deg;
+  }
+}
+
+.story-foil {
+  background: linear-gradient(180deg, #8ff5c4, #ffe0cb 30%, #dceafe 55%, #fff1bf 80%, #8ff5c4);
+  background-size: 100% 300%;
+  animation: story-foil 6s ease-in-out infinite alternate;
+}
+@keyframes story-foil {
+  to {
+    background-position: 0 100%;
+  }
+}
+
 /* Hidden on screen; the flat passport appears when printing the story URL. */
 .story-print-only {
   display: none;
@@ -216,5 +547,10 @@
   .story-seg[data-state="active"] .story-seg-fill {
     animation: none;
     transform: scaleX(1);
+  }
+  .story-backdrop *,
+  .story-holo,
+  .story-foil {
+    animation: none !important;
   }
 }

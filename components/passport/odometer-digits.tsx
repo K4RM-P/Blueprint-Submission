@@ -58,7 +58,7 @@ function Window({ digit, delay, still }: { digit: number; delay: number; still: 
       <Liquid tilt={tilt} />
       <motion.span className="absolute inset-x-0 top-0 flex flex-col" style={{ y }}>
         {DIGITS.map((n, k) => (
-          <span key={k} className="story-huge grid h-[1.18em] place-items-center text-ink">
+          <span key={k} className="story-huge grid h-[1.18em] place-items-center text-[#17201C]">
             {n}
           </span>
         ))}

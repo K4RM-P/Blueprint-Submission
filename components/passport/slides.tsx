@@ -1,12 +1,12 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowRight, BadgeCheck, Cpu, HandCoins, HardDrive, Recycle, ShieldCheck, Terminal, Users, Wrench } from "lucide-react";
+import { ArrowRight, BadgeCheck, Cpu, Flame, Gift, HandCoins, HardDrive, Hourglass, Recycle, ShieldCheck, Sparkles, Terminal, Users, Wrench, Zap } from "lucide-react";
 import type { ReactNode } from "react";
 import { Seal } from "@/components/clay/seal";
 import { ClayLaptop } from "@/components/illustrations/clay-laptop";
 import { PassportBooklet } from "@/components/journey/passport-booklet";
-import { storyDate, type BenchStep, type PassportStory, type SlideKey } from "@/lib/passport-story";
+import { storyDate, type BenchStep, type PassportStory, type Persona, type SlideKey } from "@/lib/passport-story";
 import { cn } from "@/lib/utils";
 import { BatonSprite } from "./baton-sprite";
 import { OdometerDigits } from "./odometer-digits";
@@ -54,6 +54,8 @@ export function SlideContent({ k, ...props }: SlideProps & { k: SlideKey }) {
       return <NextLeg {...props} />;
     case "recycled":
       return <Recycled {...props} />;
+    case "persona":
+      return <PersonaSlide {...props} />;
     case "finale":
       return <>{props.finale}</>;
   }
@@ -457,6 +459,62 @@ function Recycled({ story }: SlideProps) {
         </motion.span>
       </Hero>
       <Sub delay={0.9}>Not every laptop can be refurbished. When one can&apos;t, Free Geek Toronto makes sure it&apos;s recycled responsibly instead of sent to landfill.</Sub>
+    </>
+  );
+}
+
+export const PERSONA_ICON: Record<Persona["key"], ReactNode> = {
+  phoenix: <Flame />,
+  sprinter: <Zap />,
+  veteran: <Hourglass />,
+  free_spirit: <Terminal />,
+  gift: <Gift />,
+  comeback: <Sparkles />,
+};
+
+/* Persona: Wrapped's "personality" reveal. A holographic plate flips in, then its traits stamp down. */
+function PersonaSlide({ story }: SlideProps) {
+  const { reduced } = useStoryMotion();
+  const p = story.persona;
+  return (
+    <>
+      <Eyebrow>Its passport personality</Eyebrow>
+      <KineticLine text="After everything, this laptop is…" size="sm" className="mt-3" />
+      <Hero className="flex-col gap-[3cqh]">
+        <motion.div
+          className="story-holo w-full max-w-[380px]"
+          initial={reduced ? false : { rotateY: -90, scale: 0.7, opacity: 0 }}
+          animate={{ rotateY: 0, scale: 1, opacity: 1 }}
+          transition={reduced ? { duration: 0.15 } : { type: "spring", stiffness: 120, damping: 14, delay: 1.1 }}
+          style={{ transformPerspective: 900 }}
+        >
+          <div className="flex flex-col items-center rounded-[26px] bg-[#0A3D2B] px-[6cqw] py-[3.4cqh] text-center">
+            <motion.span
+              className="grid size-[16cqw] max-h-16 max-w-16 place-items-center rounded-full bg-[#8FF5C4] text-[#0A3D2B] shadow-[0_0_40px_rgba(143,245,196,.55)] [&_svg]:size-[46%] [&_svg]:stroke-[2]"
+              initial={reduced ? false : { scale: 0, rotate: -120 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={reduced ? { duration: 0.15 } : { type: "spring", stiffness: 260, damping: 14, delay: 1.6 }}
+            >
+              {PERSONA_ICON[p.key]}
+            </motion.span>
+            <p className="story-huge mt-[2cqh] text-[clamp(2.4rem,13cqw,4rem)] !leading-[0.9] text-[#F6F3EC]">{p.name}</p>
+            <p className="mt-[1.4cqh] max-w-[28ch] text-[0.9375rem] leading-snug text-[#B9E6D2]">{p.tagline}</p>
+          </div>
+        </motion.div>
+        <ul className="flex flex-wrap justify-center gap-2" aria-label="Traits">
+          {p.traits.map((t, i) => (
+            <motion.li
+              key={t}
+              className="rounded-full border border-[#8FF5C4]/40 bg-[#8FF5C4]/10 px-3.5 py-1.5 font-mono text-[0.75rem] uppercase tracking-[0.1em] text-[#E4FBEF]"
+              initial={reduced ? false : { opacity: 0, scale: 1.6, rotate: i % 2 ? 8 : -8 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={reduced ? { duration: 0.15 } : { type: "spring", stiffness: 480, damping: 20, delay: 2.2 + i * 0.16 }}
+            >
+              {t}
+            </motion.li>
+          ))}
+        </ul>
+      </Hero>
     </>
   );
 }

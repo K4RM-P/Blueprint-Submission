@@ -5,6 +5,7 @@ import type { PointerEvent } from "react";
 import { LoopMark } from "@/components/shell/logo";
 import { cardFacts, legLabel, type PassportStory } from "@/lib/passport-story";
 import { cn } from "@/lib/utils";
+import { PERSONA_ICON } from "./slides";
 import { useStoryMotion } from "./story-context";
 
 /**
@@ -57,6 +58,12 @@ export function WrappedCard({ story, className }: { story: PassportStory; classN
           </div>
           <p className="story-huge mt-[2.4cqh] text-[clamp(1.75rem,8.4cqw,2.6rem)] !leading-[0.95] !tracking-[-0.045em] text-white">{story.deviceName}</p>
           <p className="mt-2 text-[0.8125rem] text-[#B9E6D2]">{story.specs.slice(0, 3).join(" · ")}</p>
+          <span className="mt-[1.6cqh] inline-flex h-7 items-center gap-1.5 rounded-full bg-[#8FF5C4] px-3 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-[#0A3D2B] [&_svg]:size-3.5 [&_svg]:stroke-[2.2]">
+            {PERSONA_ICON[story.persona.key]}
+            {story.persona.name}
+          </span>
+          {/* holographic foil strip, like a real passport's security band */}
+          <span aria-hidden className="story-foil pointer-events-none absolute right-10 top-0 h-full w-10 skew-x-[-18deg] opacity-30 mix-blend-overlay" />
         </div>
 
         {/* tear line */}
