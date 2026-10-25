@@ -10,5 +10,4 @@ export { StatusChip, type ChipTone } from "./status-chip";
 export { Field, Input, Textarea, Select, Checkbox } from "./field";
 export { EmptyState } from "./empty-state";
 export { Skeleton, PageSkeleton } from "./skeleton";
-export { DemoBanner } from "./demo-banner";
 export { Dock } from "./dock";
