@@ -975,53 +975,19 @@ html[data-reduced-motion="true"] :is(.laptop-lid, .laptop-lane-fill, .laptop-bat
     transform: translate(364px, 0);
   }
 }
-.route-dash {
-  transform-origin: 0 50%;
-  animation: route-dash 0.5s var(--ease-soft) both;
-}
-@keyframes route-dash {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: none;
-  }
-}
-.metaball {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-}
-@keyframes meta-a {
-  to {
-    transform: translate(-90px, 70px) scale(1.08);
-  }
-}
-@keyframes meta-b {
-  to {
-    transform: translate(-150px, -60px) scale(0.86);
-  }
-}
-@keyframes meta-c {
-  to {
-    transform: translate(170px, -90px) scale(1.15);
-  }
-}
 /* pause every loop while the hero is offscreen */
-.hero[data-live="false"] :is(.baton-wave, .baton-wave-slow, .baton-bubble, .metaball) {
+.hero[data-live="false"] :is(.baton-wave, .baton-wave-slow, .baton-bubble) {
   animation-play-state: paused;
 }
 @media (prefers-reduced-motion: reduce) {
-  :is(.hero-in, .hero-word, .hero-drop, .hero-baton-in, .baton-liquid, .baton-wave, .baton-wave-slow, .route-dash, .metaball) {
+  :is(.hero-in, .hero-word, .hero-drop, .hero-baton-in, .baton-liquid, .baton-wave, .baton-wave-slow) {
     animation: none !important;
   }
   .baton-bubble {
     display: none;
   }
 }
-html[data-reduced-motion="true"] :is(.hero-in, .hero-word, .hero-drop, .hero-baton-in, .baton-liquid, .baton-wave, .baton-wave-slow, .route-dash, .metaball) {
+html[data-reduced-motion="true"] :is(.hero-in, .hero-word, .hero-drop, .hero-baton-in, .baton-liquid, .baton-wave, .baton-wave-slow) {
   animation: none !important;
 }
 html[data-reduced-motion="true"] .baton-bubble {
@@ -1059,4 +1025,149 @@ html[data-reduced-motion="true"] .baton-bubble {
   .tactile:active {
     transform: none;
   }
+}
+
+/* ---------- Landing, sharpened: stage, callouts, guides (Stripe/Linear/Vercel/Apple patterns in Relay's material) ---------- */
+.hero-title {
+  font-weight: 700;
+  letter-spacing: -0.058em;
+}
+.stage {
+  background: linear-gradient(180deg, #fcfaf6 0%, #f2ede4 100%);
+  border: 1px solid rgba(90, 75, 55, 0.12);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 1px 0 rgba(255, 255, 255, 0.7),
+    0 50px 90px -50px rgba(90, 75, 55, 0.4),
+    0 18px 30px -24px rgba(90, 75, 55, 0.25);
+}
+.stage-grid {
+  background-image:
+    linear-gradient(to right, rgba(90, 75, 55, 0.075) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(90, 75, 55, 0.075) 1px, transparent 1px);
+  background-size: 44px 44px;
+  background-position: center center;
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 25%, transparent 80%);
+  mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 25%, transparent 80%);
+}
+.stage-spot {
+  background: radial-gradient(38rem circle at var(--sx, 50%) var(--sy, 46%), rgba(255, 255, 255, 0.8), transparent 62%);
+}
+.stage-halo {
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(47, 191, 138, 0.2), rgba(47, 191, 138, 0.07) 55%, transparent);
+}
+.stage-reflection {
+  opacity: 0.2;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 45%);
+  mask-image: linear-gradient(to bottom, #000, transparent 45%);
+}
+.stage-reflection > svg {
+  transform: scaleY(-1);
+}
+.crosshair {
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+}
+.crosshair::before,
+.crosshair::after {
+  content: "";
+  position: absolute;
+  background: rgba(90, 75, 55, 0.38);
+}
+.crosshair::before {
+  left: 0;
+  right: 0;
+  top: 6px;
+  height: 1px;
+}
+.crosshair::after {
+  top: 0;
+  bottom: 0;
+  left: 6px;
+  width: 1px;
+}
+@media (min-width: 768px) {
+  .callout {
+    left: var(--at);
+    width: 15rem;
+    translate: -50% 0;
+    text-align: center;
+  }
+  .callout-above {
+    top: 40px;
+  }
+  .callout-below {
+    bottom: 34px;
+  }
+  .callout-line {
+    position: absolute;
+    left: 50%;
+    width: 1px;
+    background: linear-gradient(to bottom, rgba(23, 32, 28, 0.35), rgba(23, 32, 28, 0.12));
+  }
+  .callout-line::after {
+    content: "";
+    position: absolute;
+    left: -3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1.5px solid var(--loop);
+  }
+  .callout-above .callout-line {
+    top: calc(100% + 10px);
+    height: 26px;
+  }
+  .callout-above .callout-line::after {
+    bottom: -4px;
+  }
+  .callout-below .callout-line {
+    bottom: calc(100% + 10px);
+    height: 64px;
+  }
+  .callout-below .callout-line::after {
+    top: -4px;
+  }
+}
+
+/* Page guides: two hairlines framing the content column, with crosshairs where section rules cross them. */
+.page-guides {
+  pointer-events: none;
+  position: absolute;
+  inset: 0 0 0 50%;
+  width: min(1200px, 100%);
+  translate: -50% 0;
+  border-inline: 1px solid rgba(90, 75, 55, 0.09);
+}
+.rule {
+  position: relative;
+  height: 1px;
+  background: rgba(90, 75, 55, 0.11);
+}
+.rule-mark {
+  position: absolute;
+  top: -6px;
+  width: 13px;
+  height: 13px;
+}
+/* The one dark panel on the landing page (Passport): ink with a faint grid and a mint glow. */
+.ink-panel {
+  background:
+    radial-gradient(40rem 26rem at 85% 120%, rgba(47, 191, 138, 0.28), transparent 60%),
+    radial-gradient(30rem 20rem at 0% -20%, rgba(255, 255, 255, 0.06), transparent 60%),
+    #17201c;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 50px 90px -50px rgba(23, 32, 28, 0.6);
+}
+.ink-panel-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 70% 60%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 80% at 70% 60%, #000 20%, transparent 75%);
 }

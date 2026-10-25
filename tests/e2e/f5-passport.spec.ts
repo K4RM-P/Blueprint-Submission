@@ -35,7 +35,8 @@ test("F5 — staff records a sale; the passport renders and hides private fields
   const watch = watchErrors(anon);
   await anon.goto(`/p/${code}`);
   await settle(anon);
-  await expect(anon.getByText(code)).toBeVisible();
+  // The code shows twice since the passport cover was added (cover + header); either proves it rendered.
+  await expect(anon.getByText(code).first()).toBeVisible();
   await expect(anon.getByText(/Refurbished by Free Geek Toronto/).first()).toBeVisible();
   await expect(anon.getByText(/independent non-profit/).first()).toBeVisible();
   await expect(anon.getByRole("heading", { name: /Why isn.t (this|it) free/i })).toBeVisible();
@@ -55,5 +56,5 @@ test("F5 — staff records a sale; the passport renders and hides private fields
 test("F5 — an unknown passport code is a friendly 404 linking to /about (DP-10)", async ({ page }) => {
   await page.goto("/p/FGT-ZZZZZZZZ");
   await expect(page.getByRole("link", { name: /about/i }).first()).toBeVisible();
-  await expect(page.locator("main")).toContainText(/couldn.t find|not found|no passport/i);
+  await expect(page.locator("main")).toContainText(/(couldn.t|can.t) find|not found|no passport/i);
 });

@@ -11,7 +11,7 @@ await p.waitForTimeout(1500);
 await p.goto(BASE + "/", { waitUntil: "commit" });
 const t0 = Date.now();
 for (let i = 0; i < 14; i++) {
-  await p.screenshot({ path: `${out}/entrance-${w}-${String(i).padStart(2, "0")}.png` });
+  await p.screenshot({ path: `${out}/entrance-${w}-${String(i).padStart(2, "0")}.png` }).catch(() => {}); // the first frame can land before paint
   const next = t0 + (i + 1) * 120;
   await p.waitForTimeout(Math.max(0, next - Date.now()));
 }

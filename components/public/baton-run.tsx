@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useMotionPrefs } from "@/lib/motion";
 import { ClayBaton } from "@/components/illustrations/clay-baton";
+import { SectionHead } from "@/components/landing/section-head";
 
 export interface RelayStation {
   /** Whose hands the baton is in, e.g. "A Toronto business". */
@@ -53,19 +54,16 @@ export function BatonRun({ stations }: { stations: RelayStation[] }) {
 
   return (
     <section ref={ref} aria-labelledby="relay-title" className={cn("relative", reduced ? "" : "md:h-[200vh]")}>
-      <div className={cn("flex flex-col justify-center pb-20 pt-6", reduced ? "md:py-28" : "md:sticky md:top-0 md:h-dvh md:justify-start md:py-0 md:pt-[14vh]")}>
+      <div className={cn("flex flex-col justify-center pb-20 pt-16", reduced ? "md:py-28" : "md:sticky md:top-0 md:h-dvh md:justify-start md:py-0 md:pt-[13vh]")}>
         <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6">
-          <div className="grid items-end gap-6 md:grid-cols-12">
-            <div className="md:col-span-8">
-              <p className="eyebrow">The relay</p>
-              <h2 id="relay-title" className="font-display mt-3 max-w-2xl text-[2.25rem] leading-[1.02] sm:text-display-m">
-                Four handoffs. Every one on the record.
-              </h2>
-            </div>
-            <p className="text-ink-2 md:col-span-4 md:pb-1">
-              Follow one laptop from an office desk to a student&apos;s backpack. Scroll, and the baton runs the relay with the real counts from Free Geek Toronto&apos;s bench.
-            </p>
-          </div>
+          <SectionHead
+            id="relay-title"
+            fig="0.2"
+            label="The relay"
+            title="Four handoffs."
+            muted="Every one on the record."
+            aside={<p className="text-ink-2">Follow one laptop from an office desk to a student&apos;s backpack, with the real counts from Free Geek Toronto&apos;s bench.</p>}
+          />
 
           {/* Desktop: horizontal relay lane over a 4-column station grid */}
           <div className="mt-14 hidden md:block">

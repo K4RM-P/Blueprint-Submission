@@ -6,7 +6,7 @@ import { ArrowRight, ScanLine } from "lucide-react";
 import { isValidPassportCode, normalizePassportCode } from "@/lib/passport-code";
 
 /** Type the code from a laptop sticker → its passport. */
-export function PassportLookup({ className }: { className?: string }) {
+export function PassportLookup({ className, tone = "light" }: { className?: string; /** "dark" when placed on an ink panel (error text stays readable). */ tone?: "light" | "dark" }) {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export function PassportLookup({ className }: { className?: string }) {
       <label htmlFor="passport-code" className="sr-only">
         Passport code
       </label>
-      <div className="glass flex h-14 items-center gap-2 rounded-full pl-5 pr-1.5">
+      <div className={`flex h-14 items-center gap-2 rounded-full pl-5 pr-1.5 ${tone === "dark" ? "bg-surface text-ink shadow-[inset_0_1px_0_#fff,0_20px_40px_-20px_rgba(0,0,0,0.6)]" : "glass"}`}>
         <ScanLine className="size-5 shrink-0 text-loop-deep" aria-hidden />
         <input
           id="passport-code"
@@ -44,7 +44,7 @@ export function PassportLookup({ className }: { className?: string }) {
         </button>
       </div>
       {error ? (
-        <p id="passport-error" role="alert" className="mt-2 pl-5 text-small font-medium text-danger-ink">
+        <p id="passport-error" role="alert" className={`mt-2 pl-5 text-small font-medium ${tone === "dark" ? "text-[#FFB4A8]" : "text-danger-ink"}`}>
           {error}
         </p>
       ) : null}

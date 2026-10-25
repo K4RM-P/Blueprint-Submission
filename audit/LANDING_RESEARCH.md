@@ -63,3 +63,22 @@ Honest comparison with `landing-before/`:
 - **Still not perfect:** the metaball backdrop is close to "soft blob" territory. It is kept quiet (60% opacity, masked edges, desktop-only motion). The pinned relay still leaves sticky runway in full-page captures; that's how pinning looks in a full-page capture, not something a visitor sees.
 
 **Performance (Lighthouse 12.6, `pnpm start`, localhost):** desktop 100 (LCP 0.8s, CLS 0). Mobile (simulated slow 4G) 87; the previous commit measured 88 on the same machine. Observed LCP is ~0.63s; the simulated 4.1s is render delay from the app-wide JS bundle (React + motion, shared by every page), not from the landing changes. Getting mobile ≥ 90 means trimming shared client JS in the shell, which is outside this task's scope.
+
+## 5. Round 2: sharpened, pattern by pattern
+
+Studied the live reference sites (screenshots kept out of the repo) and adapted specific patterns, rebuilt in Relay's own clay + liquid material. No assets, copy or branding taken.
+
+| Pattern | Seen on | How Relay uses it |
+|---|---|---|
+| Live running number above the headline ("Global GDP running on Stripe: 1.73…%") | Stripe | "Devices back in use through Relay: 58 →" ticker, counts up, links to /impact |
+| Hairline guides framing the content column, logo strip boxed by hairlines | Stripe | `page-guides` + `Rule` hairlines; "In the relay" partner strip under the hero (static, no marquee per §12.9) |
+| Two-tone statements (ink + muted continuation) | Stripe, Vercel | Hero supporting line and every chapter heading |
+| Product shown in a large framed stage under a short headline; "FIG 0.x" mono labels | Linear | The baton on a framed stage, "Fig 0.1 · The baton"; chapters numbered Fig 0.2–0.6 |
+| Object on a soft halo, crosshair marks on the grid | Vercel | Mint halo behind the baton, faint grid, "+" crosshairs on stage corners and where rules meet the guides |
+| Floating product render with floor reflection; spec callouts; sticky buy pill | Apple | Baton reflection, three leader-line callouts with live counts (handed over / wiped & rebuilt / passed on), sticky "Free to start · Become a partner" pill once the hero's own CTA is gone |
+| Product tilts flat as it scrolls into view | Linear/Apple | Stage starts at rotateX 18° and stands up on scroll |
+| One dark band for contrast | Linear, Apple | Passport becomes the page's only ink panel |
+
+Removed: the metaball backdrop (the weakest, most "AI blob" element), the baton-inside-the-sentence layout (the headline is now one clean line on desktop, two on phones), the bento of stat pebbles (now a Stripe-style stat row on hairlines plus one liquid lane).
+
+**Performance (Lighthouse 12.6, prod build, localhost):** desktop 99 (LCP 0.8s, CLS 0, TBT 0). Mobile 87, same as before this round and vs 88 for the pre-revamp page; the gap is the shared app-wide JS bundle, not the landing page.
