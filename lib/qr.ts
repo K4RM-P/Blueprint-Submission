@@ -3,7 +3,7 @@ import QRCode from "qrcode";
 import { env } from "@/lib/env";
 
 export function passportUrl(code: string) {
-  return `${env.siteUrl}/p/${code}`;
+  return `${env.publicSiteUrl}/p/${code}`;
 }
 
 /** Inline SVG QR (no network, prints crisply). */

@@ -21,7 +21,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ numb
   let path = cert.pdf_path;
   if (!path) {
     // Seeded/older certificates: render from the chain of custody. Staff store it; partners get it streamed.
-    const data = await buildCertificateData(supabase, { batchId: cert.batch_id, number: cert.certificate_number, issuedAt: cert.issued_at, issuedBy: cert.profiles?.full_name ? `${cert.profiles.full_name}, Free Geek Toronto` : "Free Geek Toronto staff", siteUrl: env.siteUrl });
+    const data = await buildCertificateData(supabase, { batchId: cert.batch_id, number: cert.certificate_number, issuedAt: cert.issued_at, issuedBy: cert.profiles?.full_name ? `${cert.profiles.full_name}, Free Geek Toronto` : "Free Geek Toronto staff", siteUrl: env.publicSiteUrl });
     const pdf = await renderCertificatePdf(data);
     const { data: me } = await supabase.from("profiles").select("role").eq("id", claims.claims.sub).single();
     if (me?.role !== "staff") {

@@ -24,7 +24,7 @@ export async function issueCertificate(input: unknown): Promise<ActionResult<{ n
     const { data: existing } = await s.supabase.from("certificates").select("certificate_number").like("certificate_number", `GL-${year}-%`);
     const number = nextCertificateNumber(year, (existing ?? []).map((c) => c.certificate_number));
     const issuedAt = new Date().toISOString();
-    const data = await buildCertificateData(s.supabase, { batchId, number, issuedAt, issuedBy: `${s.profile.full_name ?? "Staff"}, Free Geek Toronto`, siteUrl: env.siteUrl });
+    const data = await buildCertificateData(s.supabase, { batchId, number, issuedAt, issuedBy: `${s.profile.full_name ?? "Staff"}, Free Geek Toronto`, siteUrl: env.publicSiteUrl });
     const pdf = await renderCertificatePdf(data);
     const path = certificatePath(batch.organization_id, number);
     const { error: upErr } = await s.supabase.storage.from("certificates").upload(path, pdf, { contentType: "application/pdf", upsert: true });

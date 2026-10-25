@@ -12,6 +12,17 @@ function resolveSiteUrl(): string {
   return configured || "http://localhost:3000";
 }
 
+/** The live production domain. Printed QR stickers must resolve from any phone, forever. */
+export const PRODUCTION_SITE_URL = "https://freegeek-relay.vercel.app";
+
+/**
+ * Where anything a phone scans should point (passport and certificate QRs). Unlike
+ * siteUrl it is never a LAN/localhost address, so QRs made from `pnpm dev` work too.
+ */
+export function resolvePublicSiteUrl(siteUrl: string): string {
+  return isPrivateUrl(siteUrl) ? PRODUCTION_SITE_URL : siteUrl;
+}
+
 /** localhost, 127.x, 10.x, 172.16–31.x, 192.168.x, *.local, or anything unparseable. */
 export function isPrivateUrl(url: string): boolean {
   let host: string;
@@ -36,5 +47,6 @@ export const env = {
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
   supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
   siteUrl: resolveSiteUrl(),
+  publicSiteUrl: resolvePublicSiteUrl(resolveSiteUrl()),
   demoMode: process.env.NEXT_PUBLIC_DEMO_MODE === "true",
 };
