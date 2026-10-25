@@ -2,7 +2,6 @@
 
 import { motion, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { Building2, HardDrive, HeartHandshake, Wrench } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMotionPrefs } from "@/lib/motion";
 import { ClayBaton } from "@/components/illustrations/clay-baton";
@@ -15,8 +14,6 @@ export interface RelayStation {
   stat: string;
   statLabel: string;
 }
-
-const ICONS = [Building2, HardDrive, Wrench, HeartHandshake];
 
 /** Squash amount (0..1) as the baton passes through a handoff point. */
 function bumpAt(v: number, stops: number[], width = 0.035) {
@@ -41,6 +38,9 @@ export function BatonRun({ stations }: { stations: RelayStation[] }) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const progress = useSpring(scrollYProgress, { stiffness: 90, damping: 20, mass: 1.2 });
   const travel = useTransform(progress, [0.08, 0.8], [stops[0], stops[n - 1]], { clamp: true });
+  // Arrival starts while the section is still entering the viewport, as the hero hands off.
+  const { scrollYProgress: entering } = useScroll({ target: ref, offset: ["start 75%", "start start"] });
+  const arrive = useSpring(entering, { stiffness: 120, damping: 14, mass: 1 });
   const [active, setActive] = useState(0);
   useMotionValueEvent(travel, "change", (v) => {
     let a = 0;
@@ -52,24 +52,24 @@ export function BatonRun({ stations }: { stations: RelayStation[] }) {
   const shown = reduced ? n - 1 : active;
 
   return (
-    <section ref={ref} aria-labelledby="relay-title" className={cn("relative", reduced ? "" : "md:h-[240vh]")}>
-      <div className={cn("flex flex-col justify-center py-20", reduced ? "md:py-28" : "md:sticky md:top-0 md:h-dvh md:justify-start md:py-0 md:pt-[16vh]")}>
+    <section ref={ref} aria-labelledby="relay-title" className={cn("relative", reduced ? "" : "md:h-[200vh]")}>
+      <div className={cn("flex flex-col justify-center pb-20 pt-6", reduced ? "md:py-28" : "md:sticky md:top-0 md:h-dvh md:justify-start md:py-0 md:pt-[14vh]")}>
         <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6">
           <div className="grid items-end gap-6 md:grid-cols-12">
             <div className="md:col-span-8">
               <p className="eyebrow">The relay</p>
               <h2 id="relay-title" className="font-display mt-3 max-w-2xl text-[2.25rem] leading-[1.02] sm:text-display-m">
-                Every laptop is a baton. Four pairs of hands pass it on.
+                Four handoffs. Every one on the record.
               </h2>
             </div>
             <p className="text-ink-2 md:col-span-4 md:pb-1">
-              Follow one device from an office desk to a student&apos;s backpack. Each handoff is recorded, so nobody has to take it on trust.
+              Follow one laptop from an office desk to a student&apos;s backpack. Scroll, and the baton runs the relay with the real counts from Free Geek Toronto&apos;s bench.
             </p>
           </div>
 
           {/* Desktop: horizontal relay lane over a 4-column station grid */}
           <div className="mt-14 hidden md:block">
-            <Lane stations={stations} stops={stops} travel={travel} shown={shown} reduced={reduced} />
+            <Lane stations={stations} stops={stops} travel={travel} arrive={arrive} shown={shown} reduced={reduced} />
             <ol className="mt-10 grid grid-cols-4 gap-5">
               {stations.map((s, i) => (
                 <li key={s.title}>
@@ -87,7 +87,7 @@ export function BatonRun({ stations }: { stations: RelayStation[] }) {
   );
 }
 
-function Lane({ stations, stops, travel, shown, reduced }: { stations: RelayStation[]; stops: number[]; travel: MotionValue<number>; shown: number; reduced: boolean }) {
+function Lane({ stations, stops, travel, arrive, shown, reduced }: { stations: RelayStation[]; stops: number[]; travel: MotionValue<number>; arrive: MotionValue<number>; shown: number; reduced: boolean }) {
   const laneRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   useEffect(() => {
@@ -103,6 +103,9 @@ function Lane({ stations, stops, travel, shown, reduced }: { stations: RelayStat
   const squash = useTransform(travel, (v) => (reduced ? 0 : bumpAt(v, stops.slice(1))));
   const scaleX = useTransform(squash, (b) => 1 - 0.16 * b);
   const scaleY = useTransform(squash, (b) => 1 + 0.14 * b);
+  // The hero's baton drops in from above: the lane catches it, squashes, then the run starts.
+  const catchY = useTransform(arrive, [0, 1], reduced ? [0, 0] : [-90, 0]);
+  const caught = useTransform(arrive, [0, 0.5], reduced ? [1, 1] : [0, 1]);
 
   return (
     <div ref={laneRef} className="relative h-16" aria-hidden>
@@ -128,7 +131,7 @@ function Lane({ stations, stops, travel, shown, reduced }: { stations: RelayStat
           </span>
         </div>
       ))}
-      <motion.div className="absolute left-0 top-1/2 -ml-12 -mt-5 w-24" style={{ x, scaleX, scaleY }}>
+      <motion.div className="absolute left-0 top-1/2 -ml-12 -mt-5 w-24" style={{ x, y: catchY, scaleX, scaleY, opacity: caught }}>
         <ClayBaton core={0.35 + 0.65 * ((shown + 1) / stations.length)} />
       </motion.div>
     </div>
@@ -173,32 +176,32 @@ function VerticalRun({ stations, reduced }: { stations: RelayStation[]; reduced:
 }
 
 function StationCard({ station, index, lit, receiving }: { station: RelayStation; index: number; lit: boolean; receiving: boolean }) {
-  const { t } = useMotionPrefs();
-  const Icon = ICONS[index % ICONS.length];
+  const { t, reduced } = useMotionPrefs();
   return (
     <motion.div
       // ≤ 2 tints per view (§12): only the station holding the baton turns mint.
       data-tint={receiving ? "mint" : "porcelain"}
-      animate={{ y: receiving ? -6 : 0 }}
+      initial={false}
+      animate={{ y: receiving ? -8 : 0, scale: lit || reduced ? 1 : 0.97, opacity: lit || reduced ? 1 : 0.62 }}
       transition={t("soft")}
-      className="clay-glass hairline-top flex h-full gap-4 p-5 transition-[background-color] duration-500 md:flex-col"
+      className="clay-glass hairline-top relative flex h-full flex-col overflow-hidden p-5 transition-[background-color] duration-500 md:p-6"
     >
-      <span
-        data-tint={lit ? "mint" : "porcelain"}
-        className={cn("clay-sm relative grid size-11 shrink-0 place-items-center rounded-[14px] transition-colors duration-500 [&_svg]:size-[22px] [&_svg]:stroke-[1.75]", lit ? "text-loop-deep" : "text-ink-3")}
-        aria-hidden
-      >
-        <Icon />
-      </span>
-      <div className="min-w-0">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className={cn("font-display text-[2.5rem] leading-none tnum transition-colors md:text-[3rem]", lit ? "text-ink" : "text-ink-3")}>{station.stat}</p>
         <p className="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-ink-3">Leg {index + 1}</p>
-        <h3 className={cn("mt-0.5 font-semibold leading-snug transition-colors", lit ? "text-ink" : "text-ink-2")}>{station.title}</h3>
-        <p className="mt-1 text-small text-ink-2">{station.body}</p>
-        <p className={cn("mt-4 font-display text-[2rem] leading-none tnum transition-colors", lit ? "text-ink" : "text-ink-3")}>
-          {station.stat}
-          <span className="ml-2 font-sans text-small font-medium tracking-normal text-ink-2">{station.statLabel}</span>
-        </p>
       </div>
+      <p className="mt-1 text-small text-ink-2">{station.statLabel}</p>
+      <h3 className={cn("mt-6 text-lg font-semibold leading-snug transition-colors", lit ? "text-ink" : "text-ink-2")}>{station.title}</h3>
+      <p className="mt-1 text-small text-ink-2">{station.body}</p>
+      {/* the handoff: liquid pours along the card's floor when the baton arrives */}
+      <span aria-hidden className="absolute inset-x-0 bottom-0 h-1.5 overflow-hidden">
+        <motion.span
+          className="absolute inset-0 origin-left bg-gradient-to-r from-loop-light to-loop"
+          initial={false}
+          animate={{ scaleX: lit ? 1 : 0 }}
+          transition={t("liquid")}
+        />
+      </span>
     </motion.div>
   );
 }
