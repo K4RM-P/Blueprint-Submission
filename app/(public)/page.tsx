@@ -50,10 +50,11 @@ export default async function Landing() {
       {/* 1 · Hero: "Pass it on." */}
       <Hero
         devicesReused={t.devicesReused}
+        totals={{ received: t.devicesReceived, verified: impact.stages.verified, reused: t.devicesReused, kgDiverted: t.kgDiverted }}
         legs={[
-          { at: 27, label: "Handed over", stat: t.devicesReceived, caption: "laptops from Toronto businesses" },
-          { at: 50, label: "Wiped & rebuilt", stat: impact.stages.verified, caption: "drives verified clean", above: true },
-          { at: 73, label: "Passed on", stat: t.devicesReused, caption: "now in someone's hands" },
+          { label: "Handed over", stat: t.devicesReceived, caption: "laptops from Toronto businesses" },
+          { label: "Wiped & rebuilt", stat: impact.stages.verified, caption: "drives verified clean" },
+          { label: "Passed on", stat: t.devicesReused, caption: "now in someone's hands" },
         ]}
       />
 
@@ -108,7 +109,7 @@ export default async function Landing() {
             <Reveal key={s.label} delay={i * 0.08} className={i % 2 ? "border-l border-line pl-5 md:pl-6" : i ? "md:border-l md:border-line md:pl-6" : undefined}>
               <dt className="sr-only">{s.label}</dt>
               <dd>
-                <p className="font-display text-[2.75rem] leading-none tracking-[-0.045em] sm:text-[3.75rem]">
+                <p className="font-display text-[3rem] font-semibold leading-none tracking-[-0.055em] sm:text-[4.5rem]">
                   <CountUp value={s.value} />
                   {s.suffix ? <span className="ml-1 font-sans text-[0.35em] font-medium tracking-normal text-ink-3">{s.suffix}</span> : null}
                 </p>
@@ -230,7 +231,29 @@ export default async function Landing() {
 
       <Rule />
 
-      {/* 6 · Honest note */}
+      {/* 6 · Closing: one big line, one decision */}
+      <section id="closing" aria-labelledby="closing-title" className="relative isolate overflow-hidden px-4 py-28 text-center sm:px-6 md:py-40">
+        <span aria-hidden className="closing-glow absolute inset-x-0 bottom-0 -z-10 h-[70%]" />
+        <Reveal className="mx-auto max-w-[900px]">
+          <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-3">Your move</p>
+          <h2 id="closing-title" className="font-display mt-5 text-[clamp(2.75rem,8vw,6rem)] font-bold leading-[0.95] tracking-[-0.055em]">
+            Your old laptops <span className="text-ink-3">have a next owner.</span>
+          </h2>
+          <p className="mx-auto mt-6 max-w-xl text-body-l text-ink-2">Book a pickup in minutes. Get a certificate for every wiped drive and a live dashboard of who your devices reach.</p>
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 min-[420px]:flex-row">
+            <ClayButton href="/login?mode=signup" variant="primary" size="lg" iconRight={<ArrowRight />}>
+              Become a Reuse Partner
+            </ClayButton>
+            <ClayButton href="/donate" variant="secondary" size="lg">
+              Can I donate?
+            </ClayButton>
+          </div>
+        </Reveal>
+      </section>
+
+      <Rule />
+
+      {/* 7 · Honest note */}
       <section className="mx-auto max-w-[1200px] px-4 py-20 sm:px-6 md:py-28">
         <Reveal className="grid gap-4 md:grid-cols-12">
           <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3 md:col-span-3 md:pt-2">Good to know</p>
@@ -245,7 +268,7 @@ export default async function Landing() {
         </Reveal>
       </section>
 
-      <StickyCta heroId="hero" />
+      <StickyCta heroId="hero" endSelector="#closing" />
     </main>
   );
 }

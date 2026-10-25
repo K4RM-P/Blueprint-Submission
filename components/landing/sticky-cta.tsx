@@ -21,7 +21,7 @@ export function StickyCta({ heroId, endSelector = "footer" }: { heroId: string; 
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (e.target === hero) setHeroGone(!e.isIntersecting && e.boundingClientRect.top < 0);
-        if (e.target === end) setAtEnd(e.isIntersecting);
+        if (e.target === end) setAtEnd(e.isIntersecting || e.boundingClientRect.top < 0);
       }
     });
     if (hero) io.observe(hero);

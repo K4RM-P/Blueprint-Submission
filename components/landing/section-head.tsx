@@ -12,7 +12,7 @@ export function SectionHead({ fig, label, title, muted, aside, id, className }: 
         <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3">
           Fig {fig} <span className="mx-1.5 text-line">/</span> {label}
         </p>
-        <h2 id={id} className="font-display mt-4 max-w-[18ch] text-[2.5rem] leading-[1] tracking-[-0.045em] sm:text-[3.25rem] lg:text-[3.75rem]">
+        <h2 id={id} className="font-display mt-4 max-w-[18ch] text-[2.5rem] font-semibold leading-[0.98] tracking-[-0.055em] sm:text-[3.5rem] lg:text-[4.25rem]">
           {title}
           {muted ? <span className="text-ink-3"> {muted}</span> : null}
         </h2>
