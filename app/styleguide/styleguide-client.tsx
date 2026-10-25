@@ -24,6 +24,11 @@ import {
 } from "@/components/clay";
 import { CapacityGlasses, FlowLine, HoldToConfirm, LiquidBlob, LiquidFill, LiquidMeter } from "@/components/liquid";
 import { ClayLaptop } from "@/components/illustrations/clay-laptop";
+import { ClayBaton } from "@/components/illustrations/clay-baton";
+import { LiquidDigits } from "@/components/liquid/liquid-digits";
+import { Seal } from "@/components/clay/seal";
+import { PeoplePebbles } from "@/components/partner/people-pebbles";
+import { PipelineTrack } from "@/components/staff/pipeline-track";
 import { ClayVessel } from "@/components/illustrations/clay-vessel";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
@@ -109,7 +114,7 @@ export function StyleguideClient() {
 
       <Section title="Type" note="Bricolage Grotesque for display, Geist for UI, Geist Mono for codes.">
         <div className="space-y-5">
-          <p className="font-display text-[3rem] leading-none sm:text-display-xl">Old laptops.</p>
+          <p className="font-display text-[3rem] leading-none sm:text-display-xl">Pass it on.</p>
           <p className="font-display text-[2.5rem] leading-none sm:text-display-l">Dell Latitude 5420</p>
           <p className="font-display text-display-m">Page title</p>
           <p className="text-title font-semibold">Card title</p>
@@ -285,6 +290,50 @@ export function StyleguideClient() {
             <LiquidBlob className="-left-10 -top-10 size-80" tone="mint" />
             <LiquidBlob className="-bottom-16 -right-10 size-72" tone="apricot" duration={24} />
             <ClayLaptop className="relative mx-auto max-w-sm" />
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Relay moments" note="The baton is the story: a device handed business → volunteer → new owner. Each piece below is one signature moment.">
+        <div className="grid gap-5 md:grid-cols-12">
+          <ClayCard className="flex flex-col items-start gap-4 md:col-span-5">
+            <p className="eyebrow">Clay baton · liquid core</p>
+            <div className="flex items-center gap-6">
+              <ClayBaton className="w-28" core={0.3} />
+              <ClayBaton className="w-28" core={1} />
+            </div>
+            <p className="text-small text-ink-2">Landing Baton Run, submit baton pass, bench handoff, empty states.</p>
+          </ClayCard>
+          <ClayCard className="flex flex-col items-start gap-4 md:col-span-7">
+            <p className="eyebrow">Liquid digits</p>
+            <LiquidDigits value={1284} label="1,284 devices back in use" className="text-[2.75rem]" />
+            <p className="text-small text-ink-2">Odometer for the hero counter. Rolls once on view; reduced motion shows the final number.</p>
+          </ClayCard>
+          <ClayCard className="flex items-center gap-6 md:col-span-5">
+            <Seal rim="DATA WIPED · RELAY · DATA WIPED · " icon={<ShieldCheck />} size={104} inView />
+            <p className="text-small text-ink-2">Ink seal: wipes, certificates, verification. Presses in once with a slight hand-stamped tilt.</p>
+          </ClayCard>
+          <ClayCard tint="mint" className="flex flex-col gap-4 md:col-span-7">
+            <p className="eyebrow !text-loop-deep">People pebbles</p>
+            <PeoplePebbles count={16} />
+            <p className="text-small text-ink-2">One pebble per person a partner&apos;s laptops now help.</p>
+          </ClayCard>
+          <div className="flat p-6 md:col-span-12">
+            <p className="eyebrow mb-4">Pipeline flow bar</p>
+            <PipelineTrack
+              label="Example pipeline"
+              stages={[
+                { label: "Received", value: 14 },
+                { label: "Testing", value: 4 },
+                { label: "Wipe pending", value: 4 },
+                { label: "Verified", value: 3 },
+                { label: "Refurb", value: 5 },
+                { label: "Ready", value: 6 },
+                { label: "Listed", value: 8 },
+                { label: "Sold", value: 58 },
+                { label: "Recycled", value: 7, muted: true },
+              ]}
+            />
           </div>
         </div>
       </Section>

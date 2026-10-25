@@ -117,7 +117,7 @@ export function DeviceTable({ rows, volunteers }: { rows: DeviceRow[]; volunteer
                   <input type="checkbox" aria-label={`Select ${r.passport_code}`} className="size-5 accent-[var(--loop)]" checked={selected.has(r.id)} onChange={() => toggle(r.id)} />
                 </td>
                 <td>
-                  <Link href={`/staff/devices/${r.id}`} className="font-mono text-[0.875rem] text-loop-deep underline-offset-4 hover:underline">
+                  <Link href={`/staff/devices/${r.id}`} className="whitespace-nowrap font-mono text-[0.875rem] text-loop-deep underline-offset-4 hover:underline">
                     {r.passport_code}
                   </Link>
                 </td>
