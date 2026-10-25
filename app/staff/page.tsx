@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Printer, QrCode } from "lucide-react";
+import { Play, Printer, QrCode } from "lucide-react";
 import { ClayButton, ClayCard, FlatCard, StatPebble } from "@/components/clay";
 import { PassportQrImage } from "@/components/journey/passport-qr";
 import { CapacityGlasses } from "@/components/liquid";
@@ -15,6 +15,7 @@ import { computeImpact } from "@/lib/impact";
 import { DEVICE_STATUSES, labels } from "@/lib/domain";
 import { daysAgo, longDate, shortDate } from "@/lib/dates";
 import { scoreLabel } from "@/lib/batch-score";
+import { SHOWCASE_PASSPORTS } from "@/lib/showcase-passports";
 
 export const metadata: Metadata = { title: "Overview" };
 
@@ -35,7 +36,7 @@ export default async function StaffOverview() {
   const since = monthStart();
   const sixtyDays = daysAgo(60).toISOString();
   const settings = await getSettings(supabase);
-  const [calendar, factors, devicesRes, pendingRes, membershipsRes, fundRes, orgsRes, activeVolRes, checkerRes, latestRes] = await Promise.all([
+  const [calendar, factors, devicesRes, pendingRes, membershipsRes, fundRes, orgsRes, activeVolRes, checkerRes] = await Promise.all([
     getCalendar(supabase, settings.weeklyCapacity, 4),
     getFactors(supabase),
     supabase.from("devices").select("status, category, weight_kg, recipient_category, refurbished_at, sold_at, price_cents, batch_line_items(quantity)"),
@@ -45,9 +46,9 @@ export default async function StaffOverview() {
     supabase.from("organizations").select("id, donation_batches(status)"),
     supabase.from("device_events").select("actor_id, profiles!inner(role)").gte("created_at", sixtyDays).eq("profiles.role", "volunteer"),
     supabase.from("checker_logs").select("outcome"),
-    supabase.from("devices").select("id, passport_code, make, model, status").order("created_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
-  const latest = latestRes.data;
+  // The demo passport with a full three-leg story (seeded, fixed code).
+  const showcase = SHOWCASE_PASSPORTS[0];
   // DP-06: anonymous story analytics (counts only).
   const { data: engagementRaw } = await supabase.rpc("passport_story_summary");
   const engagement = (engagementRaw as { starts: number; completions: number; shares: number; drops: { slide: string; count: number }[] } | null) ?? { starts: 0, completions: 0, shares: 0, drops: [] };
@@ -89,7 +90,7 @@ export default async function StaffOverview() {
       </div>
 
       <section aria-labelledby="passport-qr" className="flat mt-6 grid gap-6 p-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
-        {latest ? <PassportQrImage code={latest.passport_code} size={152} className="border border-line" /> : null}
+        <PassportQrImage code={showcase.code} size={152} className="border border-line" />
         <div className="flex min-w-0 flex-col gap-3">
           <p className="eyebrow inline-flex items-center gap-1.5">
             <QrCode className="size-4" aria-hidden /> Device Passports
@@ -98,23 +99,16 @@ export default async function StaffOverview() {
             Every laptop gets a QR code that tells its story.
           </h2>
           <p className="text-ink-2">
-            Stick a label on each device at intake. Anyone who scans it sees where it came from, who refurbished it and who it helps now.
-            {latest ? (
-              <>
-                {" "}
-                Latest: <span className="font-mono text-ink">{latest.passport_code}</span> · {latest.make} {latest.model}.
-              </>
-            ) : null}
+            Stick a label on each device at intake. Anyone who scans it watches its story: where it came from, how its data was wiped, who refurbished it and who it helps now.
+            {" "}Scan this code to watch <span className="font-mono text-ink">{showcase.code}</span>, a laptop that has run all three legs.
           </p>
           <div className="flex flex-wrap gap-2.5">
             <ClayButton href="/staff/labels" variant="primary" size="sm" icon={<Printer />}>
               Create QR labels
             </ClayButton>
-            {latest ? (
-              <ClayButton href={`/p/${latest.passport_code}`} size="sm">
-                See a scanned passport
-              </ClayButton>
-            ) : null}
+            <ClayButton href={`/p/${showcase.code}`} size="sm" icon={<Play />}>
+              Watch a passport story
+            </ClayButton>
             <ClayButton href="/staff/devices" variant="ghost" size="sm">
               Pick devices to label
             </ClayButton>
