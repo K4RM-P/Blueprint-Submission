@@ -30,6 +30,14 @@ import { Seal } from "@/components/clay/seal";
 import { PeoplePebbles } from "@/components/partner/people-pebbles";
 import { PipelineTrack } from "@/components/staff/pipeline-track";
 import { ClayVessel } from "@/components/illustrations/clay-vessel";
+import { BatonSprite } from "@/components/passport/baton-sprite";
+import { OdometerDigits } from "@/components/passport/odometer-digits";
+import { StampSequence } from "@/components/passport/stamp-sequence";
+import { VesselPour } from "@/components/passport/vessel-pour";
+import { WrappedCard } from "@/components/passport/wrapped-card";
+import { LiquidTransition } from "@/components/passport/liquid-transition";
+import { buildPassportStory, type PassportStoryData } from "@/lib/passport-story";
+import "@/components/passport/story.css";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const colors = [
@@ -338,6 +346,10 @@ export function StyleguideClient() {
         </div>
       </Section>
 
+      <Section title="Relay Wrapped" note="The passport story kit (/p/[code]): one liquid-rise transition, one hero and one tint per slide. Live at /p/FGT-WRAPPED2.">
+        <WrappedKit />
+      </Section>
+
       <Section title="Badges & celebration">
         <div className="flex flex-wrap items-end gap-8">
           <BadgeCoin key={celebrate} slug="first-boot" name="First Boot" unlocked celebrate={celebrate > 0} />
@@ -427,5 +439,98 @@ export function StyleguideClient() {
         </div>
       </Section>
     </main>
+  );
+}
+
+const SAMPLE_STORY: PassportStoryData = {
+  code: "FGT-WRAPPED2",
+  category: "laptop",
+  make: "Lenovo",
+  model: "ThinkPad T480",
+  cpu: "Intel Core i5-8350U",
+  ram_gb: 8,
+  storage_gb: 256,
+  approx_year: 2019,
+  status: "sold",
+  os_installed: "Linux Mint 22",
+  is_open_source_os: true,
+  weight_kg: null,
+  uniform: true,
+  pif_subsidized: true,
+  donor: { type: "partner", name: "Maple Ledger Accounting", logo_path: null },
+  volunteer_first_name: "Aisha",
+  timeline: { donated_at: "2026-05-18T14:00:00Z", wipe_verified_at: "2026-05-22T13:00:00Z", refurbished_at: "2026-05-25T12:00:00Z", ready_at: "2026-05-25T12:00:00Z", in_new_home: true },
+  factor: { category: "laptop", avg_weight_kg: 2.1, co2e_avoided_kg_per_reuse: 230, source_title: "TO VERIFY", source_url: null },
+  price_breakdown: [
+    { label: "Refurbishing & testing", percent: 35, description: "" },
+    { label: "Fair wages & training", percent: 30, description: "" },
+    { label: "Operations & space", percent: 15, description: "" },
+    { label: "Data security", percent: 10, description: "" },
+    { label: "Digital-inclusion programs", percent: 10, description: "" },
+  ],
+  price_breakdown_confirmed: false,
+  offered_at: "2026-05-06T14:00:00Z",
+  milestones: [
+    { kind: "received", at: "2026-05-18T14:00:00Z" },
+    { kind: "hardware_test", at: "2026-05-20T12:00:00Z" },
+    { kind: "wipe_performed", at: "2026-05-21T18:00:00Z" },
+    { kind: "wipe_verified", at: "2026-05-22T13:00:00Z" },
+    { kind: "os_installed", at: "2026-05-24T09:00:00Z" },
+    { kind: "final_qa", at: "2026-05-25T12:00:00Z" },
+  ],
+  steps_completed: ["hardware_test", "wipe_performed", "os_installed", "final_qa"],
+  bench_days: 5,
+  recycled: false,
+};
+
+/** Relay Wrapped components, replayable. */
+function WrappedKit() {
+  const [run, setRun] = useState(0);
+  const story = buildPassportStory(SAMPLE_STORY);
+  const tints = ["apricot", "sky", "butter", "mint"] as const;
+  const tint = tints[run % tints.length];
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <ClayButton size="sm" onClick={() => setRun((r) => r + 1)}>
+          Replay
+        </ClayButton>
+      </div>
+      <div key={run} className="grid gap-6 lg:grid-cols-3">
+        <FlatCard className="flex flex-col gap-4">
+          <p className="eyebrow">LiquidTransition</p>
+          <div className="relative h-56 overflow-hidden rounded-[20px] [container-type:size]" style={{ background: "#F4F0E9" }}>
+            <LiquidTransition dir={run === 0 ? 0 : 1} tint={tint} reduced={false}>
+              <div className="story-slide !p-6" data-tint={tint}>
+                <p className="font-display text-[1.75rem] leading-none">Every byte erased.</p>
+              </div>
+            </LiquidTransition>
+          </div>
+        </FlatCard>
+        <FlatCard className="flex flex-col gap-4">
+          <p className="eyebrow">OdometerDigits</p>
+          <OdometerDigits value={2.1} decimals={1} label="2.1 kilograms" className="text-[4.5rem]" />
+          <OdometerDigits value={230} label="230 kilograms" className="text-[2.5rem]" />
+        </FlatCard>
+        <FlatCard className="flex flex-col items-center gap-4">
+          <p className="eyebrow self-start">BatonSprite</p>
+          <BatonSprite glow className="w-48" />
+        </FlatCard>
+        <FlatCard className="flex flex-col gap-4">
+          <p className="eyebrow">StampSequence</p>
+          <StampSequence
+            stamps={story.benchSteps.map((b) => ({ key: b.kind, label: b.label, date: b.at ? new Date(b.at).toLocaleDateString("en-CA", { month: "short", day: "numeric" }) : "Coming up", icon: <Cpu />, done: Boolean(b.at) }))}
+          />
+        </FlatCard>
+        <FlatCard className="flex flex-col gap-4">
+          <p className="eyebrow">VesselPour</p>
+          <VesselPour slices={story.priceBreakdown} />
+        </FlatCard>
+        <div className="[container-type:inline-size]">
+          <p className="eyebrow mb-4">WrappedCard</p>
+          <WrappedCard story={story} />
+        </div>
+      </div>
+    </div>
   );
 }

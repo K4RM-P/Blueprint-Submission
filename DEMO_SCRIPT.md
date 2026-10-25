@@ -35,9 +35,20 @@ Times are cumulative.
 
 ### 1:50 – 2:25 · F5: sale and passport (Staff → phone)
 16. Staff → **Devices** → filter **Ready** → open one → **Set price** → **Record sale** → recipient **Student**, Pay-It-Forward subsidy $20.
-17. On the phone (signed out), open that device's passport `/p/FGT-…`.
-18. Scroll: the cover card, then the stamps (*Donated by Maple Ledger Accounting* → *Data wiped & verified* → *Refurbished by Aisha* → *In its new home*), the impact pebbles, **Where your money goes** (with the *Illustrative* tag), **Why isn't it free?**, and the Free Geek network note.
-19. Say: *"No serial numbers, no wipe report IDs, no price paid — never on the public page."*
+17. On the phone (signed out), scan or open that device's passport `/p/FGT-…`. It opens **Relay Wrapped**: the passport booklet opens in 3D → *"This laptop has a story."* → **Tap to begin**.
+18. Let it play (or tap right): *Its first job was at Maple Ledger Accounting* (the baton glows in) → the handoff → **Every byte erased** (sky seal stamps down) → *Aisha brought it back to life* (stamps land in order) → *ready in N days* → Linux Mint → the liquid odometer (kg kept out of landfill) → **Where your money goes** pour (*Illustrative*) with the Pay-It-Forward line → **Why isn't it free?** → *Now it's your turn. Pass it on.* → the collectible card → **Share my laptop's story**.
+19. Say: *"No serial numbers, no wipe report IDs, no price paid, no buyer — never on the public page or in the share image."* Tap ✕ to show the full passport (also the print view).
+
+**Showcase passports** (fixed codes from `pnpm seed`; also listed on `/demo` under "Scan a passport"):
+
+| Code | Story |
+|---|---|
+| `FGT-WRAPPED2` | The full relay: Maple Ledger → Aisha → sold, with a Pay-It-Forward subsidy. 12 slides. **Use this one for the video.** |
+| `FGT-QUEEN7WD` | Anonymous: the donor and volunteer opted out, so it says "a Toronto business" / "an FGT volunteer". |
+| `FGT-BENCH24Z` | Still on the bench with Jordan: ends on "Its next leg is coming soon." |
+| `FGT-PARTS4RC` | Recycled after its hardware test: "Its parts live on through responsible recycling." |
+
+Deep link any slide with `?s=N` (e.g. `/p/FGT-WRAPPED2?s=12` is the card). On a phone over Wi-Fi: run `pnpm dev -H 0.0.0.0`, then open `http://<your-laptop-LAN-IP>:3000/p/FGT-WRAPPED2`. For the printed QR codes to point at your laptop, set `NEXT_PUBLIC_SITE_URL=http://<LAN-IP>:3000` in `.env.local` first.
 
 ### 2:25 – 2:50 · F6: the partner sees impact (Partner)
 20. Partner dashboard: "Your laptops are now helping **N people**", the recipient categories, devices over time.

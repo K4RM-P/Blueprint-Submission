@@ -48,6 +48,11 @@ export default async function StaffOverview() {
     supabase.from("devices").select("id, passport_code, make, model, status").order("created_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
   const latest = latestRes.data;
+  // DP-06: anonymous story analytics (counts only).
+  const { data: engagementRaw } = await supabase.rpc("passport_story_summary");
+  const engagement = (engagementRaw as { starts: number; completions: number; shares: number; drops: { slide: string; count: number }[] } | null) ?? { starts: 0, completions: 0, shares: 0, drops: [] };
+  const completionRate = engagement.starts > 0 ? Math.round((engagement.completions / engagement.starts) * 100) : 0;
+  const topDrop = engagement.drops[0];
   const devices = devicesRes.data ?? [];
   const pending = pendingRes.data ?? [];
   const impact = computeImpact(
@@ -115,6 +120,28 @@ export default async function StaffOverview() {
             </ClayButton>
           </div>
         </div>
+      </section>
+
+      <section aria-labelledby="engagement" className="flat mt-6 p-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <h2 id="engagement" className="font-semibold">
+            Passport engagement
+          </h2>
+          <span className="text-small text-ink-2">Anonymous counts from Relay Wrapped stories. No codes, no people.</span>
+        </div>
+        <dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {[
+            ["Stories started", engagement.starts.toLocaleString("en-CA")],
+            ["Watched to the card", `${engagement.completions.toLocaleString("en-CA")}${engagement.starts ? ` · ${completionRate}%` : ""}`],
+            ["Shared", engagement.shares.toLocaleString("en-CA")],
+            ["Most common drop-off", topDrop ? `${topDrop.slide.replace("_", " ")} (${topDrop.count})` : "None yet"],
+          ].map(([k, v]) => (
+            <div key={k}>
+              <dt className="text-small text-ink-2">{k}</dt>
+              <dd className="font-display text-[1.5rem] capitalize tnum">{v}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">

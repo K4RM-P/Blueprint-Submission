@@ -23,7 +23,7 @@ test("HC-02 accepted — a 4-year-old working laptop", async ({ page }) => {
   const watch = watchErrors(page);
   await answer(page, "Laptops", "3–6 years", "Yes");
   await expect(page.getByRole("heading", { name: /we.d love it/i })).toBeVisible();
-  await expect(page.getByText("180 Sudbury Street")).toBeVisible();
+  await expect(page.getByText("180 Sudbury Street").first()).toBeVisible();
   watch.assertClean();
 });
 

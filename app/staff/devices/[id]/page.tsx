@@ -70,8 +70,11 @@ export default async function StaffDevicePage({ params }: { params: Promise<{ id
         actions={
           <>
             <DeviceStatusChip status={d.status} />
-            <Link href={`/p/${d.passport_code}`} className="chip bg-white/70 text-loop-deep underline-offset-4 hover:underline">
-              Public passport
+            <Link href={`/p/${d.passport_code}`} target="_blank" rel="noopener" className="chip bg-white/70 text-loop-deep underline-offset-4 hover:underline">
+              Preview passport story
+            </Link>
+            <Link href={`/p/${d.passport_code}?view=full`} className="chip bg-white/70 text-loop-deep underline-offset-4 hover:underline">
+              Full passport
             </Link>
           </>
         }

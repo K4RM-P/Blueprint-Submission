@@ -33,7 +33,10 @@ test("F5 — staff records a sale; the passport renders and hides private fields
   // A fresh, signed-out visitor scans the QR code.
   const anon = await (await browser.newContext()).newPage();
   const watch = watchErrors(anon);
+  // The QR opens the Relay Wrapped story; the static passport is ?view=full.
   await anon.goto(`/p/${code}`);
+  await expect(anon.locator(".story-slide[data-slide='cover']")).toBeVisible();
+  await anon.goto(`/p/${code}?view=full`);
   await settle(anon);
   // The code shows twice since the passport cover was added (cover + header); either proves it rendered.
   await expect(anon.getByText(code).first()).toBeVisible();
@@ -44,12 +47,14 @@ test("F5 — staff records a sale; the passport renders and hides private fields
   await expect(anon.getByText(/Pay-It-Forward fund/).first()).toBeVisible();
   await expect(anon.getByText("In its new home")).toBeVisible();
 
-  // DP-05: no serial, no sanitization report ID, no sale price in the HTML.
-  const html = await (await anon.request.get(`/p/${code}`)).text();
-  if (serial !== "—") expect(html).not.toContain(serial);
-  if (reportRef !== "—") expect(html).not.toContain(reportRef);
-  expect(html).not.toMatch(/wipe_report_ref|serial_number/);
-  expect(html).not.toContain("$180.00");
+  // DP-05: no serial, no sanitization report ID, no sale price in either view's HTML.
+  for (const path of [`/p/${code}`, `/p/${code}?view=full`, `/p/${code}?s=12`]) {
+    const html = await (await anon.request.get(path)).text();
+    if (serial !== "—") expect(html).not.toContain(serial);
+    if (reportRef !== "—") expect(html).not.toContain(reportRef);
+    expect(html).not.toMatch(/wipe_report_ref|serial_number|recipient_category|price_cents/);
+    expect(html).not.toContain("$180.00");
+  }
   watch.assertClean();
 });
 

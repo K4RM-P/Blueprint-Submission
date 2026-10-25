@@ -13,6 +13,7 @@ import { DEFAULT_ACCEPTED_ITEMS } from "../lib/checker";
 import { addDays, mondayOf, toISODate } from "../lib/dates";
 import type { DeviceCategory, DeviceCondition, DeviceStatus, PartnerTier, RecipientCategory, SaleChannel } from "../lib/domain";
 import { generateUniqueCodes } from "../lib/passport-code";
+import { SHOWCASE_PASSPORTS } from "../lib/showcase-passports";
 import { devicePath } from "../lib/status-machine";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -264,6 +265,34 @@ const HOUSEHOLD: { category: DeviceCategory; make: string; model: string; year: 
 const RECIPIENTS: RecipientCategory[] = ["student", "student", "student", "newcomer", "newcomer", "senior", "low_income_household", "nonprofit", "small_business", "general", "student", "newcomer"];
 const CHANNELS: SaleChannel[] = ["in_store", "in_store", "online", "b2b"];
 
+// ------------------------------------------------------------------ showcase passports
+/**
+ * Four passports with fixed codes for the demo and the "Scan a passport" list
+ * (DEMO_SCRIPT.md). Keyed by `${batch}:${device index}`; everything else about
+ * them comes from the batch they belong to, so they stay consistent with it.
+ */
+interface Showcase {
+  code: string;
+  volunteer?: string;
+  os?: string;
+  subsidyCents?: number;
+  recipient?: RecipientCategory;
+  /** For recycled devices: the last status before recycling. */
+  recycleAfter?: DeviceStatus;
+  /** Hours between steps, so the story's dates read naturally. */
+  stepHours: number[];
+}
+const SHOWCASE: Record<string, Showcase> = {
+  // (a) Full attribution: opted-in donor + volunteer, sold, Pay-It-Forward subsidy.
+  "B1:0": { code: SHOWCASE_PASSPORTS[0].code, os: "Linux Mint 22", subsidyCents: 5000, recipient: "student", stepHours: [20, 26, 30, 19, 44, 27, 22, 410] },
+  // (b) Anonymous: donor and volunteer both opted out.
+  "B4:0": { code: SHOWCASE_PASSPORTS[1].code, volunteer: `volunteer-tomas${DOMAIN}`, os: "Ubuntu 24.04 LTS", subsidyCents: 0, recipient: "newcomer", stepHours: [30, 22, 41, 20, 50, 24, 30, 260] },
+  // (c) In progress: wiped and on the bench, not yet ready.
+  "B3:6": { code: SHOWCASE_PASSPORTS[2].code, volunteer: `volunteer-jordan${DOMAIN}`, os: "Linux Mint 22", stepHours: [26, 30, 28, 21, 36] },
+  // (d) Recycled after failing its hardware test.
+  "B1:10": { code: SHOWCASE_PASSPORTS[3].code, recycleAfter: "testing", stepHours: [22, 30, 48] },
+};
+
 // ------------------------------------------------------------------ main
 async function reset() {
   console.log("Resetting demo data…");
@@ -357,7 +386,7 @@ async function main() {
 
   console.log("Batches, devices and timelines…");
   const deviceCount = BATCHES.reduce((s, b) => s + b.lines.reduce((x, l) => x + (b.receivedDaysAgo !== undefined ? l.qty : 0), 0), 0) + HOUSEHOLD.length;
-  const codes = generateUniqueCodes(deviceCount, new Set(), codeRandom);
+  const codes = generateUniqueCodes(deviceCount, new Set(Object.values(SHOWCASE).map((x) => x.code)), codeRandom);
   let codeIdx = 0;
   const thisMonday = mondayOf(NOW);
 
@@ -414,8 +443,10 @@ async function main() {
       if (!received) continue;
       const statuses = l.statuses ?? rep(l.qty, "received" as DeviceStatus);
       statuses.forEach((status, i) => {
+        const showcase = SHOWCASE[`${b.key}:${i}`];
         const volunteer = aishaQuota > 0 && reachesQa(status) ? (aishaQuota--, aisha) : pick(others);
         buildDevice({
+          showcase,
           batchId,
           lineItemId: (li as { id: string }).id,
           source: "partner",
@@ -429,7 +460,7 @@ async function main() {
           serial: `${l.make.slice(0, 2).toUpperCase()}${between(1000000, 9999999)}`,
           status,
           start: new Date(received.getTime() + hours(i * 0.25)),
-          volunteer,
+          volunteer: showcase?.volunteer ? userId.get(showcase.volunteer)! : volunteer,
         });
       });
     }
@@ -476,13 +507,18 @@ async function main() {
     status: DeviceStatus;
     start: Date;
     volunteer: string;
+    showcase?: Showcase;
   }) {
     const id = crypto.randomUUID();
-    const code = codes[codeIdx++];
+    const sc = d.showcase;
+    // Showcase devices still take a slot so every other code stays the same.
+    const code = sc ? (codeIdx++, sc.code) : codes[codeIdx++];
     let t = d.start.getTime();
+    let stepNo = 0;
     // Keep every timeline in the past.
     const step = () => {
-      t = Math.min(t + hours(between(6, 60)), NOW.getTime() - hours(2));
+      const h = sc ? (sc.stepHours[stepNo++] ?? 24) : between(6, 60);
+      t = Math.min(t + hours(h), NOW.getTime() - hours(2));
       return new Date(t).toISOString();
     };
     const row: Record<string, unknown> = {
@@ -505,7 +541,7 @@ async function main() {
     const ev = (e: Record<string, unknown>) => events.push({ device_id: id, batch: d.batchId, metadata: {}, ...e });
     ev({ actor_id: staffId, event_type: "status_change", to_status: "received", note: d.source === "household" ? "Household intake" : "Received from partner batch", created_at: row.created_at });
 
-    const target = d.status === "recycled" ? (pick(["received", "testing", "wipe_verified"] as const) as DeviceStatus) : d.status;
+    const target = d.status === "recycled" ? (sc?.recycleAfter ?? (pick(["received", "testing", "wipe_verified"] as const) as DeviceStatus)) : d.status;
     const path = devicePath("received", target) ?? [];
     if (path.length > 0 || d.status !== "received") {
       row.assigned_volunteer_id = d.volunteer;
@@ -525,7 +561,7 @@ async function main() {
         Object.assign(row, { wipe_verified_by: staffId, wipe_verified_at: at });
         ev({ actor_id: staffId, event_type: "status_change", from_status: prev, to_status: next, note: "Verified against the sanitization report", created_at: at });
       } else if (next === "refurbishing") {
-        const os = d.category === "tablet" ? "iPadOS (reset)" : pick(["Linux Mint 22", "Linux Mint 22", "Ubuntu 24.04 LTS"]);
+        const os = sc?.os ?? (d.category === "tablet" ? "iPadOS (reset)" : pick(["Linux Mint 22", "Linux Mint 22", "Ubuntu 24.04 LTS"]));
         const open = d.category !== "tablet";
         Object.assign(row, { os_installed: d.category === "monitor" || d.category === "accessory" ? null : os, is_open_source_os: d.category === "monitor" ? null : open });
         if (row.os_installed) ev({ actor_id: d.volunteer, event_type: "step_completed", step: "os_installed", metadata: { os, is_open_source: open }, created_at: at });
@@ -537,9 +573,9 @@ async function main() {
       } else if (next === "listed") {
         ev({ actor_id: staffId, event_type: "status_change", from_status: prev, to_status: next, note: "Listed in the FGT store", created_at: at });
       } else if (next === "sold") {
-        const recipient = pick(RECIPIENTS);
+        const recipient = sc?.recipient ?? pick(RECIPIENTS);
         const channel = pick(CHANNELS);
-        const subsidy = ["student", "newcomer", "low_income_household"].includes(recipient) && rand() < 0.22 ? 5000 : 0;
+        const subsidy = sc?.subsidyCents ?? (["student", "newcomer", "low_income_household"].includes(recipient) && rand() < 0.22 ? 5000 : 0);
         Object.assign(row, { sold_at: at, sale_channel: channel, recipient_category: recipient, pif_subsidy_cents: subsidy });
         ev({ actor_id: staffId, event_type: "sale", note: `Sold ${channel.replace("_", " ")}`, metadata: { recipient_category: recipient }, created_at: at });
         if (subsidy) {
@@ -552,7 +588,7 @@ async function main() {
     }
     if (d.status === "recycled") {
       const at = step();
-      const reason = pick(["Cracked motherboard — recycled for parts", "Swollen battery, unsafe to refurbish", "Failed hardware test (no display)"]);
+      const reason = sc ? "Failed hardware test (no display)" : pick(["Cracked motherboard — recycled for parts", "Swollen battery, unsafe to refurbish", "Failed hardware test (no display)"]);
       Object.assign(row, { recycled_reason: reason, assigned_volunteer_id: null });
       ev({ actor_id: staffId, event_type: "status_change", from_status: prev, to_status: "recycled", note: reason, created_at: at });
     }

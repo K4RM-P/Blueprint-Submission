@@ -25,5 +25,5 @@ test("F3 — volunteer claims a device and completes the checklist on a phone (V
   await expect(page.getByRole("dialog")).toContainText("Open Source Installer");
   await page.getByRole("button", { name: "Keep going" }).click();
   await page.getByRole("button", { name: /Final QA — tap to complete/ }).click();
-  await expect(page.getByText(/All four steps done/)).toBeVisible();
+  await expect(page.getByText(/Handed to staff/)).toBeVisible();
 });

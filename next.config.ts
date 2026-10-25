@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
     },
   },
   serverExternalPackages: ["@react-pdf/renderer"],
+  // Bundled TTFs for the passport share images (lib/og/passport-card.tsx).
+  outputFileTracingIncludes: { "/p/**": ["./lib/og/fonts/*.ttf"] },
   images: {
     remotePatterns: [{ protocol: "https", hostname: "bykwwvzgvxtrzxfdjsoi.supabase.co" }],
   },

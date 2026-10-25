@@ -712,6 +712,27 @@ export type Database = {
           },
         ]
       }
+      passport_story_events: {
+        Row: {
+          created_at: string
+          id: number
+          kind: string
+          slide: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          kind: string
+          slide?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          kind?: string
+          slide?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           attribution_opt_in: boolean
@@ -896,6 +917,7 @@ export type Database = {
         Returns: boolean
       }
       get_passport: { Args: { p_code: string }; Returns: Json }
+      get_passport_story: { Args: { p_code: string }; Returns: Json }
       is_staff: { Args: never; Returns: boolean }
       log_checker: {
         Args: {
@@ -903,6 +925,10 @@ export type Database = {
           p_is_business: boolean
           p_outcome: Database["public"]["Enums"]["checker_outcome"]
         }
+        Returns: undefined
+      }
+      log_passport_story: {
+        Args: { p_kind: string; p_slide: string }
         Returns: undefined
       }
       maybe_complete_batch: { Args: { p_batch: string }; Returns: undefined }
@@ -943,6 +969,7 @@ export type Database = {
           tier: Database["public"]["Enums"]["partner_tier"]
         }[]
       }
+      passport_story_summary: { Args: never; Returns: Json }
       public_fund_summary: { Args: never; Returns: Json }
       public_impact_totals: { Args: never; Returns: Json }
       public_settings: { Args: never; Returns: Json }
