@@ -1149,3 +1149,27 @@ html[data-reduced-motion="true"] .float-path {
   animation: none;
   stroke-dasharray: none;
 }
+/* Landing cards, flat: paper white on a hairline, with a soft drop only. */
+.card-line {
+  background: var(--surface-flat);
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgba(60, 50, 35, 0.04);
+}
+.card-grid {
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(90, 75, 55, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(90, 75, 55, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 90% at 70% 100%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 90% at 70% 100%, #000 20%, transparent 75%);
+}
+/* A printed document: white stock, a hairline edge and a real paper shadow. */
+.cert-paper {
+  background: #fff;
+  border: 1px solid rgba(90, 75, 55, 0.12);
+  box-shadow:
+    0 1px 1px rgba(60, 50, 35, 0.04),
+    0 12px 24px -12px rgba(60, 50, 35, 0.18),
+    0 40px 70px -40px rgba(60, 50, 35, 0.35);
+}

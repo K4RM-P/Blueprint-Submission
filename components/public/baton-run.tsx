@@ -4,7 +4,6 @@ import { motion, useMotionValueEvent, useScroll, useSpring, useTransform, type M
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useMotionPrefs } from "@/lib/motion";
-import { ClayBaton } from "@/components/illustrations/clay-baton";
 import { SectionHead } from "@/components/landing/section-head";
 
 export interface RelayStation {
@@ -16,17 +15,10 @@ export interface RelayStation {
   statLabel: string;
 }
 
-/** Squash amount (0..1) as the baton passes through a handoff point. */
-function bumpAt(v: number, stops: number[], width = 0.035) {
-  let b = 0;
-  for (const s of stops) b = Math.max(b, 1 - Math.abs(v - s) / width);
-  return Math.max(0, b);
-}
-
 /**
  * The Baton Run (Signature Moment 1): the landing page's one pinned, scroll-linked
- * showpiece. A clay baton with a liquid core travels the relay lane; at every
- * handoff it squashes, the receiving station lights up and a single liquid ring
+ * showpiece. One device, tagged with its passport code, travels a hairline track
+ * that inks in behind it; at every handoff the receiving station lights up and a ring
  * spreads from the node. Scrolling up runs it backwards. Desktop pins; phones get
  * a vertical lane that follows normal scroll. Reduced motion: every station lit,
  * baton resting at the finish.
@@ -98,41 +90,48 @@ function Lane({ stations, stops, travel, arrive, shown, reduced }: { stations: R
   const finish = stops[stops.length - 1];
   const x = useTransform(travel, (v) => (reduced ? finish : v) * width);
   const fill = useTransform(travel, (v) => (reduced ? finish : v));
-  const squash = useTransform(travel, (v) => (reduced ? 0 : bumpAt(v, stops.slice(1))));
-  const scaleX = useTransform(squash, (b) => 1 - 0.16 * b);
-  const scaleY = useTransform(squash, (b) => 1 + 0.14 * b);
-  // The hero's baton drops in from above: the lane catches it, squashes, then the run starts.
-  const catchY = useTransform(arrive, [0, 1], reduced ? [0, 0] : [-90, 0]);
+  // The device tag drops in from above as the hero hands off, then the run starts.
+  const catchY = useTransform(arrive, [0, 1], reduced ? [0, 0] : [-40, 0]);
   const caught = useTransform(arrive, [0, 0.5], reduced ? [1, 1] : [0, 1]);
 
   return (
     <div ref={laneRef} className="relative h-16" aria-hidden>
-      {/* lane: a well pressed into the page, filling with liquid behind the baton */}
-      <div className="well absolute inset-x-0 top-1/2 h-4 -translate-y-1/2 overflow-hidden rounded-full">
-        <motion.div className="absolute inset-0 origin-left rounded-full bg-gradient-to-r from-loop-light to-loop" style={{ scaleX: fill }} />
+      {/* track: a hairline, inked in solid green behind the device as it travels */}
+      <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-line">
+        <motion.div className="absolute inset-y-0 left-0 w-full origin-left bg-loop" style={{ scaleX: fill }} />
       </div>
       {stations.map((s, i) => (
         <div key={s.title} className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2" style={{ left: `${stops[i] * 100}%` }}>
-          <span className={cn("relative grid size-6 place-items-center rounded-full border-4 border-canvas transition-colors duration-300", i <= shown ? "bg-loop" : "bg-[#E1D9CC]")}>
+          <span className={cn("relative block size-2.5 rounded-full border transition-colors duration-300", i <= shown ? "border-loop bg-loop" : "border-[#cfc6b8] bg-canvas")}>
             {i === shown && i > 0 && !reduced ? (
               <motion.span
                 key={`ring-${i}`}
-                className="absolute size-6 rounded-full border-2 border-loop-light"
-                initial={{ scale: 0.6, opacity: 0.7 }}
-                animate={{ scale: 3.2, opacity: 0 }}
+                className="absolute -inset-px rounded-full border border-loop"
+                initial={{ scale: 1, opacity: 0.8 }}
+                animate={{ scale: 3.4, opacity: 0 }}
                 transition={{ duration: 0.9, ease: [0.2, 0, 0, 1] }}
               />
             ) : null}
           </span>
-          <span className={cn("absolute left-1/2 top-9 -translate-x-1/2 whitespace-nowrap font-mono text-[0.6875rem] uppercase tracking-[0.1em] transition-colors", i <= shown ? "text-loop-deep" : "text-ink-3")}>
+          <span className={cn("absolute left-1/2 top-6 -translate-x-1/2 whitespace-nowrap font-mono text-[0.6875rem] uppercase tracking-[0.1em] transition-colors", i <= shown ? "text-ink" : "text-ink-3")}>
             {s.hand}
           </span>
         </div>
       ))}
-      <motion.div className="absolute left-0 top-1/2 -ml-12 -mt-5 w-24" style={{ x, y: catchY, scaleX, scaleY, opacity: caught }}>
-        <ClayBaton core={0.35 + 0.65 * ((shown + 1) / stations.length)} />
+      <motion.div className="absolute left-0 top-1/2 -translate-x-1/2" style={{ x, y: catchY, opacity: caught }}>
+        <DeviceTag />
       </motion.div>
     </div>
+  );
+}
+
+/** The thing being relayed: one device, shown as its passport code on a flat ink tag above the track. */
+function DeviceTag() {
+  return (
+    <span className="absolute bottom-3 left-1/2 flex -translate-x-1/2 flex-col items-center">
+      <span className="whitespace-nowrap rounded-md bg-ink px-2 py-1 font-mono text-[0.6875rem] font-medium tracking-[0.04em] text-white shadow-[0_6px_16px_-6px_rgba(23,32,28,0.5)]">FGT-7Q2K</span>
+      <span className="h-2.5 w-px bg-ink" />
+    </span>
   );
 }
 
@@ -157,12 +156,10 @@ function VerticalRun({ stations, reduced }: { stations: RelayStation[]; reduced:
 
   return (
     <ol ref={listRef} className="relative mt-10 grid gap-4 pl-14 md:hidden">
-      <span aria-hidden className="well absolute bottom-8 left-[18px] top-8 w-3 overflow-hidden rounded-full">
-        <motion.span className="absolute inset-0 origin-top rounded-full bg-gradient-to-b from-loop-light to-loop" style={{ scaleY: fill }} />
+      <span aria-hidden className="absolute bottom-8 left-[23px] top-8 w-px bg-line">
+        <motion.span className="absolute inset-0 origin-top bg-loop" style={{ scaleY: fill }} />
       </span>
-      <motion.span aria-hidden className="absolute left-[-6px] top-0 w-[60px] origin-center rotate-90" style={{ y }}>
-        <ClayBaton core={(shown + 1) / n} />
-      </motion.span>
+      <motion.span aria-hidden className="absolute left-[19px] top-0 size-[9px] rounded-full bg-loop shadow-[0_0_0_4px_var(--canvas),0_0_0_5px_rgba(19,138,97,0.35)]" style={{ y }} />
       {stations.map((s, i) => (
         <li key={s.title}>
           <p className={cn("mb-2 font-mono text-[0.6875rem] uppercase tracking-[0.1em]", i <= shown ? "text-loop-deep" : "text-ink-3")}>{s.hand}</p>
@@ -177,24 +174,22 @@ function StationCard({ station, index, lit, receiving }: { station: RelayStation
   const { t, reduced } = useMotionPrefs();
   return (
     <motion.div
-      // ≤ 2 tints per view (§12): only the station holding the baton turns mint.
-      data-tint={receiving ? "mint" : "porcelain"}
       initial={false}
       animate={{ y: receiving ? -8 : 0, scale: lit || reduced ? 1 : 0.97, opacity: lit || reduced ? 1 : 0.62 }}
       transition={t("soft")}
-      className="clay-glass hairline-top relative flex h-full flex-col overflow-hidden p-5 transition-[background-color] duration-500 md:p-6"
+      className={cn("relative flex h-full flex-col overflow-hidden rounded-[var(--r-md)] border bg-surface-flat p-5 transition-[border-color,box-shadow] duration-500 md:p-6", receiving ? "border-loop/35 shadow-[0_18px_40px_-24px_rgba(19,94,66,0.45)]" : "border-line")}
     >
       <div className="flex items-baseline justify-between gap-3">
-        <p className={cn("font-display text-[2.5rem] leading-none tnum transition-colors md:text-[3rem]", lit ? "text-ink" : "text-ink-3")}>{station.stat}</p>
+        <p className={cn("font-display text-[2.5rem] font-semibold leading-none tracking-[-0.05em] tnum transition-colors md:text-[3rem]", lit ? "text-ink" : "text-ink-3")}>{station.stat}</p>
         <p className="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-ink-3">Leg {index + 1}</p>
       </div>
       <p className="mt-1 text-small text-ink-2">{station.statLabel}</p>
       <h3 className={cn("mt-6 text-lg font-semibold leading-snug transition-colors", lit ? "text-ink" : "text-ink-2")}>{station.title}</h3>
       <p className="mt-1 text-small text-ink-2">{station.body}</p>
-      {/* the handoff: liquid pours along the card's floor when the baton arrives */}
-      <span aria-hidden className="absolute inset-x-0 bottom-0 h-1.5 overflow-hidden">
+      {/* the handoff: a green rule draws along the card's floor when the device arrives */}
+      <span aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden">
         <motion.span
-          className="absolute inset-0 origin-left bg-gradient-to-r from-loop-light to-loop"
+          className="absolute inset-0 origin-left bg-loop"
           initial={false}
           animate={{ scaleX: lit ? 1 : 0 }}
           transition={t("liquid")}

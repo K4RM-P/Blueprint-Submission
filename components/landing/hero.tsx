@@ -45,14 +45,17 @@ export function Hero({ devicesReused, legs, totals }: { devicesReused: number; l
         <FloatingPathsBackground position={-1} className="absolute inset-0" />
       </div>
       <div className="mx-auto max-w-[1200px] px-4 pt-12 text-center sm:px-6 md:pt-20 lg:pt-24">
-        <Link href="/impact" className="hero-in glass group inline-flex items-center gap-2.5 rounded-full py-1.5 pl-2 pr-3.5 text-small text-ink-2 [--d:0ms]">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-ink px-2.5 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-white">
-            <span aria-hidden className="live-dot size-1.5 rounded-full bg-loop-light" /> Live
+        <Link href="/impact" className="hero-in group inline-flex items-center gap-3 text-small text-ink-2 [--d:0ms]">
+          <span className="inline-flex items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-loop-deep">
+            <span aria-hidden className="live-dot size-1.5 rounded-full bg-loop" /> Live
           </span>
+          <span aria-hidden className="h-3.5 w-px bg-line" />
           <span>
             <CountUp value={devicesReused} className="font-semibold text-ink" /> devices back in use
           </span>
-          <ArrowRight aria-hidden className="size-3.5 text-ink-3 transition-transform group-hover:translate-x-0.5" />
+          <span className="hidden items-center gap-1 font-medium text-ink underline decoration-line sm:inline-flex underline-offset-4 transition-colors group-hover:decoration-ink">
+            See the impact <ArrowRight aria-hidden className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+          </span>
         </Link>
 
         <h1 id="hero-title" className="hero-title font-display mx-auto mt-8 text-[clamp(4.75rem,19vw,10.5rem)] leading-[0.86] md:mt-10">

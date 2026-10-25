@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ClayButton } from "@/components/clay";
-import { ClayLaptop } from "@/components/illustrations/clay-laptop";
 import { PassportLookup } from "@/components/public/passport-lookup";
 import { PartnerTile } from "@/components/public/partner-tile";
 import { BatonRun } from "@/components/public/baton-run";
@@ -11,7 +10,8 @@ import { Hero } from "@/components/landing/hero";
 import { Pour } from "@/components/landing/pour";
 import { Reveal } from "@/components/landing/reveal";
 import { Rule, SectionHead } from "@/components/landing/section-head";
-import { ShareBar } from "@/components/landing/share-bar";
+import { OutcomeBreakdown } from "@/components/landing/outcome-breakdown";
+import { CertificatePreview } from "@/components/landing/certificate-preview";
 import { StickyCta } from "@/components/landing/sticky-cta";
 import { Tactile } from "@/components/landing/tactile";
 import { createClient } from "@/lib/supabase/server";
@@ -121,16 +121,7 @@ export default async function Landing() {
           ))}
         </dl>
         <Reveal delay={0.1} className="mt-14">
-          <div data-tint="mint" className="clay-glass hairline-top grid items-center gap-6 p-6 sm:p-8 md:grid-cols-12">
-            <p className="font-display text-[2.25rem] leading-none tracking-[-0.04em] md:col-span-4 sm:text-[2.75rem]">
-              {fmt(t.devicesReused)}
-              <span className="ml-2 font-sans text-body font-medium tracking-normal text-ink-2">of {fmt(t.devicesReceived)} donated</span>
-            </p>
-            <div className="md:col-span-8">
-              <ShareBar value={t.devicesReceived ? t.devicesReused / t.devicesReceived : 0} />
-              <p className="mt-3 text-small text-ink-2">are already back in use. The rest are on the bench, being wiped, rebuilt or responsibly recycled.</p>
-            </div>
-          </div>
+          <OutcomeBreakdown reused={t.devicesReused} inProgress={t.devicesInProgress} recycled={t.devicesRecycled} />
         </Reveal>
       </section>
 
@@ -143,20 +134,21 @@ export default async function Landing() {
         </Reveal>
         <div className="mt-14 grid gap-5 md:grid-cols-12">
           <Reveal className="md:col-span-7 md:row-span-2">
-            <Tactile data-tint="apricot" className="clay relative flex h-full min-h-[440px] flex-col overflow-hidden rounded-[var(--r-xl)] p-7 pb-56 sm:p-10 sm:pb-10">
-              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-2">01 · For businesses</p>
-              <h3 className="font-display mt-4 max-w-md text-[2rem] leading-[1.02] tracking-[-0.04em] sm:text-[2.75rem]">Your three-year-old laptops are someone&apos;s first computer.</h3>
-              <p className="mt-4 max-w-sm text-ink-2">Free to start. A data-wipe certificate for every batch, and a live dashboard of who your devices help.</p>
+            <Tactile className="card-line relative flex h-full min-h-[460px] flex-col overflow-hidden rounded-[var(--r-lg)] p-7 pb-[19rem] sm:p-10 sm:pb-64">
+              <span aria-hidden className="card-grid absolute inset-x-0 bottom-0 h-[55%]" />
+              <p className="relative font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ember-ink">01 · For businesses</p>
+              <h3 className="font-display relative mt-4 max-w-md text-[2rem] font-semibold leading-[1.02] tracking-[-0.045em] sm:text-[2.75rem]">Your three-year-old laptops are someone&apos;s first computer.</h3>
+              <p className="relative mt-4 max-w-[19rem] text-ink-2">Free to start. A data-wipe certificate for every batch, and a live dashboard of who your devices help.</p>
               <ClayButton href="/become-a-partner" variant="secondary" iconRight={<ArrowRight />} className="relative z-[1] mt-8 self-start">
                 See how partnering works
               </ClayButton>
-              <ClayLaptop className="pointer-events-none absolute -bottom-10 -right-10 w-[78%] max-w-[360px] opacity-95 sm:w-[62%] sm:-right-8" tint="porcelain" />
+              <CertificatePreview className="pointer-events-none absolute -bottom-24 right-1/2 translate-x-1/2 rotate-[-3deg] sm:right-10 sm:translate-x-0" />
             </Tactile>
           </Reveal>
           <Reveal delay={0.1} className="md:col-span-5">
-            <Tactile data-tint="porcelain" className="clay relative flex h-full flex-col gap-3 p-6 sm:p-7">
+            <Tactile className="card-line relative flex h-full flex-col gap-3 rounded-[var(--r-lg)] p-6 sm:p-7">
               <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3">02 · For volunteers</p>
-              <p className="font-display text-[3rem] leading-none tracking-[-0.045em]">
+              <p className="font-display text-[3rem] font-semibold leading-none tracking-[-0.05em]">
                 <CountUp value={t.volunteerHours} />
                 <span className="ml-2 font-sans text-body font-medium tracking-normal text-ink-2">bench hours logged</span>
               </p>
@@ -167,7 +159,7 @@ export default async function Landing() {
             </Tactile>
           </Reveal>
           <Reveal delay={0.18} className="md:col-span-5">
-            <Tactile data-tint="mint" className="clay relative flex h-full flex-col gap-3 p-6 sm:p-7">
+            <Tactile className="card-line relative flex h-full flex-col gap-3 rounded-[var(--r-lg)] p-6 sm:p-7">
               <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-loop-deep">03 · For buyers</p>
               <p className="text-title font-semibold tracking-[-0.02em]">Safe, tested computers at prices tied to what you can pay.</p>
               <p className="text-ink-2">Every one wiped, rebuilt and carrying a passport you can check.</p>
