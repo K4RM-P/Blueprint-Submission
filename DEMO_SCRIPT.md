@@ -16,20 +16,20 @@ Times are cumulative.
 3. Say: *"Free Geek Toronto has zero corporate partners. Relay gives businesses a reason to send uniform laptops, and shows everyone where they go."*
 
 ### 0:20 – 0:55 · F1: a partner donates (Partner)
-4. `/demo` → **Explore as a Partner** (Maple Ledger Accounting, Impact tier).
-5. **New batch** → Dell · Latitude 5420 · 2021 · quantity **20** · Working. The **Batch Value Score** vessel rises to **Excellent**. Read the tip aloud.
+4. `/demo` → **Partner** (Maple Ledger Accounting, Impact tier).
+5. **Donate a batch** → Dell · Latitude 5420 · 2021 · quantity **20** · Working. The **Batch Value Score** vessel rises to **Excellent**. Read the tip aloud.
 6. Next → **drop-off**, then pick an **Open** week from the capacity glasses (Full weeks have a lid).
 7. Next → tick the data-handling box → **Submit**. The vessel fills to the score (the one celebration); then open **Dashboard**: the batch shows **Submitted**.
 
 ### 0:55 – 1:25 · F2 + F4: staff run intake and prove the wipe (Staff)
-8. **Explore as Staff** → Overview: 4 pebbles, the capacity glasses for the next 4 weeks, pending approvals.
+8. **Staff** → Overview: the batches waiting for approval and the capacity glasses for the next 4 weeks, then where every device is.
 9. **Batches**: the queue is sorted by score, with Maple Ledger's batch on top. Open it → **Approve** → **Schedule** (no capacity warning) → **Receive** → bulk-add 20 devices. Each gets a unique `FGT-` passport code.
 10. **QR labels** → show the print preview of the 30-up sheet. (One sentence: "Volunteers stick these on.")
 11. **Devices** → filter *Wipe pending verification* → select all → press **`v`** → method + report reference → verify. Say: *"Only staff can verify a wipe, and the database enforces it."*
 12. Open **Queen West Design Co.**'s fully verified batch → **Issue certificate** (sky stamp). Open the PDF for 2 seconds, then `/verify/GL-…`: genuine, with no serial numbers.
 
 ### 1:25 – 1:50 · F3: the volunteer bench (Volunteer, on a phone)
-13. **Explore as a Volunteer** (Aisha) → **Claim next device**.
+13. **Volunteer** (Aisha) → **Claim next device**.
 14. Tap **Hardware test** → **hold** the **Data wipe performed** tile (liquid fills) and enter the report ID → **OS installed** (Linux Mint) → **Final QA**.
 15. A badge coin drops in. Open the **Skills Wallet**: badges with progress rings, plus "Passports you're on".
 
@@ -39,7 +39,7 @@ Times are cumulative.
 18. Let it play (or tap right): *Its first job was at Maple Ledger Accounting* (the baton glows in) → the handoff → **Every byte erased** (sky seal stamps down) → *Aisha brought it back to life* (stamps land in order) → *ready in N days* → Linux Mint → the liquid odometer (kg kept out of landfill) → **Where your money goes** pour (*Illustrative*) with the Pay-It-Forward line → **Why isn't it free?** → *Now it's your turn. Pass it on.* → the collectible card → **Share my laptop's story**.
 19. Say: *"No serial numbers, no wipe report IDs, no price paid, no buyer — never on the public page or in the share image."* Tap ✕ to show the full passport (also the print view).
 
-**Showcase passports** (fixed codes from `pnpm seed`; also listed on `/demo` under "Scan a passport"):
+**Showcase passports** (fixed codes from `pnpm seed`; also listed on `/demo` under "Or open a device passport"):
 
 | Code | Story |
 |---|---|

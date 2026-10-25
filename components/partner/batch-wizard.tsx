@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 
 type FormValues = Omit<BatchInput, "dataHandlingAck"> & { dataHandlingAck: boolean };
 
-const STEPS = ["Devices", "Logistics", "Data handling", "Review"];
+const STEPS = ["Devices", "Drop-off", "Data wipe", "Review"];
 const STEP_FIELDS: FieldPath<FormValues>[][] = [["lineItems"], ["logistics", "preferredWeek", "pickupAddress"], ["dataHandlingAck", "notes"], []];
 
 const blankItem = (): FormValues["lineItems"][number] => ({ category: "laptop", make: "", model: "", approxYear: null, quantity: 1, condition: "working" });
@@ -148,14 +148,14 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
               {step === 0 ? (
                 <fieldset>
                   <legend className="text-title font-semibold">What are you donating?</legend>
-                  <p className="mt-1 text-ink-2">Add one row per model. Identical laptops go on one row with a quantity.</p>
+                  <p className="mt-1 text-ink-2">One row per model. Identical laptops share a row with a quantity.</p>
                   <ul className="mt-6 flex flex-col gap-4">
                     {fields.map((f, i) => {
                       const le = e.lineItems?.[i];
                       return (
                         <li key={f.id} className="well rounded-[var(--r-md)] p-4 sm:p-5">
                           <div className="mb-3 flex items-center justify-between">
-                            <p className="font-semibold">Devices {i + 1}</p>
+                            <p className="font-semibold">Model {i + 1}</p>
                             {fields.length > 1 ? (
                               <button type="button" onClick={() => remove(i)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-small font-medium text-danger-ink hover:bg-white/60">
                                 <Trash2 className="size-4" aria-hidden /> Remove
@@ -257,7 +257,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                     <p className="font-medium text-ink" id="week-label">
                       Preferred week
                     </p>
-                    <p className="mb-4 text-small text-ink-2">Glasses show how full our refurbishment bench is. Full weeks are closed.</p>
+                    <p className="mb-4 text-small text-ink-2">Each glass shows how full our bench is that week. Full weeks are closed.</p>
                     <CapacityGlasses label="Preferred week" weeks={calendar} value={week} onSelect={(w) => setValue("preferredWeek", w, { shouldValidate: true })} />
                     {e.preferredWeek ? (
                       <p role="alert" className="mt-3 text-small font-medium text-danger-ink">
@@ -306,7 +306,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
 
               {step === 3 ? (
                 <div className="flex flex-col gap-6">
-                  <h2 className="text-title font-semibold">Check and send</h2>
+                  <h2 className="text-title font-semibold">Review your batch</h2>
                   <div className="flat overflow-x-auto !p-0">
                     <table className="data-table">
                       <caption className="sr-only">Devices in this batch</caption>
@@ -343,7 +343,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                         <Truck />
                       </IconTile>
                       <div>
-                        <dt className="text-small text-ink-2">Logistics</dt>
+                        <dt className="text-small text-ink-2">Getting it to us</dt>
                         <dd className="font-semibold">
                           {values.logistics === "pickup" ? `Pickup · ${values.pickupAddress}` : "Drop-off at 180 Sudbury St"} · week of {selectedWeek?.label ?? "—"}
                         </dd>
@@ -354,8 +354,8 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                         <HardDrive />
                       </IconTile>
                       <div>
-                        <dt className="text-small text-ink-2">Data handling</dt>
-                        <dd className="font-semibold">Drives intact · FGT sanitizes</dd>
+                        <dt className="text-small text-ink-2">Data wipe</dt>
+                        <dd className="font-semibold">Drives left in · Free Geek wipes them</dd>
                       </div>
                     </div>
                   </dl>
@@ -380,7 +380,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
             </ClayButton>
           ) : (
             <ClayButton key="submit" type="submit" variant="primary" loading={formState.isSubmitting}>
-              {editing ? "Save changes" : `Submit ${totalQty} device${totalQty === 1 ? "" : "s"}`}
+              {editing ? "Save changes" : `Submit batch · ${totalQty} device${totalQty === 1 ? "" : "s"}`}
             </ClayButton>
           )}
         </div>

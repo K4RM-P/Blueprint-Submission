@@ -33,20 +33,18 @@ export default async function VolunteerBench() {
   return (
     <>
       <PageHeader
-        eyebrow={`Hi ${profile.display_first_name ?? "there"}`}
         title="My Bench"
-        description={active.length ? `${active.length} device${active.length === 1 ? "" : "s"} in progress.` : "Nothing on your bench. Claim the next device when you're ready."}
+        description={`${profile.display_first_name ? `Hi ${profile.display_first_name}. ` : ""}${active.length ? `You have ${active.length} device${active.length === 1 ? "" : "s"} in progress.` : "Claim a laptop to start refurbishing it."}`}
         actions={<div className="hidden lg:block"><ClaimButton waiting={waiting} /></div>}
       />
-      {top ? (
-        <p className="glass mb-6 inline-flex flex-wrap items-center gap-2 rounded-full px-4 py-2 text-small text-ink-2">
-          Next up in the queue: <span className="font-semibold text-ink">{top.make} {top.model}</span> · score {top.value_score}
-        </p>
-      ) : null}
-
       {active.length === 0 ? (
-        <EmptyState title="Your bench is clear. The next baton is waiting." tone="butter" art="baton">
-          {waiting > 0 ? `${waiting} devices are queued for the bench. ` : ""}Claim one and we&apos;ll walk you through four steps: test, wipe, install, check.
+        <EmptyState title="Your bench is clear." tone="butter" art="baton">
+          {top ? (
+            <>
+              Next up: <span className="font-semibold text-ink">{top.make} {top.model}</span>.{" "}
+            </>
+          ) : null}
+          Claim it and we&apos;ll guide you through four steps: test, wipe, install, check.
         </EmptyState>
       ) : (
         <ul className="grid gap-5 md:grid-cols-2">
@@ -90,7 +88,7 @@ export default async function VolunteerBench() {
           <h2 id="waiting" className="text-title font-semibold">
             Waiting on staff
           </h2>
-          <p className="text-small text-ink-2">You finished these. Staff verify the data wipe before they move on.</p>
+          <p className="text-small text-ink-2">You finished these. Staff check each data wipe before the laptop moves on.</p>
           <ul className="mt-4 flex flex-col gap-2">
             {waitingOnStaff.map((d) => (
               <li key={d.id} className="glass flex items-center justify-between gap-3 rounded-[18px] px-4 py-3">
@@ -106,6 +104,7 @@ export default async function VolunteerBench() {
           </ul>
         </section>
       ) : null}
+      <div aria-hidden className="h-20 lg:hidden" />
       <div className="lg:hidden">
         <ClaimButton waiting={waiting} floating />
       </div>

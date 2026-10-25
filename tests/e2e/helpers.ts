@@ -24,6 +24,6 @@ export async function settle(page: Page) {
 
 export async function signInAs(page: Page, role: "partner" | "staff" | "volunteer") {
   await page.goto("/demo");
-  await page.getByRole("button", { name: new RegExp(`explore as (a |)${role}`, "i") }).click();
+  await page.getByRole("button", { name: new RegExp(`^${role}\\b`, "i") }).click();
   await page.waitForURL(new RegExp(`/${role}$`), { timeout: 30_000 });
 }

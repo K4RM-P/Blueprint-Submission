@@ -5,7 +5,7 @@ import { getCalendar, getSettings } from "@/lib/queries/common";
 import { getPartnerContext } from "@/lib/queries/partner";
 import type { PartnerTier } from "@/lib/domain";
 
-export const metadata: Metadata = { title: "New batch" };
+export const metadata: Metadata = { title: "Donate a batch" };
 
 export default async function NewBatchPage() {
   const { supabase, org } = await getPartnerContext();
@@ -13,7 +13,7 @@ export default async function NewBatchPage() {
   const calendar = await getCalendar(supabase, settings.weeklyCapacity);
   return (
     <>
-      <PageHeader eyebrow="New batch" title="Send us your retired devices." description="Four short steps. Your score updates as you go — it helps our team schedule your batch." />
+      <PageHeader title="Donate a batch" description="Tell us what you’re sending and when. It takes about a minute." />
       <BatchWizard tier={org.tier as PartnerTier} calendar={calendar} weights={settings.weights} maxAgeYears={settings.maxAgeYears} />
     </>
   );

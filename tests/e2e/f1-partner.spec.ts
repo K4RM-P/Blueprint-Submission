@@ -46,7 +46,7 @@ test.describe("F1 — partner first donation (PP-01..PP-07)", () => {
     await page.getByRole("button", { name: "Continue" }).click();
 
     await expect(page.getByRole("cell", { name: /Dell Latitude 5420/ })).toBeVisible();
-    await page.getByRole("button", { name: "Submit 20 devices" }).click();
+    await page.getByRole("button", { name: "Submit batch · 20 devices" }).click();
     await expect(page.getByRole("status").filter({ hasText: "Batch sent." })).toBeVisible();
 
     await page.getByRole("link", { name: "Back to dashboard" }).click();

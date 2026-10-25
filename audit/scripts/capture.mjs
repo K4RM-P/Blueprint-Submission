@@ -27,7 +27,7 @@ async function firstHref(page, url, re) {
 async function login(ctx, role) {
   const page = await ctx.newPage();
   await page.goto(BASE + "/demo");
-  await page.getByRole("button", { name: new RegExp(`explore as (a |)${role}`, "i") }).click();
+  await page.getByRole("button", { name: new RegExp(`^${role}\\b`, "i") }).click();
   await page.waitForURL(new RegExp(`/${role}$`), { timeout: 45000 });
   return page;
 }

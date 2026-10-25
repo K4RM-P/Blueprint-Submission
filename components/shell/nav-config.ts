@@ -9,7 +9,6 @@ import {
   LayoutDashboard,
   type LucideIcon,
   Package,
-  PackagePlus,
   QrCode,
   Settings,
   Users,
@@ -31,9 +30,8 @@ export const NAV: Record<Role, NavItem[]> = {
   partner: [
     { href: "/partner", label: "Dashboard", icon: LayoutDashboard, dock: true, exact: true },
     { href: "/partner/batches", label: "Batches", icon: Package, dock: true },
-    { href: "/partner/batches/new", label: "New batch", icon: PackagePlus, dock: true, exact: true },
     { href: "/partner/report", label: "Impact report", icon: FileText, dock: true },
-    { href: "/partner/membership", label: "Membership", icon: CreditCard },
+    { href: "/partner/membership", label: "Membership", icon: CreditCard, dock: true },
     { href: "/partner/settings", label: "Settings", icon: Settings, dock: true },
   ],
   staff: [

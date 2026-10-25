@@ -8,7 +8,6 @@ test.describe("auth, roles and demo mode (AUTH-01..06)", () => {
       await signInAs(page, role);
       await expect(page).toHaveURL(new RegExp(`/${role}$`));
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-      await expect(page.getByText("Demo environment · fictional data")).toBeVisible();
       w.assertClean();
     });
   }

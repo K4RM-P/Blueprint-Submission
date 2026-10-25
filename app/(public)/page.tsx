@@ -51,11 +51,6 @@ export default async function Landing() {
       <Hero
         devicesReused={t.devicesReused}
         totals={{ received: t.devicesReceived, verified: impact.stages.verified, reused: t.devicesReused, kgDiverted: t.kgDiverted }}
-        legs={[
-          { label: "Handed over", stat: t.devicesReceived, caption: "laptops from Toronto businesses" },
-          { label: "Wiped & rebuilt", stat: impact.stages.verified, caption: "drives verified clean" },
-          { label: "Passed on", stat: t.devicesReused, caption: "now in someone's hands" },
-        ]}
       />
 
       {/* Partner strip directly under the hero: who's already running */}
@@ -93,7 +88,6 @@ export default async function Landing() {
         <Reveal>
           <SectionHead
             id="impact-title"
-            fig="0.3"
             label="Live impact"
             title="What the relay"
             muted="has moved so far."
@@ -130,13 +124,13 @@ export default async function Landing() {
       {/* 4 · Three ways in, deliberately different sizes and weights */}
       <section aria-labelledby="who" className="mx-auto max-w-[1200px] px-4 py-28 sm:px-6 md:py-36">
         <Reveal>
-          <SectionHead id="who" fig="0.4" label="Take a leg" title="Everyone in the relay" muted="gets something back." />
+          <SectionHead id="who" label="Who it helps" title="Everyone in the relay" muted="gets something back." />
         </Reveal>
         <div className="mt-14 grid gap-5 md:grid-cols-12">
           <Reveal className="md:col-span-7 md:row-span-2">
             <Tactile className="card-line relative flex h-full min-h-[460px] flex-col overflow-hidden rounded-[var(--r-lg)] p-7 pb-[19rem] sm:p-10 sm:pb-64">
               <span aria-hidden className="card-grid absolute inset-x-0 bottom-0 h-[55%]" />
-              <p className="relative font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ember-ink">01 · For businesses</p>
+              <p className="relative font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ember-ink">For businesses</p>
               <h3 className="font-display relative mt-4 max-w-md text-[2rem] font-semibold leading-[1.02] tracking-[-0.045em] sm:text-[2.75rem]">Your three-year-old laptops are someone&apos;s first computer.</h3>
               <p className="relative mt-4 max-w-[19rem] text-ink-2">Free to start. A data-wipe certificate for every batch, and a live dashboard of who your devices help.</p>
               <ClayButton href="/become-a-partner" variant="secondary" iconRight={<ArrowRight />} className="relative z-[1] mt-8 self-start">
@@ -147,7 +141,7 @@ export default async function Landing() {
           </Reveal>
           <Reveal delay={0.1} className="md:col-span-5">
             <Tactile className="card-line relative flex h-full flex-col gap-3 rounded-[var(--r-lg)] p-6 sm:p-7">
-              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3">02 · For volunteers</p>
+              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3">For volunteers</p>
               <p className="font-display text-[3rem] font-semibold leading-none tracking-[-0.05em]">
                 <CountUp value={t.volunteerHours} />
                 <span className="ml-2 font-sans text-body font-medium tracking-normal text-ink-2">bench hours logged</span>
@@ -160,7 +154,7 @@ export default async function Landing() {
           </Reveal>
           <Reveal delay={0.18} className="md:col-span-5">
             <Tactile className="card-line relative flex h-full flex-col gap-3 rounded-[var(--r-lg)] p-6 sm:p-7">
-              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-loop-deep">03 · For buyers</p>
+              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-loop-deep">For buyers</p>
               <p className="text-title font-semibold tracking-[-0.02em]">Safe, tested computers at prices tied to what you can pay.</p>
               <p className="text-ink-2">Every one wiped, rebuilt and carrying a passport you can check.</p>
               <Link href="/about#pricing" className="mt-auto text-small font-semibold text-loop-deep underline-offset-4 hover:underline">
@@ -177,9 +171,7 @@ export default async function Landing() {
           <div className="ink-panel relative isolate grid grid-cols-[minmax(0,1fr)] items-center gap-10 overflow-hidden rounded-[var(--r-xl)] p-7 text-white sm:p-10 md:grid-cols-12 md:p-16">
             <span aria-hidden className="ink-panel-grid absolute inset-0 -z-10" />
             <div className="md:col-span-6">
-              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-white/60">
-                Fig 0.5 <span className="mx-1.5 text-white/25">/</span> Device Passport
-              </p>
+              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-white/60">Device Passport</p>
               <h2 id="scan-title" className="font-display mt-4 text-[2.25rem] leading-[1.02] tracking-[-0.045em] sm:text-[3rem]">
                 Every refurbished computer <span className="text-white/55">carries its story.</span>
               </h2>
@@ -196,7 +188,6 @@ export default async function Landing() {
           <Reveal>
             <SectionHead
               id="wall"
-              fig="0.6"
               label="Partner Wall"
               title="Toronto businesses"
               muted="already in the relay."

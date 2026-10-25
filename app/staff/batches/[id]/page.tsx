@@ -37,6 +37,13 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
   const canIssue = !batch.certificates && batchCanIssueCertificate(list.map((d) => d.status));
   const pendingWipes = list.filter((d) => d.status === "wipe_pending_verification").length;
 
+  const notes = batch.notes ? (
+    <FlatCard>
+      <h2 className="font-semibold">Partner notes</h2>
+      <p className="mt-2 text-ink-2">{batch.notes}</p>
+    </FlatCard>
+  ) : null;
+
   return (
     <>
       <p className="mb-4 text-small">
@@ -45,9 +52,9 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
         </Link>
       </p>
       <PageHeader
-        eyebrow={`${batch.organizations?.name} · ${batch.organizations ? labels.tier[batch.organizations.tier] : ""}`}
-        title={`${qty} devices · score ${batch.value_score}`}
-        description={`${scoreLabel(batch.value_score)} batch. Submitted ${longDate(batch.created_at)} · ${batch.logistics === "pickup" ? `pickup at ${batch.pickup_address}` : "drop-off"} · ${batch.scheduled_week ? "scheduled" : "preferred"} week of ${shortDate(batch.scheduled_week ?? batch.preferred_week)}.`}
+        eyebrow={batch.organizations ? labels.tier[batch.organizations.tier] : undefined}
+        title={batch.organizations?.name ?? "Batch"}
+        description={`${qty} devices · score ${batch.value_score} (${scoreLabel(batch.value_score)}) · submitted ${longDate(batch.created_at)} · ${batch.logistics === "pickup" ? `pickup at ${batch.pickup_address}` : "drop-off"}, ${batch.scheduled_week ? "scheduled" : "preferred"} week of ${shortDate(batch.scheduled_week ?? batch.preferred_week)}`}
         actions={<BatchStatusChip status={batch.status} />}
       />
       <ClayCard material="glass" className="flex flex-col gap-6">
@@ -57,13 +64,13 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
         {batch.decline_reason ? <p className="text-small text-ink-2">Decline reason: {batch.decline_reason}</p> : null}
       </ClayCard>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+      <div className={list.length > 0 ? "mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]" : "mt-6 max-w-3xl"}>
         <div className="min-w-0">
           {list.length > 0 ? (
             <SerialGrid devices={list} />
           ) : (
             <FlatCard>
-              <h2 className="font-semibold">Line items</h2>
+              <h2 className="font-semibold">What the partner is sending</h2>
               <ul className="mt-3 divide-y divide-line">
                 {batch.batch_line_items.map((l) => (
                   <li key={l.id} className="flex justify-between gap-4 py-2.5">
@@ -77,19 +84,22 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 text-small text-ink-2">Devices are created with passport codes when you receive the batch.</p>
+              <p className="mt-4 text-small text-ink-2">Each device gets its passport code when you receive the batch.</p>
+              {batch.notes ? (
+                <div className="mt-5 border-t border-line pt-4">
+                  <h3 className="text-small font-semibold">Partner notes</h3>
+                  <p className="mt-1 text-ink-2">{batch.notes}</p>
+                </div>
+              ) : null}
             </FlatCard>
           )}
         </div>
-        <div className="flex min-w-0 flex-col gap-6">
-          <CertificatePanel batchId={batch.id} certificate={batch.certificates} canIssue={canIssue} pendingWipes={pendingWipes} total={list.length} />
-          {batch.notes ? (
-            <FlatCard>
-              <h2 className="font-semibold">Partner notes</h2>
-              <p className="mt-2 text-ink-2">{batch.notes}</p>
-            </FlatCard>
-          ) : null}
-        </div>
+        {list.length > 0 ? (
+          <div className="flex min-w-0 flex-col gap-6">
+            <CertificatePanel batchId={batch.id} certificate={batch.certificates} canIssue={canIssue} pendingWipes={pendingWipes} total={list.length} />
+            {notes}
+          </div>
+        ) : null}
       </div>
     </>
   );

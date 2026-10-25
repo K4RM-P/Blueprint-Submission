@@ -25,16 +25,16 @@ export function CertificatePanel({ batchId, certificate, canIssue, pendingWipes,
       ) : (
         <>
           <div>
-            <h2 className="font-semibold">Data-sanitization certificate</h2>
+            <h2 className="font-semibold">Data-wipe certificate</h2>
             <p className="mt-1 text-small text-ink-2">
               {total === 0
-                ? "Receive the batch first."
+                ? "Available once the batch arrives and every drive is wiped and verified."
                 : canIssue
                   ? "Every device is verified or recycled. Ready to issue."
                   : `${pendingWipes} wipe${pendingWipes === 1 ? "" : "s"} waiting for verification. Every device must be verified or recycled first.`}
             </p>
           </div>
-          <IssueCertificateButton batchId={batchId} disabled={!canIssue} />
+          {canIssue ? <IssueCertificateButton batchId={batchId} disabled={false} /> : null}
         </>
       )}
     </ClayCard>

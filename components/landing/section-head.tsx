@@ -2,16 +2,14 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Landing chapter header: a mono figure label, then a two-tone display line
+ * Landing chapter header: a mono label, then a two-tone display line
  * (statement in ink, continuation in ink-3). Optional aside sits right on desktop.
  */
-export function SectionHead({ fig, label, title, muted, aside, id, className }: { fig: string; label: string; title: string; muted?: string; aside?: ReactNode; id: string; className?: string }) {
+export function SectionHead({ label, title, muted, aside, id, className }: { label: string; title: string; muted?: string; aside?: ReactNode; id: string; className?: string }) {
   return (
     <div className={cn("grid gap-6 md:grid-cols-12 md:items-end", className)}>
       <div className="md:col-span-8">
-        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3">
-          Fig {fig} <span className="mx-1.5 text-line">/</span> {label}
-        </p>
+        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3">{label}</p>
         <h2 id={id} className="font-display mt-4 max-w-[18ch] text-[2.5rem] font-semibold leading-[0.98] tracking-[-0.055em] sm:text-[3.5rem] lg:text-[4.25rem]">
           {title}
           {muted ? <span className="text-ink-3"> {muted}</span> : null}

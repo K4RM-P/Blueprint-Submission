@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Play, Printer, QrCode } from "lucide-react";
-import { ClayButton, ClayCard, FlatCard, StatPebble } from "@/components/clay";
+import { ClipboardCheck, Play, Printer } from "lucide-react";
+import { ClayButton, ClayCard, FlatCard, StatGroup } from "@/components/clay";
 import { PassportQrImage } from "@/components/journey/passport-qr";
 import { CapacityGlasses } from "@/components/liquid";
 import { BarsChart } from "@/components/charts/bars";
@@ -52,7 +52,6 @@ export default async function StaffOverview() {
   // DP-06: anonymous story analytics (counts only).
   const { data: engagementRaw } = await supabase.rpc("passport_story_summary");
   const engagement = (engagementRaw as { starts: number; completions: number; shares: number; drops: { slide: string; count: number }[] } | null) ?? { starts: 0, completions: 0, shares: 0, drops: [] };
-  const completionRate = engagement.starts > 0 ? Math.round((engagement.completions / engagement.starts) * 100) : 0;
   const topDrop = engagement.drops[0];
   const devices = devicesRes.data ?? [];
   const pending = pendingRes.data ?? [];
@@ -78,86 +77,32 @@ export default async function StaffOverview() {
     ] as const
   ).map(([k, label]) => ({ label, value: checker.filter((c) => c.outcome === k).length, highlight: k === "accepted" || k === "partner_redirect" }));
 
+  const kpis = [
+    { label: "devices sold this month", value: soldThisMonth.length },
+    { label: "revenue this month", note: `Sales ${money(salesCents)} · memberships ${money(membershipCents)} · fund ${money(pifCents)}`, value: `$${Math.round((salesCents + membershipCents + pifCents) / 100).toLocaleString("en-CA")}` },
+    { label: "active partners", value: activePartners },
+    { label: "volunteers active in the last 60 days", value: activeVolunteers },
+  ];
+
   return (
     <>
-      <PageHeader eyebrow="Staff Console" title="Overview" description={`${pending.length} batch${pending.length === 1 ? "" : "es"} waiting for review · ${impact.devicesInProgress} devices in the pipeline.`} />
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatPebble label="Pending approvals" value={pending.length} tint="apricot" />
-        <StatPebble label="Sold this month" value={soldThisMonth.length} tint="mint" />
-        <StatPebble label="Revenue this month" value={Math.round((salesCents + membershipCents + pifCents) / 100)} prefix="$" caption={`Sales ${money(salesCents)} · memberships ${money(membershipCents)} · PIF ${money(pifCents)}`} />
-        <StatPebble label="Active partners" value={activePartners} caption={`${activeVolunteers} volunteers active in the last 60 days`} />
-      </div>
-
-      <section aria-labelledby="passport-qr" className="flat mt-6 grid gap-6 p-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
-        <PassportQrImage code={showcase.code} size={152} className="border border-line" />
-        <div className="flex min-w-0 flex-col gap-3">
-          <p className="eyebrow inline-flex items-center gap-1.5">
-            <QrCode className="size-4" aria-hidden /> Device Passports
-          </p>
-          <h2 id="passport-qr" className="font-display text-[1.75rem] leading-tight">
-            Every laptop gets a QR code that tells its story.
-          </h2>
-          <p className="text-ink-2">
-            Stick a label on each device at intake. Anyone who scans it watches its story: where it came from, how its data was wiped, who refurbished it and who it helps now.
-            {" "}Scan this code to watch <span className="font-mono text-ink">{showcase.code}</span>, a laptop that has run all three legs.
-          </p>
-          <div className="flex flex-wrap gap-2.5">
-            <ClayButton href="/staff/labels" variant="primary" size="sm" icon={<Printer />}>
-              Create QR labels
+      <PageHeader
+        title="Overview"
+        description={
+          pending.length > 0
+            ? `${pending.length} batch${pending.length === 1 ? " needs" : "es need"} your review. ${impact.devicesInProgress} devices are being refurbished.`
+            : `No batches waiting. ${impact.devicesInProgress} devices are being refurbished.`
+        }
+        actions={
+          pending.length > 0 ? (
+            <ClayButton href="/staff/batches?status=submitted" variant="primary" icon={<ClipboardCheck />}>
+              Review {pending.length} batch{pending.length === 1 ? "" : "es"}
             </ClayButton>
-            <ClayButton href={`/p/${showcase.code}`} size="sm" icon={<Play />}>
-              Watch a passport story
-            </ClayButton>
-            <ClayButton href="/staff/devices" variant="ghost" size="sm">
-              Pick devices to label
-            </ClayButton>
-          </div>
-        </div>
-      </section>
+          ) : null
+        }
+      />
 
-      <section aria-labelledby="engagement" className="flat mt-6 p-6">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h2 id="engagement" className="font-semibold">
-            Passport engagement
-          </h2>
-          <span className="text-small text-ink-2">Anonymous counts from Relay Wrapped stories. No codes, no people.</span>
-        </div>
-        <dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {[
-            ["Stories started", engagement.starts.toLocaleString("en-CA")],
-            ["Watched to the card", `${engagement.completions.toLocaleString("en-CA")}${engagement.starts ? ` · ${completionRate}%` : ""}`],
-            ["Shared", engagement.shares.toLocaleString("en-CA")],
-            ["Most common drop-off", topDrop ? `${topDrop.slide.replace("_", " ")} (${topDrop.count})` : "None yet"],
-          ].map(([k, v]) => (
-            <div key={k}>
-              <dt className="text-small text-ink-2">{k}</dt>
-              <dd className="font-display text-[1.5rem] capitalize tnum">{v}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-        <FlatCard>
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 className="font-semibold">Devices by pipeline status</h2>
-            <span className="text-small text-ink-2 tnum">{devices.length} total</span>
-          </div>
-          <div className="mt-4">
-            <PipelineTrack stages={pipeline} label="Devices by pipeline status" />
-          </div>
-        </FlatCard>
-        <ClayCard material="glass" className="flex flex-col gap-5">
-          <div>
-            <h2 className="font-semibold">Bench capacity · next 4 weeks</h2>
-            <p className="text-small text-ink-2">{settings.weeklyCapacity} devices per week. Approved and scheduled batches count toward load.</p>
-          </div>
-          <CapacityGlasses label="Capacity for the next four weeks" weeks={calendar.map((w) => ({ ...w, sublabel: `${w.load}/${w.capacity}` }))} className="!grid-cols-4" />
-        </ClayCard>
-      </div>
-
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <section aria-labelledby="pending" className="flat overflow-hidden !p-0">
           <div className="flex items-center justify-between px-6 pt-5">
             <h2 id="pending" className="font-semibold">
@@ -199,18 +144,49 @@ export default async function StaffOverview() {
             </table>
           )}
         </section>
+        <ClayCard material="glass" className="flex flex-col gap-5">
+          <div>
+            <h2 className="font-semibold">Bench capacity · next 4 weeks</h2>
+            <p className="text-small text-ink-2">{settings.weeklyCapacity} devices a week. Approved and scheduled batches fill the glass.</p>
+          </div>
+          <CapacityGlasses label="Capacity for the next four weeks" weeks={calendar.map((w) => ({ ...w, sublabel: `${w.load}/${w.capacity}` }))} className="!grid-cols-4" />
+        </ClayCard>
+      </div>
+
+      <section aria-labelledby="pipeline" className="flat mt-6 p-6">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 id="pipeline" className="font-semibold">
+            Where every device is
+          </h2>
+          <Link href="/staff/devices" className="text-small font-semibold text-loop-deep underline-offset-4 hover:underline">
+            All {devices.length} devices
+          </Link>
+        </div>
+        <div className="mt-4">
+          <PipelineTrack stages={pipeline} label="Devices by pipeline status" />
+        </div>
+      </section>
+
+      <section aria-labelledby="month" className="mt-6">
+        <h2 id="month" className="sr-only">
+          This month
+        </h2>
+        <StatGroup label="This month" items={kpis} className="sm:grid-cols-4" />
+      </section>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
         <FlatCard className="flex flex-col gap-4">
           <h2 className="font-semibold">Impact to date</h2>
           <dl className="grid grid-cols-2 gap-4">
             {[
-              ["Devices reused", impact.devicesReused.toLocaleString("en-CA")],
-              ["kg diverted", impact.kgDiverted.toLocaleString("en-CA")],
+              ["devices reused", impact.devicesReused.toLocaleString("en-CA")],
+              ["kg kept out of landfill", impact.kgDiverted.toLocaleString("en-CA")],
               ["kg CO₂e avoided", impact.co2eAvoidedKg.toLocaleString("en-CA")],
-              ["Volunteer hours", impact.volunteerHours.toLocaleString("en-CA")],
+              ["volunteer hours", impact.volunteerHours.toLocaleString("en-CA")],
             ].map(([k, v]) => (
-              <div key={k}>
+              <div key={k} className="flex flex-col-reverse justify-end gap-1">
                 <dt className="text-small text-ink-2">{k}</dt>
-                <dd className="font-display text-[1.75rem] tnum">{v}</dd>
+                <dd className="font-display text-[1.75rem] leading-none tnum">{v}</dd>
               </div>
             ))}
           </dl>
@@ -219,11 +195,49 @@ export default async function StaffOverview() {
               <p className="text-small text-ink-2">
                 “Can I donate this?” checker · <span className="font-semibold text-ink">{checker.length}</span> answers
               </p>
-              <BarsChart label="Checker outcomes" unit="answers" height={200} data={checkerOutcomes} />
+              <BarsChart label="Checker outcomes" unit="answers" height={180} data={checkerOutcomes} />
             </div>
           ) : null}
-          <p className="text-[0.8125rem] text-ink-3">{labels.deviceStatus.sold} = reused. Factors are placeholders marked TO VERIFY.</p>
+          <p className="text-[0.8125rem] text-ink-3">{labels.deviceStatus.sold} = reused. Factors are estimates marked TO VERIFY.</p>
         </FlatCard>
+
+        <section aria-labelledby="passport-qr" className="flat flex flex-col gap-5 p-6">
+          <div className="flex items-start gap-5">
+            <PassportQrImage code={showcase.code} size={96} className="shrink-0 border border-line" />
+            <div className="min-w-0">
+              <h2 id="passport-qr" className="font-semibold">
+                Device passports
+              </h2>
+              <p className="mt-1 text-small text-ink-2">
+                Each device gets a QR label at intake. Scanning it shows where the laptop came from, how its data was wiped and who it helps now. Try{" "}
+                <span className="font-mono text-ink">{showcase.code}</span>.
+              </p>
+            </div>
+          </div>
+          <dl className="grid grid-cols-3 gap-4 border-t border-line pt-4">
+            {[
+              ["stories opened", engagement.starts.toLocaleString("en-CA")],
+              ["watched to the end", engagement.completions.toLocaleString("en-CA")],
+              ["shared", engagement.shares.toLocaleString("en-CA")],
+            ].map(([k, v]) => (
+              <div key={k} className="flex flex-col-reverse justify-end gap-1">
+                <dt className="text-small text-ink-2">{k}</dt>
+                <dd className="font-display text-[1.5rem] leading-none tnum">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="-mt-2 text-[0.8125rem] text-ink-3">
+            Anonymous counts only.{topDrop ? ` Most viewers stop at the “${topDrop.slide.replace("_", " ")}” slide.` : ""}
+          </p>
+          <div className="flex flex-wrap gap-2.5">
+            <ClayButton href="/staff/labels" size="sm" icon={<Printer />}>
+              Print QR labels
+            </ClayButton>
+            <ClayButton href={`/p/${showcase.code}`} variant="ghost" size="sm" icon={<Play />}>
+              Watch a story
+            </ClayButton>
+          </div>
+        </section>
       </div>
     </>
   );

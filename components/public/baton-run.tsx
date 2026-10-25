@@ -50,7 +50,6 @@ export function BatonRun({ stations }: { stations: RelayStation[] }) {
         <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6">
           <SectionHead
             id="relay-title"
-            fig="0.2"
             label="The relay"
             title="Four handoffs."
             muted="Every one on the record."

@@ -15,9 +15,9 @@ for (const route of PUBLIC_ROUTES) {
   });
 }
 
-test("demo banner shows in demo mode", async ({ page }) => {
+test("demo note shows in demo mode", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText("Demo environment · fictional data")).toBeVisible();
+  await expect(page.getByText(/Demo data is fictional/)).toBeVisible();
 });
 
 const ROLE_ROUTES: Record<"partner" | "staff" | "volunteer", string[]> = {

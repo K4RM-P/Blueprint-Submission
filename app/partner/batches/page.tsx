@@ -13,12 +13,11 @@ export default async function BatchesPage() {
   return (
     <>
       <PageHeader
-        eyebrow={org.name}
-        title="Your batches"
-        description="Every batch you send, from submission to the moment its devices reach new owners."
+        title="Batches"
+        description="Every batch you've sent, and how far along it is."
         actions={
           <ClayButton href="/partner/batches/new" variant="primary" icon={<PackagePlus />}>
-            New batch
+            Donate a batch
           </ClayButton>
         }
       />
@@ -29,7 +28,7 @@ export default async function BatchesPage() {
           </EmptyState>
         </FlatCard>
       ) : (
-        <ul className="flex flex-col gap-5">
+        <ul className="flex flex-col gap-3">
           {batches.map((b) => (
             <li key={b.id}>
               <BatchCard batch={b} />

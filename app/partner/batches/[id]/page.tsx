@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ClayCard, EmptyState, FlatCard } from "@/components/clay";
 import { PageHeader } from "@/components/shell/page-header";
-import { PassportQrImage } from "@/components/journey/passport-qr";
 import { JourneyTimeline } from "@/components/journey/journey-timeline";
 import { BatchStatusChip, DeviceStatusChip } from "@/components/journey/status";
 import { BatchActions } from "@/components/partner/batch-actions";
 import { CertificateCard } from "@/components/partner/certificate-card";
 import { batchSteps } from "@/lib/batch-timeline";
-import { batchQuantity, batchTitle, getBatch, getPartnerContext } from "@/lib/queries/partner";
+import { batchTitle, getBatch, getPartnerContext } from "@/lib/queries/partner";
 import { longDate, shortDate } from "@/lib/dates";
 import { labels } from "@/lib/domain";
 import { scoreLabel } from "@/lib/batch-score";
@@ -26,6 +25,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
   const verified = devices.filter((d) => VERIFIED_OR_LATER.includes(d.status) || d.status === "recycled").length;
   const steps = batchSteps(batch).map((s) => ({ ...s, icon: null }));
   const week = batch.scheduled_week ?? batch.preferred_week;
+  const hasSerials = devices.some((d) => d.serial_number);
 
   return (
     <>
@@ -35,7 +35,6 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
         </Link>
       </p>
       <PageHeader
-        eyebrow={`Batch · ${batchQuantity(batch)} devices`}
         title={batchTitle(batch)}
         description={
           reused > 0 ? (
@@ -45,7 +44,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
           ) : batch.status === "declined" ? (
             "This batch was declined. Here's why, and what to do next."
           ) : (
-            `Submitted ${longDate(batch.created_at)}. ${batch.scheduled_week ? "Scheduled" : "Preferred"} week of ${shortDate(week)}.`
+            `Submitted ${longDate(batch.created_at)}${["submitted", "approved", "scheduled"].includes(batch.status) ? ` · ${batch.scheduled_week ? "drop-off" : "preferred"} week of ${shortDate(week)}` : ""}`
           )
         }
         actions={<BatchStatusChip status={batch.status} />}
@@ -71,9 +70,9 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
 
           <section aria-labelledby="journeys">
             <h2 id="journeys" className="text-title font-semibold">
-              Device journeys
+              Devices{devices.length > 0 ? ` (${devices.length})` : ""}
             </h2>
-            <p className="mt-1 text-small text-ink-2">Each device gets a passport with its own QR code. Scan one to see that laptop&apos;s story — once sold, you&apos;ll see who it helps, never personal details.</p>
+            <p className="mt-1 text-small text-ink-2">Open a passport to see that laptop&apos;s story and who it helps — never personal details.</p>
             <div className="flat mt-4 overflow-x-auto !p-0">
               {devices.length === 0 ? (
                 <div className="px-6">
@@ -86,35 +85,29 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
                   <caption className="sr-only">Devices in this batch</caption>
                   <thead>
                     <tr>
-                      <th scope="col">QR</th>
                       <th scope="col">Passport</th>
                       <th scope="col">Device</th>
-                      <th scope="col">Serial</th>
+                      {hasSerials ? <th scope="col">Serial</th> : null}
                       <th scope="col">Status</th>
-                      <th scope="col">Now helping</th>
+                      <th scope="col">Helping</th>
                     </tr>
                   </thead>
                   <tbody>
                     {devices.map((d) => (
                       <tr key={d.id}>
                         <td>
-                          <Link href={`/p/${d.passport_code}`} aria-label={`Open passport ${d.passport_code}`} className="block w-fit">
-                            <PassportQrImage code={d.passport_code} size={64} className="border border-line !p-1.5" />
-                          </Link>
-                        </td>
-                        <td>
-                          <Link href={`/p/${d.passport_code}`} className="font-mono text-[0.875rem] text-loop-deep underline-offset-4 hover:underline">
+                          <Link href={`/p/${d.passport_code}`} className="whitespace-nowrap font-mono text-[0.875rem] text-loop-deep underline-offset-4 hover:underline">
                             {d.passport_code}
                           </Link>
                         </td>
                         <td className="whitespace-nowrap">
                           {d.make} {d.model}
                         </td>
-                        <td className="font-mono text-[0.8125rem] text-ink-2">{d.serial_number ?? "—"}</td>
-                        <td>
+                        {hasSerials ? <td className="font-mono text-[0.8125rem] text-ink-2">{d.serial_number ?? "—"}</td> : null}
+                        <td className="whitespace-nowrap">
                           <DeviceStatusChip status={d.status} />
                         </td>
-                        <td>{d.status === "sold" ? (d.recipient_category ? labels.recipient[d.recipient_category] : "A new owner") : d.status === "recycled" ? "Recycled for parts" : "—"}</td>
+                        <td className="whitespace-nowrap">{d.status === "sold" ? (d.recipient_category ? labels.recipient[d.recipient_category] : "A new owner") : d.status === "recycled" ? "Recycled for parts" : "—"}</td>
                       </tr>
                     ))}
                   </tbody>

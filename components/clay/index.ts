@@ -11,3 +11,4 @@ export { Field, Input, Textarea, Select, Checkbox } from "./field";
 export { EmptyState } from "./empty-state";
 export { Skeleton, PageSkeleton } from "./skeleton";
 export { Dock } from "./dock";
+export { StatGroup, type StatItem } from "./stat-group";

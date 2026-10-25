@@ -10,34 +10,37 @@ import { useMotionPrefs } from "@/lib/motion";
 import { demoSignIn } from "@/server/actions/auth";
 import type { Role } from "@/lib/roles";
 
-const CARDS: { role: Role; tint: "apricot" | "sky" | "butter"; title: string; who: string; tryThis: string; icon: React.ReactNode }[] = [
+const CARDS: { role: Role; tint: "apricot" | "sky" | "butter"; title: string; app: string; who: string; does: string; icon: React.ReactNode }[] = [
   {
     role: "partner",
     tint: "apricot",
-    title: "Explore as a Partner",
-    who: "Priya, office manager at Maple Ledger Accounting",
-    tryThis: "Start a new batch of 20 Dell Latitude 5420 laptops and watch the Batch Value Score fill.",
+    title: "Partner",
+    app: "Partner Portal",
+    who: "Priya · Maple Ledger Accounting",
+    does: "Donate a batch of laptops, then follow every device and get a data-wipe certificate.",
     icon: <Building2 />,
   },
   {
     role: "staff",
     tint: "sky",
-    title: "Explore as Staff",
-    who: "Marcus, operations lead at Free Geek Toronto",
-    tryThis: "Approve Maple Ledger's submitted batch, schedule it, then receive 20 devices in one click.",
+    title: "Staff",
+    app: "Staff Console",
+    who: "Marcus · Free Geek Toronto",
+    does: "Approve incoming batches, receive devices and verify every data wipe.",
     icon: <ShieldCheck />,
   },
   {
     role: "volunteer",
     tint: "butter",
-    title: "Explore as a Volunteer",
-    who: "Aisha, volunteer building her IT résumé",
-    tryThis: "Claim the next device and work through the checklist — one more hardware test unlocks a badge.",
+    title: "Volunteer",
+    app: "Volunteer Bench",
+    who: "Aisha · volunteer technician",
+    does: "Claim a laptop, test, wipe and rebuild it, and earn skill badges.",
     icon: <Wrench />,
   },
 ];
 
-/** Three tall clay cards; pressing one presses it in, signs in and morphs to that dashboard (§9.7). */
+/** Three clay cards; pressing one presses it in, signs in and morphs to that dashboard (§9.7). */
 export function DemoCards() {
   const router = useRouter();
   const [pending, setPending] = useState<Role | null>(null);
@@ -66,27 +69,25 @@ export function DemoCards() {
             type="button"
             onClick={() => go(c.role)}
             disabled={pending !== null}
-            data-tint={c.tint}
             data-pressed={pending === c.role || undefined}
             whileTap={reduced ? undefined : { scale: 0.97 }}
             transition={t("press")}
-            className="clay clay-press lift flex h-full min-h-[340px] w-full flex-col items-start gap-5 p-7 text-left disabled:cursor-progress"
+            className="clay clay-press lift flex h-full min-h-[280px] w-full flex-col items-start gap-4 p-7 text-left disabled:cursor-progress"
             aria-describedby={`demo-${c.role}`}
           >
-            <IconTile tint={c.tint} size={52}>
+            <IconTile tint={c.tint} size={48}>
               {c.icon}
             </IconTile>
             <div>
-              <span className="font-display block text-[1.75rem] leading-tight">{c.title}</span>
-              <span className="mt-1 block text-small text-ink-2">{c.who}</span>
+              <span className="font-display block text-[2rem] leading-none">{c.title}</span>
+              <span className="mt-2 block text-small text-ink-3">{c.who}</span>
             </div>
-            <p id={`demo-${c.role}`} className="text-ink">
-              <span className="font-semibold">Try this: </span>
-              {c.tryThis}
+            <p id={`demo-${c.role}`} className="text-ink-2">
+              {c.does}
             </p>
-            <span className="mt-auto inline-flex h-12 items-center gap-2 rounded-full bg-white/75 px-5 font-semibold text-ink">
+            <span className="mt-auto inline-flex h-11 items-center gap-2 font-semibold text-loop-deep">
               {pending === c.role ? <Loader2 className="size-[18px] animate-spin" aria-hidden /> : null}
-              {pending === c.role ? "Signing in…" : "Open dashboard"}
+              {pending === c.role ? "Signing in…" : `Open ${c.app}`}
               {pending === c.role ? null : <ArrowRight className="size-[18px]" aria-hidden />}
             </span>
           </motion.button>

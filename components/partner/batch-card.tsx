@@ -1,32 +1,34 @@
+import { ChevronRight } from "lucide-react";
 import { ClayCard } from "@/components/clay";
-import { JourneyTimeline } from "@/components/journey/journey-timeline";
 import { BatchStatusChip } from "@/components/journey/status";
 import { batchSteps } from "@/lib/batch-timeline";
 import { batchQuantity, batchTitle, type PartnerBatch } from "@/lib/queries/partner";
-import { scoreLabel } from "@/lib/batch-score";
 import { longDate, shortDate } from "@/lib/dates";
+import { cn } from "@/lib/utils";
 
-/** Openable clay card for a batch with a compact horizontal timeline (§9.4). */
+/** Openable clay row for a batch: what it is, where it is, and a quiet segmented progress bar (§9.4). */
 export function BatchCard({ batch }: { batch: PartnerBatch }) {
-  const steps = batchSteps(batch).map((s) => ({ ...s, icon: null }));
+  const steps = batchSteps(batch);
+  const done = steps.filter((s) => s.done).length;
   const week = batch.scheduled_week ?? batch.preferred_week;
   return (
-    <ClayCard as="article" href={`/partner/batches/${batch.id}`} aria-label={`Open batch: ${batchTitle(batch)}`} className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="text-title font-semibold leading-snug">{batchTitle(batch)}</h3>
-          <p className="mt-1 text-small text-ink-2">
-            Submitted {longDate(batch.created_at)} · {batchQuantity(batch)} devices · {batch.status === "scheduled" || batch.scheduled_week ? "Scheduled" : "Preferred"} week of {shortDate(week)}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="chip bg-white/70 tnum text-ink-2">
-            Score {batch.value_score} · {scoreLabel(batch.value_score)}
-          </span>
+    <ClayCard as="article" href={`/partner/batches/${batch.id}`} aria-label={`Open batch: ${batchTitle(batch)}`} className="flex items-center gap-5 !py-5">
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <h3 className="text-[1.125rem] font-semibold leading-snug">{batchTitle(batch)}</h3>
           <BatchStatusChip status={batch.status} />
         </div>
+        <p className="mt-1 text-small text-ink-2">
+          {batchQuantity(batch)} devices · submitted {longDate(batch.created_at)}
+          {batch.status === "submitted" || batch.status === "approved" || batch.status === "scheduled" ? ` · drop-off week of ${shortDate(week)}` : ""}
+        </p>
+        <div className="mt-3 flex max-w-md items-center gap-1" role="img" aria-label={`Step ${done} of ${steps.length}`}>
+          {steps.map((s) => (
+            <span key={s.key} className={cn("h-1.5 flex-1 rounded-full", s.done ? (s.key === "declined" ? "bg-danger" : "bg-loop") : "bg-line")} />
+          ))}
+        </div>
       </div>
-      <JourneyTimeline orientation="horizontal" steps={steps} label="Batch progress" />
+      <ChevronRight aria-hidden className="size-5 shrink-0 text-ink-3" />
     </ClayCard>
   );
 }

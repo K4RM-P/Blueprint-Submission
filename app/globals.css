@@ -1106,7 +1106,7 @@ html[data-reduced-motion="true"] :is(.hero-in, .hero-word, .hero-drop, .live-dot
 }
 /* Hero paths: faint hairlines behind the headline, veiled under the type and at the foot. */
 .hero-paths {
-  opacity: 0.3;
+  opacity: 0.18;
 }
 .hero-paths::after {
   content: "";

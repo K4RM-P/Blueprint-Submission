@@ -60,7 +60,7 @@ export function BatchOps({ id, status, preferredWeek, quantity, calendar }: { id
           <ClayButton variant="secondary" icon={<CalendarClock />} onClick={() => setDialog("schedule")}>
             Approve &amp; schedule
           </ClayButton>
-          <ClayButton variant="danger" icon={<X />} onClick={() => setDialog("decline")}>
+          <ClayButton variant="danger" icon={<X />} className="sm:ml-auto" onClick={() => setDialog("decline")}>
             Decline
           </ClayButton>
         </>

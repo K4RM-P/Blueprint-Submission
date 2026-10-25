@@ -10,20 +10,14 @@ import { useMotionPrefs } from "@/lib/motion";
 import { CountUp } from "./count-up";
 import { DashboardPreview, type PreviewTotals } from "./dashboard-preview";
 
-export interface HeroLeg {
-  label: string;
-  stat: number;
-  caption: string;
-}
-
 /**
  * Landing hero, "Pass it on.". Centered, Apple/Vercel-style: a live pill, one
  * huge line, a two-tone sentence and the CTAs, then the product itself: the
  * Partner Portal in a window that lies back and stands up as it scrolls in, on
- * a mint glow. Under it, three live counts on hairlines. Entrance is CSS (runs
+ * a mint glow. Entrance is CSS (runs
  * before hydration). Reduced motion: everything rests in place.
  */
-export function Hero({ devicesReused, legs, totals }: { devicesReused: number; legs: HeroLeg[]; totals: PreviewTotals }) {
+export function Hero({ devicesReused, totals }: { devicesReused: number; totals: PreviewTotals }) {
   const ref = useRef<HTMLElement>(null);
   const shotRef = useRef<HTMLDivElement>(null);
   const { reduced } = useMotionPrefs();
@@ -68,8 +62,8 @@ export function Hero({ devicesReused, legs, totals }: { devicesReused: number; l
         </h1>
 
         <p className="hero-in mx-auto mt-8 max-w-[43rem] text-[1.1875rem] font-medium leading-[1.4] tracking-[-0.012em] text-ink sm:text-[1.375rem] md:mt-10 [--d:380ms]">
-          Retired business laptops, wiped and rebuilt by Free Geek Toronto volunteers.{" "}
-          <span className="text-ink-3">Then handed to the students, newcomers and families who need one. Every step on the record.</span>
+          Relay turns retired business laptops into computers for people who need one.{" "}
+          <span className="text-ink-3">Free Geek Toronto volunteers wipe and rebuild each one, and every step is on the record.</span>
         </p>
 
         <div className="hero-in mt-9 flex flex-col items-center justify-center gap-3 min-[420px]:flex-row [--d:480ms]">
@@ -93,21 +87,6 @@ export function Hero({ devicesReused, legs, totals }: { devicesReused: number; l
           <span aria-hidden className="shot-floor pointer-events-none absolute inset-x-0 -bottom-px h-40" />
         </div>
 
-        {/* three live counts, on hairlines */}
-        <ol className="mx-auto mt-12 grid max-w-[960px] grid-cols-3 border-y border-line/80 md:mt-16">
-          {legs.map((l, i) => (
-            <li key={l.label} className={i ? "border-l border-line/80 px-3 py-6 sm:px-6 md:py-8" : "px-3 py-6 sm:px-6 md:py-8"}>
-              <p className="font-mono text-[0.625rem] uppercase tracking-[0.06em] text-ink-3 sm:text-[0.6875rem] sm:tracking-[0.14em]">
-                <span className="hidden sm:inline">{String(i + 1).padStart(2, "0")} · </span>
-                {l.label}
-              </p>
-              <p className="font-display mt-3 text-[2rem] font-semibold leading-none tracking-[-0.05em] sm:text-[3rem]">
-                <CountUp value={l.stat} />
-              </p>
-              <p className="mt-2 text-[0.75rem] text-ink-2 sm:text-small">{l.caption}</p>
-            </li>
-          ))}
-        </ol>
       </div>
     </section>
   );

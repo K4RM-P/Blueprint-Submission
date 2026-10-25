@@ -65,21 +65,10 @@ export default async function StaffDevicePage({ params }: { params: Promise<{ id
             ? `Sold ${longDate(d.sold_at)} · ${d.sale_channel ? labels.channel[d.sale_channel] : ""} · ${d.recipient_category ? labels.recipient[d.recipient_category] : "recipient not recorded"}${d.pif_subsidy_cents ? ` · PIF subsidy ${money(d.pif_subsidy_cents)}` : ""}.`
             : d.status === "recycled"
               ? `Recycled: ${d.recycled_reason}`
-              : `${d.passport_views} passport view${d.passport_views === 1 ? "" : "s"}.`
+              : `From ${d.donation_batches?.organizations?.name ?? "a household"} · passport opened ${d.passport_views} time${d.passport_views === 1 ? "" : "s"}`
         }
-        actions={
-          <>
-            <DeviceStatusChip status={d.status} />
-            <Link href={`/p/${d.passport_code}`} target="_blank" rel="noopener" className="chip bg-white/70 text-loop-deep underline-offset-4 hover:underline">
-              Preview passport story
-            </Link>
-            <Link href={`/p/${d.passport_code}?view=full`} className="chip bg-white/70 text-loop-deep underline-offset-4 hover:underline">
-              Full passport
-            </Link>
-          </>
-        }
+        actions={<DeviceStatusChip status={d.status} />}
       />
-      <PassportQrCard code={d.passport_code} deviceId={d.id} className="mb-6" />
       <ClayCard material="glass" className="mb-6">
         <DeviceOps
           id={d.id}
@@ -91,6 +80,7 @@ export default async function StaffDevicePage({ params }: { params: Promise<{ id
           fundBalanceCents={Number((fund as { balance_cents?: number } | null)?.balance_cents ?? 0)}
         />
       </ClayCard>
+      <PassportQrCard code={d.passport_code} deviceId={d.id} className="mb-6" />
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         <div className="flex min-w-0 flex-col gap-6">
           <FlatCard>
@@ -99,7 +89,15 @@ export default async function StaffDevicePage({ params }: { params: Promise<{ id
               {spec.map(([k, v]) => (
                 <div key={k}>
                   <dt className="text-ink-2">{k}</dt>
-                  <dd className={k === "Serial" ? "font-mono" : "font-medium"}>{v}</dd>
+                  <dd className={k === "Serial" ? "font-mono" : "font-medium"}>
+                    {k === "Source" && d.donation_batches ? (
+                      <Link href={`/staff/batches/${d.donation_batches.id}`} className="text-loop-deep underline-offset-4 hover:underline">
+                        {v}
+                      </Link>
+                    ) : (
+                      v
+                    )}
+                  </dd>
                 </div>
               ))}
             </dl>

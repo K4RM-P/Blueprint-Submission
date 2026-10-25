@@ -18,7 +18,7 @@ export function CertificateCard({ cert, verifiedCount, total }: { cert: Cert | n
           <ShieldCheck />
         </IconTile>
         <div>
-          <h2 className="text-title font-semibold">Data-sanitization certificate</h2>
+          <h2 className="text-title font-semibold">Data-wipe certificate</h2>
           <p className="mt-1 text-ink-2">
             {total === 0
               ? "Your certificate is issued once your devices arrive and every drive is wiped and verified."
