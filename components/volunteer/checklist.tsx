@@ -90,7 +90,7 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
                       <HoldToConfirm label="Hold to confirm wipe" hint={reportRef.trim() ? "Press and hold for about a second" : "Enter the report ID first"} disabled={!reportRef.trim() || busy !== null} icon={<HardDrive />} onConfirm={() => run(step)} />
                     </div>
                   ) : step === "os_installed" && !isDone && !locked ? (
-                    <div className="clay flex flex-col gap-4 p-5" data-tint="butter">
+                    <div className="clay flex flex-col gap-4 p-5" data-tint="porcelain">
                       <p className="text-lg font-semibold">
                         {i + 1}. {labels.step[step]}
                       </p>

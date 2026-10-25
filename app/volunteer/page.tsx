@@ -45,8 +45,8 @@ export default async function VolunteerBench() {
       ) : null}
 
       {active.length === 0 ? (
-        <EmptyState title="Your bench is clear." tone="butter">
-          Claim the next device and we&apos;ll walk you through four steps: test, wipe, install, check.
+        <EmptyState title="Your bench is clear. The next baton is waiting." tone="butter" art="baton">
+          {waiting > 0 ? `${waiting} devices are queued for the bench. ` : ""}Claim one and we&apos;ll walk you through four steps: test, wipe, install, check.
         </EmptyState>
       ) : (
         <ul className="grid gap-5 md:grid-cols-2">

@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "motion/react";
-import { useRef, type KeyboardEvent } from "react";
+import { animate, motion, useMotionValue, useSpring } from "motion/react";
+import { useEffect, useRef, type KeyboardEvent } from "react";
 import { cn } from "@/lib/utils";
 import { useMotionPrefs } from "@/lib/motion";
 import { LiquidFill } from "./liquid-fill";
@@ -58,10 +58,7 @@ export function CapacityGlasses({ weeks, value, onSelect, allowFull, label, clas
         const pct = w.capacity > 0 ? w.load / w.capacity : 1;
         const inner = (
           <>
-            <div className="relative mx-auto h-16 w-12">
-              {w.status === "full" ? <span aria-hidden className="absolute -top-1.5 left-1/2 z-[1] h-2 w-11 -translate-x-1/2 rounded-full bg-[#d8cfc2]" /> : null}
-              <LiquidFill value={Math.min(pct, 1)} shape="glass" calm className="size-full" />
-            </div>
+            <SloshGlass pct={Math.min(pct, 1)} full={w.status === "full"} selected={selected} live={interactive && !disabled} />
             <span className="mt-2 block text-small font-semibold text-ink tnum">{w.label}</span>
             <span className={cn("block text-[0.8125rem] font-medium", w.status === "full" ? "text-danger-ink" : w.status === "limited" ? "text-[#8a6100]" : "text-loop-deep")}>
               {statusText[w.status]}
@@ -103,6 +100,52 @@ export function CapacityGlasses({ weeks, value, onSelect, allowFull, label, clas
           </motion.button>
         );
       })}
+    </div>
+  );
+}
+
+/**
+ * Capacity glass that sloshes (Signature Moment 9): on hover the liquid leans
+ * toward the cursor; selecting the week presses the glass in and the liquid
+ * settles with one small wave. Listens on its host button; rotate only.
+ */
+function SloshGlass({ pct, full, selected, live }: { pct: number; full: boolean; selected: boolean; live: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { reduced } = useMotionPrefs();
+  const raw = useMotionValue(0);
+  const tilt = useSpring(raw, { stiffness: 120, damping: 12, mass: 0.8 });
+  const was = useRef(selected);
+
+  useEffect(() => {
+    const host = ref.current?.closest("button");
+    if (!host || !live || reduced) return;
+    const move = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      const r = host.getBoundingClientRect();
+      raw.set(((e.clientX - r.left) / r.width - 0.5) * -16);
+    };
+    const leave = () => raw.set(0);
+    host.addEventListener("pointermove", move);
+    host.addEventListener("pointerleave", leave);
+    return () => {
+      host.removeEventListener("pointermove", move);
+      host.removeEventListener("pointerleave", leave);
+    };
+  }, [live, reduced, raw]);
+
+  useEffect(() => {
+    if (selected && !was.current && !reduced) {
+      const a = animate(raw, [0, 9, -6, 3, 0], { duration: 0.9, ease: "easeOut" });
+      was.current = selected;
+      return () => a.stop();
+    }
+    was.current = selected;
+  }, [selected, reduced, raw]);
+
+  return (
+    <div ref={ref} className="relative mx-auto h-16 w-12">
+      {full ? <span aria-hidden className="absolute -top-1.5 left-1/2 z-[1] h-2 w-11 -translate-x-1/2 rounded-full bg-[#d8cfc2]" /> : null}
+      <LiquidFill value={pct} shape="glass" calm className="size-full" tilt={tilt} />
     </div>
   );
 }

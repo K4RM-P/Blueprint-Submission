@@ -113,9 +113,9 @@ export default async function Landing() {
               See how partnering works
             </ClayButton>
           </ClayCard>
-          <ClayCard tint="butter" className="flex flex-col gap-3 md:col-span-5">
+          <ClayCard tint="porcelain" className="flex flex-col gap-3 md:col-span-5">
             <div className="flex items-center gap-3">
-              <IconTile tint="butter">
+              <IconTile tint="porcelain">
                 <Wrench />
               </IconTile>
               <p className="eyebrow">For volunteers</p>

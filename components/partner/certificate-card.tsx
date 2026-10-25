@@ -1,6 +1,6 @@
 import { Download, ShieldCheck } from "lucide-react";
 import { ClayButton, ClayCard, IconTile } from "@/components/clay";
-import { Stamp } from "@/components/clay/stamp";
+import { Seal } from "@/components/clay/seal";
 import { longDate } from "@/lib/dates";
 
 interface Cert {
@@ -30,7 +30,13 @@ export function CertificateCard({ cert, verifiedCount, total }: { cert: Cert | n
   }
   return (
     <ClayCard tint="sky" className="flex flex-col gap-5">
-      <Stamp icon={<ShieldCheck />} label="Certificate issued" date={longDate(cert.issued_at)} tint="sky" />
+      <div className="flex items-center gap-4">
+        <Seal rim="CERTIFIED · RELAY · CERTIFIED · " icon={<ShieldCheck />} size={76} tilt={-8} inView />
+        <div>
+          <p className="font-semibold text-ink">Certificate issued</p>
+          <p className="text-small text-ink-2 tnum">{longDate(cert.issued_at)}</p>
+        </div>
+      </div>
       <div>
         <p className="font-mono text-xl text-ink">{cert.certificate_number}</p>
         <p className="mt-1 text-ink-2">Covers {cert.device_count} devices. Anyone can confirm it at the public verification page.</p>

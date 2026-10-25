@@ -5,6 +5,7 @@ import { ClayButton, ClayCard, FlatCard, StatPebble } from "@/components/clay";
 import { PassportQrImage } from "@/components/journey/passport-qr";
 import { CapacityGlasses } from "@/components/liquid";
 import { BarsChart } from "@/components/charts/bars";
+import { PipelineTrack } from "@/components/staff/pipeline-track";
 import { PageHeader } from "@/components/shell/page-header";
 import { requireRole } from "@/lib/auth";
 import { getCalendar, getFactors, getSettings } from "@/lib/queries/common";
@@ -60,7 +61,7 @@ export default async function StaffOverview() {
   const pifCents = (fundRes.data ?? []).filter((f) => f.amount_cents > 0 && f.created_at >= since).reduce((s, f) => s + f.amount_cents, 0);
   const activePartners = (orgsRes.data ?? []).filter((o) => o.donation_batches.some((b) => b.status !== "declined")).length;
   const activeVolunteers = new Set((activeVolRes.data ?? []).map((e) => e.actor_id)).size;
-  const pipeline = DEVICE_STATUSES.map((s) => ({ label: PIPELINE_SHORT[s], value: devices.filter((d) => d.status === s).length, highlight: s !== "recycled" }));
+  const pipeline = DEVICE_STATUSES.map((s) => ({ label: PIPELINE_SHORT[s], value: devices.filter((d) => d.status === s).length, muted: s === "recycled" }));
   const checker = checkerRes.data ?? [];
   const checkerOutcomes = (
     [
@@ -123,7 +124,7 @@ export default async function StaffOverview() {
             <span className="text-small text-ink-2 tnum">{devices.length} total</span>
           </div>
           <div className="mt-4">
-            <BarsChart data={pipeline} label="Devices by pipeline status" />
+            <PipelineTrack stages={pipeline} label="Devices by pipeline status" />
           </div>
         </FlatCard>
         <ClayCard material="glass" className="flex flex-col gap-5">

@@ -13,8 +13,8 @@ export default function DemoPage() {
     <main className="mx-auto w-full max-w-[1200px] px-4 py-12 sm:px-6 md:py-20">
       <div className="max-w-2xl">
         <p className="eyebrow">Demo environment</p>
-        <h1 className="font-display mt-3 text-[2.5rem] leading-[1.02] sm:text-[3.5rem]">Step into the loop.</h1>
-        <p className="mt-4 text-body-l text-ink-2">Pick a role. Everything here is fictional seed data, so click anything — you can&apos;t break it.</p>
+        <h1 className="font-display mt-3 text-[2.5rem] leading-[1.02] sm:text-[3.5rem]">Pick up the baton.</h1>
+        <p className="mt-4 text-body-l text-ink-2">Pick a role and run one leg of the relay. Everything here is fictional seed data, so click anything — you can&apos;t break it.</p>
       </div>
       <div className="mt-10">
         <DemoCards />

@@ -188,6 +188,9 @@
   html {
     @apply font-sans;
     -webkit-text-size-adjust: 100%;
+    /* keep focused / scrolled-to elements clear of the sticky header and the mobile dock (WCAG 2.4.11) */
+    scroll-padding-top: 96px;
+    scroll-padding-bottom: 104px;
   }
   body {
     background-color: var(--canvas);

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BadgeCheck, SearchX } from "lucide-react";
 import { ClayCard } from "@/components/clay";
+import { Seal } from "@/components/clay/seal";
 import { createClient } from "@/lib/supabase/server";
 import { isValidCertificateNumber } from "@/lib/certificate-number";
 import { longDate } from "@/lib/dates";
@@ -25,9 +26,13 @@ export default async function VerifyPage({ params }: { params: Promise<{ number:
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-4 py-16 sm:py-24">
       <ClayCard tint={cert ? "sky" : "porcelain"} size="xl" material="glass" className="flex flex-col items-center gap-6 text-center">
-        <span data-tint={cert ? "sky" : "porcelain"} className="clay grid size-24 place-items-center rounded-full text-[#1d4f9a]">
-          {cert ? <BadgeCheck className="size-11" strokeWidth={1.5} aria-hidden /> : <SearchX className="size-10 text-ink-2" strokeWidth={1.5} aria-hidden />}
-        </span>
+        {cert ? (
+          <Seal rim="VERIFIED · FREE GEEK TORONTO · " icon={<BadgeCheck />} size={128} tilt={-7} />
+        ) : (
+          <span data-tint="porcelain" className="clay grid size-24 place-items-center rounded-full">
+            <SearchX className="size-10 text-ink-2" strokeWidth={1.5} aria-hidden />
+          </span>
+        )}
         {cert ? (
           <>
             <div>

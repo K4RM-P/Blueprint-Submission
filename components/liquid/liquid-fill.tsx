@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, type MotionValue } from "motion/react";
 import { useId } from "react";
 import { cn } from "@/lib/utils";
 import { useMotionPrefs } from "@/lib/motion";
@@ -36,10 +36,12 @@ interface LiquidFillProps {
   outline?: boolean;
   /** Smaller amplitude for tiny glasses. */
   calm?: boolean;
+  /** Slosh: rotate the liquid body (degrees) around the vessel's centre. */
+  tilt?: MotionValue<number>;
 }
 
 /** SVG vessel whose liquid level springs to `value` with a drifting wave surface (§7.2.2). */
-export function LiquidFill({ value, shape = "vessel", color = "loop", className, outline = true, calm }: LiquidFillProps) {
+export function LiquidFill({ value, shape = "vessel", color = "loop", className, outline = true, calm, tilt }: LiquidFillProps) {
   const uid = useId().replace(/:/g, "");
   const { reduced, t } = useMotionPrefs();
   const level = Math.max(0, Math.min(1, value));
@@ -61,6 +63,7 @@ export function LiquidFill({ value, shape = "vessel", color = "loop", className,
       </defs>
       <g clipPath={`url(#clip-${uid})`}>
         <path d={shapes[shape]} fill="#F7F4EE" />
+        <motion.g style={tilt ? { rotate: tilt, transformOrigin: "50px 60px", transformBox: "view-box" } : undefined}>
         <motion.g initial={false} animate={{ y }} transition={t("liquid")}>
           <g className={reduced ? undefined : "liquid-wave-slow"} style={{ transformBox: "fill-box" }}>
             <path d={wavePath(amp, 1)} fill={`url(#liq-${uid})`} opacity={0.5} transform="translate(-6 -3)" />
@@ -70,6 +73,7 @@ export function LiquidFill({ value, shape = "vessel", color = "loop", className,
             {/* meniscus */}
             <path d={wavePath(amp, 0).split(" V")[0]} fill="none" stroke="#ffffff" strokeOpacity={0.55} strokeWidth={0.8} vectorEffect="non-scaling-stroke" />
           </g>
+        </motion.g>
         </motion.g>
         {/* glass highlight, top-left light */}
         <path d={shapes[shape]} fill="none" stroke="#ffffff" strokeOpacity={0.6} strokeWidth={6} transform="translate(2 2)" />

@@ -10,6 +10,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme="light"
       position="bottom-center"
       duration={4000}
+      // clear the floating mobile dock (64px + 12px gap)
+      mobileOffset={{ bottom: 92 }}
       className="toaster group"
       icons={{
         success: (
