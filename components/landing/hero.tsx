@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import { ClayButton } from "@/components/clay";
+import { FloatingPathsBackground } from "@/components/ui/floating-paths";
 import { useMotionPrefs } from "@/lib/motion";
 import { CountUp } from "./count-up";
 import { DashboardPreview, type PreviewTotals } from "./dashboard-preview";
@@ -38,6 +39,11 @@ export function Hero({ devicesReused, legs, totals }: { devicesReused: number; l
   return (
     <section ref={ref} id="hero" aria-labelledby="hero-title" data-live={inView && live ? "true" : "false"} className="hero relative isolate overflow-x-clip">
       <span aria-hidden className="hero-aura absolute inset-x-0 top-0 -z-10 h-[1100px]" />
+      {/* a current of hairlines sweeping behind the headline, in the relay's green */}
+      <div aria-hidden className="hero-paths pointer-events-none absolute left-1/2 top-0 -z-10 h-[760px] w-[max(100%,1440px)] -translate-x-1/2 text-loop-deep md:h-[900px]">
+        <FloatingPathsBackground position={1} className="absolute inset-0" />
+        <FloatingPathsBackground position={-1} className="absolute inset-0" />
+      </div>
       <div className="mx-auto max-w-[1200px] px-4 pt-12 text-center sm:px-6 md:pt-20 lg:pt-24">
         <Link href="/impact" className="hero-in glass group inline-flex items-center gap-2.5 rounded-full py-1.5 pl-2 pr-3.5 text-small text-ink-2 [--d:0ms]">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-ink px-2.5 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-white">
