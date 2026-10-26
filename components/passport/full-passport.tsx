@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle2, HandCoins, Sparkles, HardDrive, Leaf, Package, Play, Recycle, ShieldCheck, Terminal, Wrench } from "lucide-react";
+import { Building2, CheckCircle2, HandCoins, Sparkles, HardDrive, Leaf, Package, Play, Recycle, ShieldCheck, Terminal, Wrench } from "lucide-react";
 import { ClayButton, ClayCard, IconTile, StatPebble } from "@/components/clay";
 import { LiquidBlob } from "@/components/liquid";
 import { ClayLaptop } from "@/components/illustrations/clay-laptop";
@@ -26,7 +26,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
 
   const steps = [
     { key: "donated", label: `Donated by ${donor}`, date: longDate(p.timeline.donated_at), done: true, icon: <Package />, tint: "apricot" as const },
-    { key: "wiped", label: "Data wiped & verified", date: p.timeline.wipe_verified_at ? longDate(p.timeline.wipe_verified_at) : null, done: Boolean(p.timeline.wipe_verified_at), icon: <ShieldCheck />, tint: "sky" as const, current: !p.timeline.wipe_verified_at },
+    { key: "wiped", label: "Certified data wipe, verified by staff", date: p.timeline.wipe_verified_at ? longDate(p.timeline.wipe_verified_at) : null, done: Boolean(p.timeline.wipe_verified_at), icon: <ShieldCheck />, tint: "sky" as const, current: !p.timeline.wipe_verified_at },
     { key: "refurb", label: `Refurbished by ${volunteer}`, date: p.timeline.refurbished_at ? longDate(p.timeline.refurbished_at) : null, done: Boolean(p.timeline.refurbished_at) && Boolean(p.timeline.wipe_verified_at), icon: <Wrench />, tint: "butter" as const },
     {
       key: "ready",
@@ -98,21 +98,32 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
             </div>
             <ClayLaptop className="mx-auto max-w-[240px]" tint="porcelain" />
           </div>
-          <p className="mt-6 border-t border-white/70 pt-4 text-small text-ink-2">
+          <dl className="mt-6 grid gap-4 border-t border-white/70 pt-4 sm:grid-cols-2">
+            <div>
+              <dt className="flex items-center gap-2 text-small text-ink-2">
+                <Package aria-hidden className="size-5 shrink-0 text-ember-ink" strokeWidth={1.75} /> Donated by
+              </dt>
+              <dd className="pl-7 font-semibold text-ink">
+                {donor}
+                {story.donor.household ? null : <span className="block text-small font-normal text-ink-2">{story.donor.named ? "A Reuse Partner" : "A Reuse Partner that chose not to be named"}</span>}
+              </dd>
+            </div>
+            <div>
+              <dt className="flex items-center gap-2 text-small text-ink-2">
+                <ShieldCheck aria-hidden className="size-5 shrink-0 text-loop-deep" strokeWidth={1.75} /> Certified data wipe
+              </dt>
+              <dd className="pl-7 font-semibold text-ink">
+                {p.timeline.wipe_verified_at ? `Verified ${longDate(p.timeline.wipe_verified_at)}` : "Wipe in progress"}
+                <span className="block text-small font-normal text-ink-2">Checked by Free Geek Toronto staff</span>
+              </dd>
+            </div>
+          </dl>
+          <p className="mt-4 text-small text-ink-2">
             Refurbished by <span className="font-semibold text-ink">Free Geek Toronto</span>, an independent non-profit.
           </p>
         </div>
         </PassportBooklet>
       </section>
-
-      {p.pif_subsidized ? (
-        <p className="glass mt-6 flex items-center gap-3 rounded-[20px] p-4">
-          <HandCoins className="size-5 shrink-0 text-ember-ink" aria-hidden />
-          <span>
-            This device was made more affordable by the <Link href="/pay-it-forward" className="font-semibold underline underline-offset-4">Pay-It-Forward fund</Link>.
-          </span>
-        </p>
-      ) : null}
 
       {/* 2 · Its second life — stamps */}
       <section aria-labelledby="journey" className="mt-14">
@@ -177,6 +188,16 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
         </div>
       </section>
 
+      {/* PIF-06: a quiet note, below the core story */}
+      {p.pif_subsidized ? (
+        <p className="mt-6 flex items-center gap-3 text-small text-ink-2">
+          <HandCoins className="size-4 shrink-0 text-ember-ink" aria-hidden />
+          <span>
+            This device was made more affordable by the <Link href="/pay-it-forward" className="font-semibold underline underline-offset-4">Pay-It-Forward fund</Link>.
+          </span>
+        </p>
+      ) : null}
+
       {/* 6 · Network note */}
       <ClayCard tint="sky" className="mt-14 flex items-start gap-4">
         <IconTile tint="sky">
@@ -188,14 +209,19 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
         </p>
       </ClayCard>
 
-      {/* 7 · CTAs */}
-      <div className="no-print mt-12 flex flex-wrap gap-4">
-        <ClayButton href="/pay-it-forward" variant="primary" icon={<HandCoins />}>
-          Pay it forward
-        </ClayButton>
-        <ClayButton href="/donate" variant="secondary" icon={<Leaf />}>
-          Donate your old laptop
-        </ClayButton>
+      {/* 7 · CTAs: the core first (businesses join the relay), Pay-It-Forward stays a quiet extra */}
+      <div className="no-print mt-12 flex flex-col gap-5">
+        <div className="flex flex-wrap gap-4">
+          <ClayButton href="/become-a-partner" variant="primary" icon={<Building2 />}>
+            Donate your company&apos;s laptops
+          </ClayButton>
+          <ClayButton href="/donate" variant="secondary" icon={<Leaf />}>
+            Donate your old laptop
+          </ClayButton>
+        </div>
+        <Link href="/pay-it-forward" className="inline-flex min-h-11 items-center gap-2 self-start text-small font-semibold text-loop-deep underline-offset-4 hover:underline">
+          <HandCoins aria-hidden className="size-4" /> Or pay it forward: help the next buyer pay less
+        </Link>
       </div>
     </Root>
   );

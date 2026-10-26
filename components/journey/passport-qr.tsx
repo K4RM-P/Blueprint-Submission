@@ -18,7 +18,7 @@ export async function PassportQrImage({ code, size = 160, className }: { code: s
 }
 
 /** Quiet "scan for its story" card: the QR, the passport code and what to do with it. */
-export async function PassportQrCard({ code, deviceId, title = "Device passport", className }: { code: string; deviceId?: string; title?: string; className?: string }) {
+export async function PassportQrCard({ code, deviceId, title = "Device Passport", className }: { code: string; deviceId?: string; title?: string; className?: string }) {
   return (
     <section aria-label={title} className={cn("flat flex flex-col gap-5 p-5 sm:flex-row sm:items-center", className)}>
       <PassportQrImage code={code} size={120} className="border border-line" />
@@ -30,7 +30,7 @@ export async function PassportQrCard({ code, deviceId, title = "Device passport"
         <p className="text-small text-ink-2">Scan with a phone camera to see where this laptop came from, who refurbished it and who it helps now.</p>
         <div className="mt-1 flex flex-wrap gap-2.5">
           <ClayButton href={`/p/${code}`} size="sm" icon={<ExternalLink />}>
-            Open passport
+            Open Device Passport
           </ClayButton>
           {deviceId ? (
             <ClayButton href={`/staff/labels?ids=${deviceId}`} variant="ghost" size="sm" icon={<Printer />}>

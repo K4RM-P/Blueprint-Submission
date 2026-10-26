@@ -12,7 +12,8 @@ import { DashboardPreview, type PreviewTotals } from "./dashboard-preview";
 
 /**
  * Landing hero, "Pass it on.". Centered, Apple/Vercel-style: a live pill, one
- * huge line, a two-tone sentence and the CTAs, then the product itself: the
+ * huge line, a two-tone sentence speaking to the business retiring laptops (the
+ * Reuse Partner promise), the CTAs, then the product itself: the
  * Partner Portal in a window that lies back and stands up as it scrolls in, on
  * a mint glow. Entrance is CSS (runs
  * before hydration). Reduced motion: everything rests in place.
@@ -61,20 +62,20 @@ export function Hero({ devicesReused, totals }: { devicesReused: number; totals:
           </span>
         </h1>
 
-        <p className="hero-in mx-auto mt-8 max-w-[43rem] text-[1.1875rem] font-medium leading-[1.4] tracking-[-0.012em] text-ink sm:text-[1.375rem] md:mt-10 [--d:380ms]">
-          Relay turns retired business laptops into computers for people who need one.{" "}
-          <span className="text-ink-3">Free Geek Toronto volunteers wipe and rebuild each one, and every step is on the record.</span>
+        <p className="hero-in mx-auto mt-8 max-w-[44rem] text-[1.1875rem] font-medium leading-[1.4] tracking-[-0.012em] text-ink sm:text-[1.375rem] md:mt-10 [--d:380ms]">
+          Retiring your company&apos;s laptops? Give them to Free Geek Toronto for free.{" "}
+          <span className="text-ink-3">Every drive gets a certified data wipe, and each laptop&apos;s Device Passport shows you who it helps in Toronto.</span>
         </p>
 
         <div className="hero-in mt-9 flex flex-col items-center justify-center gap-3 min-[420px]:flex-row [--d:480ms]">
-          <ClayButton href="/login?mode=signup" variant="primary" size="lg" iconRight={<ArrowRight />}>
+          <ClayButton href="/become-a-partner" variant="primary" size="lg" iconRight={<ArrowRight />}>
             Become a Reuse Partner
           </ClayButton>
-          <ClayButton href="#scan" variant="secondary" size="lg">
-            Scan a Passport
+          <ClayButton href="#passport" variant="secondary" size="lg">
+            See a Device Passport
           </ClayButton>
         </div>
-        <p className="hero-in mt-4 text-[0.8125rem] text-ink-3 [--d:540ms]">Free to start · Data-wipe certificate for every batch</p>
+        <p className="hero-in mt-4 text-[0.8125rem] text-ink-3 [--d:540ms]">Free for businesses · Certified data wipe for every batch · No price rise for the people Free Geek Toronto serves</p>
 
         {/* the product shot */}
         <div ref={shotRef} className="hero-in relative mt-16 [perspective:2000px] md:mt-24 [--d:620ms]">

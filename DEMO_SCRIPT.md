@@ -10,36 +10,37 @@ Times are cumulative.
 
 ---
 
-### 0:00 – 0:20 · The public face (landing)
-1. `/`: hold on the hero ("Old laptops. New loops."). Point to the live **devices back in use** counter.
-2. Scroll slowly through **The Loop**: the liquid fills Donated → Wiped & verified → Refurbished → In someone's hands, and each station shows a real number.
-3. Say: *"Free Geek Toronto has zero corporate partners. Relay gives businesses a reason to send uniform laptops, and shows everyone where they go."*
+How the time splits: about **75%** on the core (the Reuse Partner pipeline and the Device Passport), the supporting features as they come up, and one line on the "also included" extras at the end.
 
-### 0:20 – 0:55 · F1: a partner donates (Partner)
-4. `/demo` → **Partner** (Maple Ledger Accounting, Impact tier).
-5. **Donate a batch** → Dell · Latitude 5420 · 2021 · quantity **20** · Working. The **Batch Value Score** vessel rises to **Excellent**. Read the tip aloud.
+### 0:00 – 0:20 · The promise (landing)
+1. `/`: hold on the hero. Read the line under "Pass it on.": *free laptop retirement, a certified data wipe for every drive, and a Device Passport that shows who each laptop helps.* Point to **Become a Reuse Partner** and the live **devices back in use** counter.
+2. Say: *"Free Geek Toronto's supply of good, uniform laptops is shrinking and it has zero corporate partners, while device sales are about 77% of its revenue. Businesses have no reason to pick it over a trade-in. Relay gives them one: free, certified data destruction and a visible record of who their laptops help."*
+3. Scroll through **the relay**: business → certified data wipe → volunteer bench → Device Passport → impact back to the business. Stop on the **Device Passport** panel (the featured passport card and the code field).
+
+### 0:20 – 0:55 · F1: a business becomes a Reuse Partner and sends a batch (Partner)
+4. `/demo` → **Partner** (Priya at Maple Ledger Accounting).
+5. **Donate a batch** → Dell · Latitude 5420 · 2021 · quantity **20** · Working. The **Batch Value Score** vessel rises to **Excellent**. Read the tip aloud: uniform batches are the fastest to refurbish.
 6. Next → **drop-off**, then pick an **Open** week from the capacity glasses (Full weeks have a lid).
 7. Next → tick the data-handling box → **Submit**. The vessel fills to the score (the one celebration); then open **Dashboard**: the batch shows **Submitted**.
 
-### 0:55 – 1:25 · F2 + F4: staff run intake and prove the wipe (Staff)
-8. **Staff** → Overview: the batches waiting for approval and the capacity glasses for the next 4 weeks, then where every device is.
-9. **Batches**: the queue is sorted by score, with Maple Ledger's batch on top. Open it → **Approve** → **Schedule** (no capacity warning) → **Receive** → bulk-add 20 devices. Each gets a unique `FGT-` passport code.
-10. **QR labels** → show the print preview of the 30-up sheet. (One sentence: "Volunteers stick these on.")
+### 0:55 – 1:30 · F2 + F4: staff run intake and certify the wipe (Staff)
+8. **Staff** → Overview: the partner pipeline tiles (batches to review, next open bench week, wipes awaiting verification, certificates to issue), then incoming partner batches and the capacity glasses.
+9. **Batches**: the queue is sorted by score, with Maple Ledger's batch on top. Open it → **Approve** → **Schedule** (no capacity warning) → **Receive** → bulk-add 20 devices. Each gets a unique `FGT-` Device Passport code.
+10. **QR labels** → show the print preview of the 30-up sheet. ("Each laptop gets its passport sticker.")
 11. **Devices** → filter *Wipe pending verification* → select all → press **`v`** → method + report reference → verify. Say: *"Only staff can verify a wipe, and the database enforces it."*
 12. Open **Queen West Design Co.**'s fully verified batch → **Issue certificate** (sky stamp). Open the PDF for 2 seconds, then `/verify/GL-…`: genuine, with no serial numbers.
 
-### 1:25 – 1:50 · F3: the volunteer bench (Volunteer, on a phone)
-13. **Volunteer** (Aisha) → **Claim next device**.
-14. Tap **Hardware test** → **hold** the **Data wipe performed** tile (liquid fills) and enter the report ID → **OS installed** (Linux Mint) → **Final QA**.
-15. A badge coin drops in. Open the **Skills Wallet**: badges with progress rings, plus "Passports you're on".
+### 1:30 – 1:45 · F3: the volunteers who make it possible (Volunteer, on a phone)
+13. **Volunteer** (Aisha) → the bench says where the next laptop came from and that her work lands on its Device Passport → **Claim next device**.
+14. Tap **Hardware test** → **hold** the **Data wipe performed** tile (liquid fills) → **OS installed** → **Final QA**. A badge coin drops in. One line on the **Skills Wallet**.
 
-### 1:50 – 2:25 · F5: sale and passport (Staff → phone)
-16. Staff → **Devices** → filter **Ready** → open one → **Set price** → **Record sale** → recipient **Student**, Pay-It-Forward subsidy $20.
-17. On the phone (signed out), scan or open that device's passport `/p/FGT-…`. It opens **Relay Wrapped**: the passport booklet opens in 3D → *"This laptop has a story."* → **Tap to begin**.
-18. Let it play (or tap right): *Its first job was at Maple Ledger Accounting* (the baton glows in) → the handoff → **Every byte erased** (sky seal stamps down) → *Aisha brought it back to life* (stamps land in order) → *ready in N days* → Linux Mint → the liquid odometer (kg kept out of landfill) → **Where your money goes** pour (*Illustrative*) with the Pay-It-Forward line → **Why isn't it free?** → *Now it's your turn. Pass it on.* → the collectible card → **Share my laptop's story**.
-19. Say: *"No serial numbers, no wipe report IDs, no price paid, no buyer — never on the public page or in the share image."* Tap ✕ to show the full passport (also the print view).
+### 1:45 – 2:30 · F5: the Device Passport (Staff → phone)
+15. Staff → **Devices** → filter **Ready** → open one → **Set price** → **Record sale** → recipient **Student**.
+16. On the phone (signed out), scan the passport `/p/FGT-WRAPPED2`. It opens **Relay Wrapped**: the booklet opens → *"This laptop has a story."* → **Tap to begin**.
+17. Let it play (or tap right): **Leg 1 · Donated by a Reuse Partner**: *Its first job was at Maple Ledger Accounting* → the handoff → **Certified data wipe: Every byte erased** (sky seal) → *Aisha brought it back to life* → Linux Mint → kg kept out of landfill → **Where your money goes** (*Illustrative*) → **Why isn't it free?** → the collectible card → **Share my laptop's story**.
+18. Tap ✕ for the full passport: **Donated by Maple Ledger Accounting · A Reuse Partner** and **Certified data wipe · Verified** sit right on the cover. Say: *"This is what makes the impact visible to buyers and to the business. No serial numbers, no report IDs, no price paid, no buyer."*
 
-**Showcase passports** (fixed codes from `pnpm seed`; also listed on `/demo` under "Or open a device passport"):
+**Showcase passports** (fixed codes from `pnpm seed`; also listed on `/demo` under "Scan a Device Passport", and `FGT-WRAPPED2` is the featured passport on the landing page):
 
 | Code | Story |
 |---|---|
@@ -50,13 +51,12 @@ Times are cumulative.
 
 Deep link any slide with `?s=N` (e.g. `/p/FGT-WRAPPED2?s=12` is the card). On a phone over Wi-Fi: run `pnpm dev -H 0.0.0.0`, then open `http://<your-laptop-LAN-IP>:3000/p/FGT-WRAPPED2`. For the printed QR codes to point at your laptop, set `NEXT_PUBLIC_SITE_URL=http://<LAN-IP>:3000` in `.env.local` first.
 
-### 2:25 – 2:50 · F6: the partner sees impact (Partner)
-20. Partner dashboard: "Your laptops are now helping **N people**", the recipient categories, devices over time.
-21. **Impact report** → **Download annual report** (show page 1 for 2 seconds) → the **LinkedIn card** and suggested post → **Copy text**.
+### 2:30 – 2:50 · F6: why partners come back (Partner)
+19. Partner dashboard: "Your laptops are helping **N people**", certificates issued, then **Your laptops' Device Passports**: open one to show the partner can follow its own laptops.
+20. **Impact report** → **Download annual report** (2 seconds) → the **LinkedIn card** and suggested post.
 
-### 2:50 – 3:00 · Revenue without raising prices
-22. `/pay-it-forward` → $10 → test checkout → Pay → thank-you banner. One line on **memberships**: "Partners pay for reporting and recognition, never for priority or prices."
-23. (Optional, if time) `/donate`: a business with 20 laptops is routed to the partner program.
+### 2:50 – 3:00 · Also included, and the money
+21. One line, no clicks needed: *"Relay also includes a Pay-It-Forward fund, a 'Can I donate this?' checker for households, and optional paid memberships. The Community tier is free; the real value to Free Geek Toronto is more and better laptops, without raising prices for the people it serves."* (If time: footer → **Pay it forward** → $10 → test checkout.)
 
 ---
 

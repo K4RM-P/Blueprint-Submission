@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ClipboardCheck, Play, Printer } from "lucide-react";
+import { ArrowRight, ClipboardCheck, Play, Printer } from "lucide-react";
 import { ClayButton, ClayCard, FlatCard, StatGroup } from "@/components/clay";
 import { PassportQrImage } from "@/components/journey/passport-qr";
 import { CapacityGlasses } from "@/components/liquid";
@@ -15,6 +15,8 @@ import { computeImpact } from "@/lib/impact";
 import { DEVICE_STATUSES, labels } from "@/lib/domain";
 import { daysAgo, longDate, shortDate } from "@/lib/dates";
 import { scoreLabel } from "@/lib/batch-score";
+import { batchCanIssueCertificate } from "@/lib/status-machine";
+import { fundBalance } from "@/lib/ledger";
 import { SHOWCASE_PASSPORTS } from "@/lib/showcase-passports";
 
 export const metadata: Metadata = { title: "Overview" };
@@ -36,16 +38,18 @@ export default async function StaffOverview() {
   const since = monthStart();
   const sixtyDays = daysAgo(60).toISOString();
   const settings = await getSettings(supabase);
-  const [calendar, factors, devicesRes, pendingRes, membershipsRes, fundRes, orgsRes, activeVolRes, checkerRes] = await Promise.all([
+  const [calendar, factors, devicesRes, pendingRes, membershipsRes, fundRes, orgsRes, activeVolRes, checkerRes, certBatchesRes] = await Promise.all([
     getCalendar(supabase, settings.weeklyCapacity, 4),
     getFactors(supabase),
-    supabase.from("devices").select("status, category, weight_kg, recipient_category, refurbished_at, sold_at, price_cents, batch_line_items(quantity)"),
+    supabase.from("devices").select("status, source, batch_id, category, weight_kg, recipient_category, refurbished_at, sold_at, price_cents, batch_line_items(quantity)"),
     supabase.from("donation_batches").select("id, created_at, value_score, preferred_week, organizations(name, tier), batch_line_items(quantity, make, model)").eq("status", "submitted").order("value_score", { ascending: false }),
     supabase.from("membership_payments").select("amount_cents").gte("created_at", since),
     supabase.from("fund_transactions").select("amount_cents, type, created_at"),
     supabase.from("organizations").select("id, donation_batches(status)"),
     supabase.from("device_events").select("actor_id, profiles!inner(role)").gte("created_at", sixtyDays).eq("profiles.role", "volunteer"),
     supabase.from("checker_logs").select("outcome"),
+    // Received partner batches without a certificate yet: candidates for "certificates to issue".
+    supabase.from("donation_batches").select("id, organizations(name), certificates(id)").in("status", ["received", "in_refurbishment", "completed"]),
   ]);
   // The demo passport with a full three-leg story (seeded, fixed code).
   const showcase = SHOWCASE_PASSPORTS[0];
@@ -68,12 +72,22 @@ export default async function StaffOverview() {
   const activeVolunteers = new Set((activeVolRes.data ?? []).map((e) => e.actor_id)).size;
   const pipeline = DEVICE_STATUSES.map((s) => ({ label: PIPELINE_SHORT[s], value: devices.filter((d) => d.status === s).length, muted: s === "recycled" }));
   const checker = checkerRes.data ?? [];
+  // OPS-07/OPS-08: wipes waiting on staff, and batches whose devices are all verified (or recycled) but have no certificate yet.
+  const wipesPending = devices.filter((d) => d.status === "wipe_pending_verification").length;
+  const certsToIssue = (certBatchesRes.data ?? []).filter((b) => {
+    if (b.certificates) return false;
+    const statuses = devices.filter((d) => d.batch_id === b.id).map((d) => d.status);
+    return statuses.length > 0 && batchCanIssueCertificate(statuses);
+  });
+  const nextOpen = calendar.find((w) => w.status !== "full");
+  const householdInProgress = devices.filter((d) => d.source === "household" && !["sold", "recycled"].includes(d.status)).length;
+  const fundBalanceCents = fundBalance((fundRes.data ?? []).map((f) => ({ type: f.type, amountCents: f.amount_cents })));
   const checkerOutcomes = (
     [
       ["accepted", "Accepted"],
       ["recycling_only", "Recycling only"],
       ["not_accepted", "Not accepted"],
-      ["partner_redirect", "To partner program"],
+      ["partner_redirect", "To Reuse Partnership"],
     ] as const
   ).map(([k, label]) => ({ label, value: checker.filter((c) => c.outcome === k).length, highlight: k === "accepted" || k === "partner_redirect" }));
 
@@ -88,11 +102,7 @@ export default async function StaffOverview() {
     <>
       <PageHeader
         title="Overview"
-        description={
-          pending.length > 0
-            ? `${pending.length} batch${pending.length === 1 ? " needs" : "es need"} your review. ${impact.devicesInProgress} devices are being refurbished.`
-            : `No batches waiting. ${impact.devicesInProgress} devices are being refurbished.`
-        }
+        description={`Partner pipeline: ${pending.length > 0 ? `${pending.length} batch${pending.length === 1 ? "" : "es"} to review` : "no batches waiting"} · ${wipesPending} wipe${wipesPending === 1 ? "" : "s"} to verify · ${certsToIssue.length} certificate${certsToIssue.length === 1 ? "" : "s"} to issue. ${impact.devicesInProgress} devices are being refurbished.`}
         actions={
           pending.length > 0 ? (
             <ClayButton href="/staff/batches?status=submitted" variant="primary" icon={<ClipboardCheck />}>
@@ -102,11 +112,43 @@ export default async function StaffOverview() {
         }
       />
 
+      {/* The partner pipeline at a glance: each tile is the next job and links straight to it */}
+      <section aria-labelledby="pipeline-now" className="mb-6">
+        <h2 id="pipeline-now" className="sr-only">
+          Partner pipeline
+        </h2>
+        <ul className="flat grid grid-cols-2 gap-px overflow-hidden bg-line !p-0 lg:grid-cols-4">
+          {[
+            { href: "/staff/batches?status=submitted", value: pending.length, label: "partner batches to review", note: pending[0] ? `Top: ${pending[0].organizations?.name ?? "a partner"} · score ${pending[0].value_score}` : "Best Batch Value Score first" },
+            { href: "#capacity", value: nextOpen ? shortDate(nextOpen.week) : "—", label: "next open bench week", note: nextOpen ? `${nextOpen.capacity - nextOpen.load} of ${nextOpen.capacity} spots free` : "Every week is full" },
+            { href: "/staff/devices?status=wipe_pending_verification", value: wipesPending, label: "wipes awaiting verification", note: "Only staff can verify a wipe" },
+            {
+              href: certsToIssue.length === 1 ? `/staff/batches/${certsToIssue[0].id}` : "/staff/batches?status=in_refurbishment",
+              value: certsToIssue.length,
+              label: "certificates to issue",
+              note: certsToIssue.length ? certsToIssue.map((b) => b.organizations?.name).filter(Boolean).slice(0, 2).join(", ") : "Every verified batch has one",
+            },
+          ].map((tile) => (
+            <li key={tile.label} className="bg-surface-flat">
+              <Link href={tile.href} className="group flex h-full flex-col-reverse justify-end gap-1 p-5 hover:bg-canvas">
+                <span className="text-small text-ink-2">
+                  <span className="inline-flex items-center gap-1 font-medium text-ink">
+                    {tile.label} <ArrowRight aria-hidden className="size-3.5 text-loop-deep transition-transform group-hover:translate-x-0.5" />
+                  </span>
+                  <span className="mt-0.5 block text-[0.8125rem] text-ink-3">{tile.note}</span>
+                </span>
+                <span className="font-display tnum text-[2rem] leading-none text-ink">{tile.value}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <section aria-labelledby="pending" className="flat overflow-hidden !p-0">
           <div className="flex items-center justify-between px-6 pt-5">
             <h2 id="pending" className="font-semibold">
-              Waiting for approval
+              Incoming partner batches
             </h2>
             <Link href="/staff/batches?status=submitted" className="text-small font-semibold text-loop-deep underline-offset-4 hover:underline">
               Open queue
@@ -144,7 +186,7 @@ export default async function StaffOverview() {
             </table>
           )}
         </section>
-        <ClayCard material="glass" className="flex flex-col gap-5">
+        <ClayCard material="glass" id="capacity" className="flex scroll-mt-24 flex-col gap-5">
           <div>
             <h2 className="font-semibold">Bench capacity · next 4 weeks</h2>
             <p className="text-small text-ink-2">{settings.weeklyCapacity} devices a week. Approved and scheduled batches fill the glass.</p>
@@ -167,46 +209,13 @@ export default async function StaffOverview() {
         </div>
       </section>
 
-      <section aria-labelledby="month" className="mt-6">
-        <h2 id="month" className="sr-only">
-          This month
-        </h2>
-        <StatGroup label="This month" items={kpis} className="sm:grid-cols-4" />
-      </section>
-
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <FlatCard className="flex flex-col gap-4">
-          <h2 className="font-semibold">Impact to date</h2>
-          <dl className="grid grid-cols-2 gap-4">
-            {[
-              ["devices reused", impact.devicesReused.toLocaleString("en-CA")],
-              ["kg kept out of landfill", impact.kgDiverted.toLocaleString("en-CA")],
-              ["kg CO₂e avoided", impact.co2eAvoidedKg.toLocaleString("en-CA")],
-              ["volunteer hours", impact.volunteerHours.toLocaleString("en-CA")],
-            ].map(([k, v]) => (
-              <div key={k} className="flex flex-col-reverse justify-end gap-1">
-                <dt className="text-small text-ink-2">{k}</dt>
-                <dd className="font-display text-[1.75rem] leading-none tnum">{v}</dd>
-              </div>
-            ))}
-          </dl>
-          {checker.length > 0 ? (
-            <div className="border-t border-line pt-4">
-              <p className="text-small text-ink-2">
-                “Can I donate this?” checker · <span className="font-semibold text-ink">{checker.length}</span> answers
-              </p>
-              <BarsChart label="Checker outcomes" unit="answers" height={180} data={checkerOutcomes} />
-            </div>
-          ) : null}
-          <p className="text-[0.8125rem] text-ink-3">{labels.deviceStatus.sold} = reused. Factors are estimates marked TO VERIFY.</p>
-        </FlatCard>
-
         <section aria-labelledby="passport-qr" className="flat flex flex-col gap-5 p-6">
           <div className="flex items-start gap-5">
             <PassportQrImage code={showcase.code} size={96} className="shrink-0 border border-line" />
             <div className="min-w-0">
               <h2 id="passport-qr" className="font-semibold">
-                Device passports
+                Device Passports
               </h2>
               <p className="mt-1 text-small text-ink-2">
                 Each device gets a QR label at intake. Scanning it shows where the laptop came from, how its data was wiped and who it helps now. Try{" "}
@@ -238,7 +247,70 @@ export default async function StaffOverview() {
             </ClayButton>
           </div>
         </section>
+
+        <FlatCard className="flex flex-col gap-4">
+          <h2 className="font-semibold">Impact to date</h2>
+          <dl className="grid grid-cols-2 gap-4">
+            {[
+              ["devices reused", impact.devicesReused.toLocaleString("en-CA")],
+              ["kg kept out of landfill", impact.kgDiverted.toLocaleString("en-CA")],
+              ["kg CO₂e avoided", impact.co2eAvoidedKg.toLocaleString("en-CA")],
+              ["volunteer hours", impact.volunteerHours.toLocaleString("en-CA")],
+            ].map(([k, v]) => (
+              <div key={k} className="flex flex-col-reverse justify-end gap-1">
+                <dt className="text-small text-ink-2">{k}</dt>
+                <dd className="font-display text-[1.75rem] leading-none tnum">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="text-[0.8125rem] text-ink-3">{labels.deviceStatus.sold} = reused. Factors are estimates marked TO VERIFY.</p>
+        </FlatCard>
       </div>
+
+      {/* Also running: quieter numbers that support the pipeline */}
+      <section aria-labelledby="month" className="mt-12">
+        <h2 id="month" className="text-title font-semibold">
+          This month
+        </h2>
+        <StatGroup label="This month" items={kpis} className="mt-4 sm:grid-cols-4" />
+      </section>
+
+      <section aria-labelledby="also" className="mt-12">
+        <h2 id="also" className="text-title font-semibold">
+          Also running
+        </h2>
+        <p className="mt-1 text-small text-ink-2">Household donations, the Pay-It-Forward fund and the “Can I donate this?” checker.</p>
+        <div className="mt-4 grid gap-6 xl:grid-cols-2">
+          <FlatCard className="flex flex-col gap-4">
+            <dl className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col-reverse justify-end gap-1">
+                <dt className="text-small text-ink-2">household devices in progress</dt>
+                <dd className="font-display text-[1.5rem] leading-none tnum">{householdInProgress}</dd>
+              </div>
+              <div className="flex flex-col-reverse justify-end gap-1">
+                <dt className="text-small text-ink-2">Pay-It-Forward fund balance</dt>
+                <dd className="font-display text-[1.5rem] leading-none tnum">{money(fundBalanceCents)}</dd>
+              </div>
+            </dl>
+            <div className="flex flex-wrap gap-x-5 gap-y-1 text-small font-semibold">
+              <Link href="/staff/devices" className="text-loop-deep underline-offset-4 hover:underline">
+                Household intake
+              </Link>
+              <Link href="/staff/fund" className="text-loop-deep underline-offset-4 hover:underline">
+                Fund ledger
+              </Link>
+            </div>
+          </FlatCard>
+          {checker.length > 0 ? (
+            <FlatCard className="flex flex-col gap-2">
+              <p className="text-small text-ink-2">
+                “Can I donate this?” checker · <span className="font-semibold text-ink">{checker.length}</span> answers
+              </p>
+              <BarsChart label="Checker outcomes" unit="answers" height={180} data={checkerOutcomes} />
+            </FlatCard>
+          ) : null}
+        </div>
+      </section>
     </>
   );
 }

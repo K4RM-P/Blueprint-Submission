@@ -17,7 +17,7 @@ export default async function VolunteerBench() {
   const [{ data: mine }, { data: queue }] = await Promise.all([
     supabase
       .from("devices")
-      .select("id, passport_code, make, model, category, status, cpu, ram_gb, storage_gb")
+      .select("id, passport_code, make, model, category, status, source, cpu, ram_gb, storage_gb")
       .eq("assigned_volunteer_id", profile.id)
       .not("status", "in", "(sold,recycled,listed)")
       .order("updated_at", { ascending: false }),
@@ -34,14 +34,15 @@ export default async function VolunteerBench() {
     <>
       <PageHeader
         title="My Bench"
-        description={`${profile.display_first_name ? `Hi ${profile.display_first_name}. ` : ""}${active.length ? `You have ${active.length} device${active.length === 1 ? "" : "s"} in progress.` : "Claim a laptop to start refurbishing it."}`}
+        description={`${profile.display_first_name ? `Hi ${profile.display_first_name}. ` : ""}${active.length ? `You have ${active.length} device${active.length === 1 ? "" : "s"} in progress.` : "Claim a laptop to start refurbishing it."} Every step you finish is stamped on the laptop's Device Passport.`}
         actions={<div className="hidden lg:block"><ClaimButton waiting={waiting} /></div>}
       />
       {active.length === 0 ? (
         <EmptyState title="Your bench is clear." tone="butter" art="baton">
           {top ? (
             <>
-              Next up: <span className="font-semibold text-ink">{top.make} {top.model}</span>.{" "}
+              Next up: <span className="font-semibold text-ink">{top.make} {top.model}</span>
+              {top.source === "partner" ? ", from a Reuse Partner batch" : ", a household donation"}.{" "}
             </>
           ) : null}
           Claim it and we&apos;ll guide you through four steps: test, wipe, install, check.
@@ -63,6 +64,7 @@ export default async function VolunteerBench() {
                     </div>
                     <DeviceStatusChip status={d.status} />
                   </div>
+                  <p className="-mt-2 text-small text-ink-2">{d.source === "partner" ? "From a Reuse Partner batch" : "A household donation"} · your work goes on its Device Passport</p>
                   <ol className="flex gap-2" aria-label="Checklist progress">
                     {CHECKLIST_STEPS.map((s) => (
                       <li key={s} className={cn("flex h-2 flex-1 rounded-full", set?.has(s) ? "bg-loop" : "bg-white/70")}>
@@ -88,7 +90,7 @@ export default async function VolunteerBench() {
           <h2 id="waiting" className="text-title font-semibold">
             Waiting on staff
           </h2>
-          <p className="text-small text-ink-2">You finished these. Staff check each data wipe before the laptop moves on.</p>
+          <p className="text-small text-ink-2">You finished these. Staff verify each wipe, so it counts as a certified data wipe on the business&apos;s certificate.</p>
           <ul className="mt-4 flex flex-col gap-2">
             {waitingOnStaff.map((d) => (
               <li key={d.id} className="glass flex items-center justify-between gap-3 rounded-[18px] px-4 py-3">

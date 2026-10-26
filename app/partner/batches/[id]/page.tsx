@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowUpRight, QrCode } from "lucide-react";
 import { ClayCard, EmptyState, FlatCard } from "@/components/clay";
 import { PageHeader } from "@/components/shell/page-header";
 import { JourneyTimeline } from "@/components/journey/journey-timeline";
@@ -72,7 +73,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
             <h2 id="journeys" className="text-title font-semibold">
               Devices{devices.length > 0 ? ` (${devices.length})` : ""}
             </h2>
-            <p className="mt-1 text-small text-ink-2">Open a passport to see that laptop&apos;s story and who it helps — never personal details.</p>
+            <p className="mt-1 text-small text-ink-2">Every laptop has its own Device Passport. Open one to see its certified data wipe, its volunteer and who it helps — never personal details.</p>
             <div className="flat mt-4 overflow-x-auto !p-0">
               {devices.length === 0 ? (
                 <div className="px-6">
@@ -85,7 +86,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
                   <caption className="sr-only">Devices in this batch</caption>
                   <thead>
                     <tr>
-                      <th scope="col">Passport</th>
+                      <th scope="col">Device Passport</th>
                       <th scope="col">Device</th>
                       {hasSerials ? <th scope="col">Serial</th> : null}
                       <th scope="col">Status</th>
@@ -96,8 +97,14 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
                     {devices.map((d) => (
                       <tr key={d.id}>
                         <td>
-                          <Link href={`/p/${d.passport_code}`} className="whitespace-nowrap font-mono text-[0.875rem] text-loop-deep underline-offset-4 hover:underline">
+                          <Link
+                            href={`/p/${d.passport_code}`}
+                            aria-label={`Open Device Passport ${d.passport_code}`}
+                            className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap font-mono text-[0.875rem] font-semibold text-loop-deep underline underline-offset-4"
+                          >
+                            <QrCode aria-hidden className="size-4" strokeWidth={1.75} />
                             {d.passport_code}
+                            <ArrowUpRight aria-hidden className="size-3.5" />
                           </Link>
                         </td>
                         <td className="whitespace-nowrap">

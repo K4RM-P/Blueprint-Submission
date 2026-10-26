@@ -165,7 +165,7 @@ export function DonationChecker({ categories }: { categories: { category: Device
                 </div>
                 {isBusiness ? (
                   <div className="mt-6 max-w-xs">
-                    <Field label="How many devices?" hint={`${BUSINESS_REDIRECT_MIN} or more? Our partner program has extras for you.`}>
+                    <Field label="How many devices?" hint={`${BUSINESS_REDIRECT_MIN} or more? The free Reuse Partnership has extras for you.`}>
                       {({ id, describedBy }) => <Input id={id} type="number" min={1} inputMode="numeric" aria-describedby={describedBy} value={quantity} onChange={(e) => setQuantity(e.target.value)} />}
                     </Field>
                   </div>
@@ -268,7 +268,7 @@ function ResultCard({ result, label, onReset }: { result: CheckerResult; label: 
         <div className="flex flex-wrap items-center gap-4">
           {result.outcome === "partner_redirect" ? (
             <ClayButton href="/become-a-partner" variant="primary" iconRight={<ArrowRight />}>
-              See the partner program
+              See the Reuse Partnership
             </ClayButton>
           ) : null}
           <ClayButton variant={result.outcome === "partner_redirect" ? "ghost" : "secondary"} icon={<RotateCcw />} onClick={onReset}>

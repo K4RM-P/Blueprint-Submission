@@ -41,10 +41,10 @@ export function StickyCta({ heroId, endSelector = "footer" }: { heroId: string; 
           className="glass-ink fixed inset-x-4 bottom-4 z-40 flex items-center justify-between gap-4 rounded-full py-1.5 pl-5 pr-1.5 sm:inset-x-auto sm:bottom-6 sm:right-6"
         >
           <p className="text-small leading-tight">
-            <span className="font-semibold">Free to start.</span> <span className="hidden text-white/70 sm:inline">A wipe certificate with every batch.</span>
+            <span className="font-semibold">Free for businesses.</span> <span className="hidden text-white/70 sm:inline">A certified data wipe for every batch.</span>
           </p>
-          <ClayButton href="/login?mode=signup" variant="primary" size="sm">
-            Become a partner
+          <ClayButton href="/become-a-partner" variant="primary" size="sm">
+            Become a Reuse Partner
           </ClayButton>
         </motion.div>
       ) : null}

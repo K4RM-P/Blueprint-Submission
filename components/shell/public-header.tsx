@@ -7,13 +7,20 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 
+/**
+ * Core first: the Reuse Partner pipeline ("For Businesses") and the Device Passport.
+ * Pay-It-Forward and "Can I donate this?" live in the footer and the landing page's
+ * "More ways to help".
+ */
 const LINKS = [
-  { href: "/partners", label: "Partners" },
-  { href: "/impact", label: "Impact" },
-  { href: "/about", label: "About" },
-  { href: "/become-a-partner", label: "Become a Partner" },
-  { href: "/donate", label: "Can I Donate?" },
+  { href: "/become-a-partner", label: "For Businesses", match: ["/become-a-partner"] },
+  { href: "/#passport", label: "Device Passport", match: ["/p/"] },
+  { href: "/impact", label: "Impact", match: ["/impact"] },
+  { href: "/partners", label: "Partner Wall", match: ["/partners"] },
+  { href: "/about", label: "About", match: ["/about"] },
 ];
+
+const isCurrent = (pathname: string, match: string[]) => match.some((m) => pathname.startsWith(m));
 
 export function PublicHeader({ dashboardHref }: { dashboardHref: string | null }) {
   const pathname = usePathname();
@@ -26,10 +33,10 @@ export function PublicHeader({ dashboardHref }: { dashboardHref: string | null }
             <Link
               key={l.href}
               href={l.href}
-              aria-current={pathname.startsWith(l.href) ? "page" : undefined}
+              aria-current={isCurrent(pathname, l.match) ? "page" : undefined}
               className={cn(
                 "rounded-full px-3.5 py-2 text-[0.9375rem] font-medium text-ink-2 transition-colors hover:text-ink",
-                pathname.startsWith(l.href) && "bg-[#ece6dc] text-ink",
+                isCurrent(pathname, l.match) && "bg-[#ece6dc] text-ink",
               )}
             >
               {l.label}
