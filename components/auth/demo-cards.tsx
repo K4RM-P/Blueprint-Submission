@@ -17,7 +17,7 @@ const CARDS: { role: Role; tint: "apricot" | "sky" | "butter"; title: string; ap
     title: "Partner",
     app: "Partner Portal",
     who: "Priya · Maple Ledger Accounting",
-    does: "Donate a batch of laptops, then follow every device and get a data-wipe certificate.",
+    does: "Start here. Donate a batch of laptops, follow every device to its Device Passport and get a certificate for its certified data wipe.",
     icon: <Building2 />,
   },
   {
@@ -26,7 +26,7 @@ const CARDS: { role: Role; tint: "apricot" | "sky" | "butter"; title: string; ap
     title: "Staff",
     app: "Staff Console",
     who: "Marcus · Free Geek Toronto",
-    does: "Approve incoming batches, receive devices and verify every data wipe.",
+    does: "Approve incoming partner batches, receive devices, verify every data wipe and issue the certificate.",
     icon: <ShieldCheck />,
   },
   {
@@ -35,13 +35,13 @@ const CARDS: { role: Role; tint: "apricot" | "sky" | "butter"; title: string; ap
     title: "Volunteer",
     app: "Volunteer Bench",
     who: "Aisha · volunteer technician",
-    does: "Claim a laptop, test, wipe and rebuild it, and earn skill badges.",
+    does: "Claim a laptop from a partner batch, test, wipe and rebuild it. Your work lands on its Device Passport.",
     icon: <Wrench />,
   },
 ];
 
-/** Three clay cards; pressing one presses it in, signs in and morphs to that dashboard (§9.7). */
-export function DemoCards() {
+/** Clay role cards; pressing one presses it in, signs in and morphs to that dashboard (§9.7). `roles` picks which, in order. */
+export function DemoCards({ roles = ["partner", "staff", "volunteer"], className }: { roles?: Role[]; className?: string }) {
   const router = useRouter();
   const [pending, setPending] = useState<Role | null>(null);
   const [, startTransition] = useTransition();
@@ -62,8 +62,10 @@ export function DemoCards() {
   };
 
   return (
-    <ul className="grid gap-5 md:grid-cols-3">
-      {CARDS.map((c, i) => (
+    <ul className={className ?? "grid gap-5 md:grid-cols-3"}>
+      {CARDS.filter((c) => roles.includes(c.role))
+        .sort((a, b) => roles.indexOf(a.role) - roles.indexOf(b.role))
+        .map((c, i) => (
         <motion.li key={c.role} initial={reduced ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ ...t("soft"), delay: reduced ? 0 : i * 0.06 }}>
           <motion.button
             type="button"

@@ -32,7 +32,7 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
 
   return (
     <>
-      <PageHeader eyebrow="Membership" title={labels.tier[tier]} description="Memberships pay for reporting and recognition — never for priority access to devices or a say in prices." />
+      <PageHeader eyebrow="Membership" title={labels.tier[tier]} description="Optional. Your batches, certified data wipes and Device Passports are free on every tier. Paid memberships add reporting and recognition — never priority access to devices or a say in prices." />
 
       {justPaid ? (
         <div role="status" className="glass mb-8 flex items-center gap-3 rounded-full py-2 pl-2 pr-5">

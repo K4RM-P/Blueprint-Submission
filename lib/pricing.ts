@@ -38,7 +38,12 @@ export function splitPrice(priceCents: number, slices: BreakdownSlice[]): number
 export const TIER_PRICE_CENTS: Record<PartnerTier, number> = { community: 0, impact: 50_000, champion: 150_000 };
 
 export const TIER_BENEFITS: Record<PartnerTier, string[]> = {
-  community: ["Batch submission and drop-off scheduling", "Data-sanitization certificate for every batch", "Basic impact summary"],
+  community: [
+    "Batch submission and drop-off scheduling",
+    "Certified data wipe, with a certificate for every batch",
+    "A Device Passport for every laptop",
+    "Impact summary on your dashboard",
+  ],
   impact: ["Everything in Community", "Pickup requests", "Live ESG impact dashboard", "Downloadable annual impact report", "Shareable LinkedIn impact card", "Logo on the public Partner Wall"],
   champion: [
     "Everything in Impact",

@@ -27,7 +27,7 @@ export default async function PartnersPage() {
         </p>
       </div>
       {partners.length === 0 ? (
-        <EmptyState className="mt-12" title="The wall is waiting for its first partner." tone="apricot" action={<ClayButton href="/become-a-partner" variant="secondary" size="sm">Become a partner</ClayButton>} />
+        <EmptyState className="mt-12" title="The wall is waiting for its first partner." tone="apricot" action={<ClayButton href="/become-a-partner" variant="secondary" size="sm">Become a Reuse Partner</ClayButton>} />
       ) : (
         tiers.map((tier) => {
           const list = partners.filter((p) => p.tier === tier);

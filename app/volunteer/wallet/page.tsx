@@ -81,7 +81,7 @@ export default async function WalletPage() {
 
       <section aria-labelledby="passports" className="mt-14">
         <h2 id="passports" className="text-title font-semibold">
-          Passports you&apos;re on
+          Device Passports you&apos;re on
         </h2>
         <p className="text-small text-ink-2">{profile.attribution_opt_in ? "Buyers see your first name on these." : "Your name is hidden on passports — turn it on in Privacy."}</p>
         {list.length === 0 ? (
@@ -90,7 +90,7 @@ export default async function WalletPage() {
           <ul className="-mx-4 mt-5 flex snap-x gap-4 overflow-x-auto px-4 pb-4">
             {list.map((p) => (
               <li key={p.id} className="w-56 shrink-0 snap-start">
-                <ClayCard tint="apricot" href={`/p/${p.passport_code}`} aria-label={`Open passport ${p.passport_code}`} className="flex h-40 flex-col justify-between !p-5">
+                <ClayCard tint="apricot" href={`/p/${p.passport_code}`} aria-label={`Open Device Passport ${p.passport_code}`} className="flex h-40 flex-col justify-between !p-5">
                   <p className="font-mono text-[0.8125rem] text-ink-2">{p.passport_code}</p>
                   <div>
                     <p className="font-semibold leading-tight">

@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
-import { ArrowRight, PackagePlus } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, PackagePlus, QrCode } from "lucide-react";
 import { ClayButton, ClayCard, EmptyState, FlatCard, StatGroup } from "@/components/clay";
 import { PageHeader } from "@/components/shell/page-header";
 import { BatchCard } from "@/components/partner/batch-card";
 import { PeoplePebbles } from "@/components/partner/people-pebbles";
 import { getPartnerContext, listBatches } from "@/lib/queries/partner";
 import { getPartnerImpact } from "@/lib/queries/impact";
-import { recipientNoun, type RecipientCategory } from "@/lib/domain";
+import { labels, recipientNoun, type DeviceStatus, type RecipientCategory } from "@/lib/domain";
 import { hasFullDashboard } from "@/lib/pricing";
 import { DevicesAreaChart } from "@/components/charts/area";
 import { lastMonths, monthlySeries } from "@/lib/impact";
 
 export const metadata: Metadata = { title: "Dashboard" };
+
+/** Device Passports shown on the dashboard: laptops already helping someone first. */
+const PASSPORT_ORDER: DeviceStatus[] = ["sold", "listed", "ready", "refurbishing", "wipe_verified", "wipe_pending_verification", "testing", "received", "recycled"];
 
 export default async function PartnerDashboard() {
   const { supabase, org, profile } = await getPartnerContext();
@@ -20,6 +24,9 @@ export default async function PartnerDashboard() {
   const people = t.devicesReused;
   const recipients = (Object.entries(t.recipients) as [RecipientCategory, number][]).filter(([k]) => k !== "undisclosed").sort((a, b) => b[1] - a[1]);
   const full = hasFullDashboard(org.tier);
+  const certificates = batches.filter((b) => b.certificates).length;
+  // The partner's own laptops, each linking to its Device Passport.
+  const passports = [...impact.devices].sort((a, b) => PASSPORT_ORDER.indexOf(a.status) - PASSPORT_ORDER.indexOf(b.status)).slice(0, 6);
   const firstName = profile.display_first_name;
 
   return (
@@ -61,15 +68,85 @@ export default async function PartnerDashboard() {
           label="Your impact in numbers"
           items={[
             { label: "devices donated", value: t.devicesReceived },
-            { label: "being refurbished now", value: t.devicesInProgress },
-            { label: "recycled responsibly", value: t.devicesRecycled },
+            { label: "being refurbished now", value: t.devicesInProgress, note: t.devicesRecycled > 0 ? `${t.devicesRecycled} recycled responsibly` : undefined },
+            { label: `data-wipe certificate${certificates === 1 ? "" : "s"} issued`, value: certificates },
             { label: "kept out of landfill", value: t.kgDiverted.toLocaleString("en-CA", { maximumFractionDigits: 1 }), unit: "kg" },
           ]}
         />
       </div>
 
+      <section className="mt-10" aria-labelledby="recent">
+        <div className="flex items-end justify-between gap-4">
+          <h2 id="recent" className="text-title font-semibold">
+            Your batches
+          </h2>
+          {batches.length > 3 ? (
+            <ClayButton href="/partner/batches" variant="ghost" size="sm">
+              See all {batches.length}
+            </ClayButton>
+          ) : null}
+        </div>
+        {batches.length === 0 ? (
+          <FlatCard className="mt-4">
+            <EmptyState title="No batches yet." tone="apricot" action={<ClayButton href="/partner/batches/new" variant="secondary" size="sm">Start your first batch</ClayButton>}>
+              Your first 5 laptops could reach a classroom next month.
+            </EmptyState>
+          </FlatCard>
+        ) : (
+          <ul className="mt-4 flex flex-col gap-3">
+            {batches.slice(0, 3).map((b) => (
+              <li key={b.id}>
+                <BatchCard batch={b} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      <section className="mt-10" aria-labelledby="passports">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 id="passports" className="text-title font-semibold">
+              Your laptops&apos; Device Passports
+            </h2>
+            <p className="mt-1 text-small text-ink-2">Every laptop you donate gets its own public story. Open one to see its certified data wipe, its volunteer and who it helps.</p>
+          </div>
+          {batches.length > 0 ? (
+            <ClayButton href="/partner/batches" variant="ghost" size="sm">
+              Every device, by batch
+            </ClayButton>
+          ) : null}
+        </div>
+        {passports.length === 0 ? (
+          <FlatCard className="mt-4">
+            <p className="text-ink-2">When Free Geek Toronto receives your first batch, each laptop gets a QR label and a Device Passport. They appear here.</p>
+          </FlatCard>
+        ) : (
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {passports.map((d) => (
+              <li key={d.id}>
+                <Link href={`/p/${d.passport_code}`} className="flat lift group flex h-full items-center gap-4 p-4" aria-label={`Open the Device Passport for ${d.make} ${d.model}, ${d.passport_code}`}>
+                  <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-[14px] bg-mint text-loop-deep">
+                    <QrCode className="size-5" strokeWidth={1.75} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold">
+                      {d.make} {d.model}
+                    </span>
+                    <span className="block font-mono text-[0.8125rem] text-ink-2">{d.passport_code}</span>
+                    <span className="block text-[0.8125rem] text-ink-2">
+                      {d.status === "sold" ? (d.recipient_category && d.recipient_category !== "undisclosed" ? `In a new home · ${labels.recipient[d.recipient_category]}` : "In a new home") : labels.deviceStatus[d.status]}
+                    </span>
+                  </span>
+                  <ArrowRight aria-hidden className="size-4 shrink-0 text-loop-deep transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       {full ? (
-        <section aria-labelledby="esg" className="flat mt-5 p-6">
+        <section aria-labelledby="esg" className="flat mt-10 p-6">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h2 id="esg" className="font-semibold">
               Devices over time
@@ -98,44 +175,13 @@ export default async function PartnerDashboard() {
       ) : null}
 
       {!full ? (
-        <FlatCard className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-title font-semibold">See the full picture with Impact Partner</h2>
-            <p className="mt-1 text-ink-2">Live ESG dashboard, a branded annual report and a LinkedIn card to share — $500 a year. Your batches stay free either way.</p>
-          </div>
-          <ClayButton href="/partner/membership" variant="secondary" iconRight={<ArrowRight />}>
-            Compare memberships
-          </ClayButton>
-        </FlatCard>
+        <p className="mt-10 border-t border-line pt-5 text-small text-ink-2">
+          Your batches, certificates and Device Passports are free on the Community tier. Want a live ESG dashboard, an annual report and a LinkedIn card for your board?{" "}
+          <Link href="/partner/membership" className="font-semibold text-loop-deep underline-offset-4 hover:underline">
+            Compare optional memberships
+          </Link>
+        </p>
       ) : null}
-
-      <section className="mt-12" aria-labelledby="recent">
-        <div className="flex items-end justify-between gap-4">
-          <h2 id="recent" className="text-title font-semibold">
-            Your batches
-          </h2>
-          {batches.length > 3 ? (
-            <ClayButton href="/partner/batches" variant="ghost" size="sm">
-              See all {batches.length}
-            </ClayButton>
-          ) : null}
-        </div>
-        {batches.length === 0 ? (
-          <FlatCard className="mt-4">
-            <EmptyState title="No batches yet." tone="apricot" action={<ClayButton href="/partner/batches/new" variant="secondary" size="sm">Start your first batch</ClayButton>}>
-              Your first 5 laptops could reach a classroom next month.
-            </EmptyState>
-          </FlatCard>
-        ) : (
-          <ul className="mt-4 flex flex-col gap-3">
-            {batches.slice(0, 3).map((b) => (
-              <li key={b.id}>
-                <BatchCard batch={b} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
     </>
   );
 }

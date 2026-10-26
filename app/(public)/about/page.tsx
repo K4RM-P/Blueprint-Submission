@@ -37,7 +37,7 @@ export default function AboutPage() {
           <div className="measure mt-3 flex flex-col gap-3 text-ink-2">
             <p>Every computer is tested, securely wiped, repaired and reinstalled. That takes parts, tools, space and paid staff who train people facing barriers to employment.</p>
             <p>Sales are how Free Geek Toronto pays for that work — most of its revenue comes from selling refurbished devices. Prices are kept as low as possible and tied to ability to pay.</p>
-            <p>Each Device Passport shows where your money goes. Businesses that partner with us pay for reporting and recognition — never for priority access or influence over prices.</p>
+            <p>Each Device Passport shows where your money goes. Reuse Partners never pay for reuse. Optional memberships add reporting and recognition — never priority access or influence over prices.</p>
           </div>
         </section>
 
@@ -50,7 +50,7 @@ export default function AboutPage() {
               [HardDrive, "Drives arrive intact. Donors don't need to remove or destroy them."],
               [Wrench, "A volunteer wipes each drive with Free Geek Toronto's sanitization software, which produces a report."],
               [ShieldCheck, "A staff member — never a volunteer — checks the report and verifies the wipe before the device can move on."],
-              [ShieldCheck, "Every step is logged in an append-only record. Business donors receive a numbered certificate anyone can verify."],
+              [ShieldCheck, "Every step is logged in an append-only record. Reuse Partners receive a numbered certificate for this certified data wipe, which anyone can verify."],
             ].map(([Icon, text], i) => {
               const I = Icon as typeof HardDrive;
               return (

@@ -24,7 +24,7 @@ export default async function PartnerReportPage() {
         <ClayCard tint="apricot" size="lg" className="flex max-w-2xl flex-col gap-5">
           <h2 className="text-title font-semibold">Included with Impact and Champion memberships</h2>
           <p className="text-ink-2">
-            Your Community membership already includes a data-wipe certificate for every batch and an impact summary on your dashboard. Upgrade for a downloadable annual report with
+            Your free Community tier already includes a certified data wipe with a certificate for every batch, a Device Passport for every laptop and an impact summary on your dashboard. Upgrade for a downloadable annual report with
             your logo and a shareable LinkedIn card.
           </p>
           <ClayButton href="/partner/membership" variant="primary" iconRight={<ArrowRight />} className="self-start">

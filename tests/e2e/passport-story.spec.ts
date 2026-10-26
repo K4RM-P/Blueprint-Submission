@@ -137,7 +137,7 @@ test("each showcase passport tells its own story", async ({ page }) => {
   };
 
   // (a) full attribution, sold, Pay-It-Forward
-  expect(await keys(FULL)).toBe(12);
+  expect(await keys(FULL)).toBe(13);
   await page.goto(`/p/${FULL}?s=9`);
   await expectSlide(page, "money");
   await expect(current(page)).toContainText("Someone paid it forward");
@@ -153,7 +153,8 @@ test("each showcase passport tells its own story", async ({ page }) => {
 
   // (c) in progress: ends on the next leg
   await page.goto(`/p/${BENCH}?s=99`);
-  await page.goto(`/p/${BENCH}?s=${(await page.locator(".story-seg").count()) - 1}`);
+  // The persona and finale slides follow the next leg.
+  await page.goto(`/p/${BENCH}?s=${(await page.locator(".story-seg").count()) - 2}`);
   await expectSlide(page, "next_leg");
   await expect(current(page)).toContainText("Its next leg is coming soon");
 

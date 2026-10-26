@@ -51,15 +51,15 @@ export function BatonRun({ stations }: { stations: RelayStation[] }) {
           <SectionHead
             id="relay-title"
             label="The relay"
-            title="Four handoffs."
+            title="One laptop, five handoffs."
             muted="Every one on the record."
-            aside={<p className="text-ink-2">Follow one laptop from an office desk to a student&apos;s backpack, with the real counts from Free Geek Toronto&apos;s bench.</p>}
+            aside={<p className="text-ink-2">Follow one laptop from an office desk to its next owner, and the story back to the business that gave it. Real counts from Free Geek Toronto&apos;s bench.</p>}
           />
 
-          {/* Desktop: horizontal relay lane over a 4-column station grid */}
+          {/* Desktop: horizontal relay lane over one station column per handoff */}
           <div className="mt-14 hidden md:block">
             <Lane stations={stations} stops={stops} travel={travel} arrive={arrive} shown={shown} reduced={reduced} />
-            <ol className="mt-10 grid grid-cols-4 gap-5">
+            <ol className="mt-10 grid gap-5" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
               {stations.map((s, i) => (
                 <li key={s.title}>
                   <StationCard station={s} index={i} lit={i <= shown} receiving={i === shown} />

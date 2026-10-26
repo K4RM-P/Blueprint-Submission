@@ -103,7 +103,7 @@ function Origin({ story }: SlideProps) {
   const line = d.household ? `It started out with *${clean(d.label)}.*` : `Its first job was at *${clean(d.label)}.*`;
   return (
     <>
-      <Eyebrow>Leg 1 · Where it started</Eyebrow>
+      <Eyebrow>{d.household ? "Leg 1 · Where it started" : "Leg 1 · Donated by a Reuse Partner"}</Eyebrow>
       <KineticLine text={line} className="mt-3" />
       <Sub>
         {story.deviceName}
@@ -179,13 +179,13 @@ function Station({ label, date, tint, icon, delay = 0.5 }: { label: string; date
 function Erased({ story }: SlideProps) {
   return (
     <>
-      <Eyebrow>Data security</Eyebrow>
+      <Eyebrow>Certified data wipe</Eyebrow>
       <KineticLine text="Every byte *erased.*" className="mt-3" />
       <Hero>
         <Seal rim="DATA WIPED · VERIFIED · TORONTO · " icon={<ShieldCheck />} size={200} tilt={-8} />
       </Hero>
       <MonoChip className="self-start">VERIFIED · {storyDate(story.dates.wipeVerified).toUpperCase()}</MonoChip>
-      <Sub delay={0.9}>The drive was wiped, then checked by Free Geek Toronto staff before anyone else touched it. Nothing from its first job came along.</Sub>
+      <Sub delay={0.9}>The drive was wiped, then verified by Free Geek Toronto staff before anyone else touched it. Nothing from its first job came along{story.donor.household ? "" : ", and the business gets a certificate that lists it"}.</Sub>
     </>
   );
 }

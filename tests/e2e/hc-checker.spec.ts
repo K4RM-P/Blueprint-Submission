@@ -38,10 +38,10 @@ test("HC-02 not accepted — a TV points to Ontario recyclers", async ({ page })
   await expect(page.getByRole("link", { name: /find a drop-off/i })).toHaveAttribute("href", /recyclemyelectronics/);
 });
 
-test("HC-03 business with 5+ devices is routed to the partner program", async ({ page }) => {
+test("HC-03 business with 5+ devices is routed to the Reuse Partnership", async ({ page }) => {
   await answer(page, "Laptops", "Under 3 years", "Yes", 20);
   await expect(page.getByRole("heading", { name: /reuse partner/i })).toBeVisible();
-  await page.getByRole("link", { name: "See the partner program" }).click();
+  await page.getByRole("link", { name: "See the Reuse Partnership" }).click();
   await expect(page).toHaveURL(/\/become-a-partner/);
 });
 

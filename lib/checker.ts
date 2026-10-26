@@ -31,12 +31,12 @@ export interface CheckerResult {
   note: string;
 }
 
-/** Businesses with this many devices are routed to the Reuse Partner program (HC-03). */
+/** Businesses with this many devices are routed to the Reuse Partnership (HC-03). */
 export const BUSINESS_REDIRECT_MIN = 5;
 
 export function evaluateDonation(a: CheckerAnswers, rules: AcceptedItem[]): CheckerResult {
   if (a.isBusiness && a.quantity >= BUSINESS_REDIRECT_MIN) {
-    return { outcome: "partner_redirect", note: "Businesses donating 5 or more devices get free pickup scheduling, a data-wipe certificate and an impact report as a Reuse Partner." };
+    return { outcome: "partner_redirect", note: "Businesses donating 5 or more devices can join the free Reuse Partnership: a certified data wipe, a certificate for every batch and a Device Passport for every laptop." };
   }
   const rule = rules.find((r) => r.category === a.category);
   if (!rule || rule.decision === "not_accepted") {

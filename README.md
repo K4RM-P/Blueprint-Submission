@@ -1,6 +1,10 @@
 # Relay
 
-**Relay makes the value Free Geek Toronto creates visible.** Businesses donate batches of retired laptops and get a data-wipe certificate plus a live impact dashboard. Every refurbished device gets a public **Device Passport** (scan the QR code). Volunteers build a **Skills Wallet** of verified hands-on work. Built for the FUSE Society Blueprint 2026 hackathon, with Free Geek Toronto (FGT) as the partner business.
+**Relay gives Toronto small businesses free, certified data destruction and a visible record of who their retired laptops help, turning them into a steady supply of uniform laptops for Free Geek Toronto, without raising prices for the communities it serves.** Built for the FUSE Society Blueprint 2026 hackathon, with Free Geek Toronto (FGT) as the partner business.
+
+**The problem.** FGT's supply of high-value, uniform laptops is shrinking and it has zero corporate partners, while device sales are about 77% of its revenue. Businesses have no reason to choose FGT over trade-in programs, resellers or paid IT disposal: no proof of data destruction, no visible impact, no recognition. Relay introduces a **Reuse Partnership** to fix that (FGT has no partner or membership program today).
+
+**Who it's for.** The office manager or IT lead at a Toronto small or medium business retiring 10–50 laptops.
 
 - **Live demo:** _add the Vercel URL here after deploying_ → open **`/demo`** for one-click sign-in
 - **Demo accounts:** `demo-partner@geekloop.test`, `demo-staff@geekloop.test`, `demo-volunteer@geekloop.test`. The shared password is shown on `/demo` in demo mode. Every organization and person in the data is fictional.
@@ -8,20 +12,38 @@
 
 ---
 
+## What Relay does
+
+### Core
+1. **The Reuse Partner pipeline (the engine).** Become a Reuse Partner (free) → submit a **batch** with a live **Batch Value Score** and a capacity-aware calendar → staff approve, schedule and receive it → every drive gets a **certified data wipe** (a volunteer wipes, only staff can verify) → the partner downloads a numbered certificate with a public verification link.
+2. **The QR Device Passport ("Relay Wrapped").** Every device gets a QR label. Scanning it opens the device's story: donated by which Reuse Partner (if they opted in), its certified data wipe, the volunteer who rebuilt it, its impact, and where the buyer's money goes. This is what makes the impact visible to buyers and partners.
+
+### Supporting (how the core works)
+3. **Partner impact dashboard and certificates:** why partners stay. People helped, recipient categories, every device linked to its Device Passport, an annual report and a LinkedIn card.
+4. **Volunteer Bench and Skills Wallet:** how FGT handles the extra volume. Volunteers claim the best-scoring partner devices first, their work is stamped on each Device Passport, and they earn verifiable skill badges.
+5. **Staff Console:** how a tiny team runs it all in minutes. The overview leads with incoming partner batches, capacity, wipes awaiting verification and certificates to issue.
+
+### Also included (fully working, quieter)
+6. **Pay-It-Forward fund:** optional contributions that lower prices for digital-inclusion buyers.
+7. **"Can I donate this?" household checker:** triages household donations and routes businesses with 5+ devices to the Reuse Partnership.
+8. **Paid membership tiers:** the free **Community** tier is the headline and includes everything above. Impact ($500) and Champion ($1,500) are optional extras for businesses that want more reporting and recognition. The main value to FGT is more and better laptops, not fees. Fees are memberships, not donations, and come with no tax receipt. Prices are [ASSUMPTION] until FGT confirms them.
+
+---
+
 ## Guided tour (about 6 minutes)
 
-These are flows F1–F6 from `PRD.md` §8. Start at `/demo`.
+These are flows F1–F6 from `PRD.md` §8. Start at `/demo`: Partner first, then a showcase Device Passport, then Staff and Volunteer.
 
 | # | Flow | Sign in as | What to do |
 |---|---|---|---|
-| F1 | **Partner's first donation** | Partner | **New batch** → add 20 × Dell Latitude 5420 (2021, working) → watch the Batch Value Score fill to *Excellent* → pick an open week from the capacity glasses → submit. |
-| F2 | **Staff process the batch** | Staff | **Batches** (sorted by score) → open Maple Ledger's batch → approve → schedule (capacity check) → receive → bulk-add 20 devices → **QR labels** prints a 30-up sheet. |
-| F3 | **Volunteer refurbishes** | Volunteer | **Claim next device** → hardware test → hold to confirm the data wipe (or press Enter twice) → install Linux Mint → final QA → a badge unlocks. |
+| F1 | **Partner's first donation** | Partner | **Donate a batch** → add 20 × Dell Latitude 5420 (2021, working) → watch the Batch Value Score fill to *Excellent* → pick an open week from the capacity glasses → submit. |
+| F2 | **Staff process the batch** | Staff | Overview: the partner pipeline tiles → **Batches** (sorted by score) → open Maple Ledger's batch → approve → schedule (capacity check) → receive → bulk-add 20 devices → **QR labels** prints a 30-up sheet. |
+| F3 | **Volunteer refurbishes** | Volunteer | **Claim next device** (it says which kind of batch it came from) → hardware test → hold to confirm the data wipe (or press Enter twice) → install Linux Mint → final QA → a badge unlocks. |
 | F4 | **Staff verify and certify** | Staff | **Devices** → select wipes pending verification → press `v` to bulk-verify → open a fully verified batch → **Issue certificate** (stamp) → download the PDF → open `/verify/GL-…` (no serials shown). |
-| F5 | **Sale and passport** | Staff | Open a *Ready* device → set the price → **Record sale** (recipient: Student, optional Pay-It-Forward subsidy) → open its passport `/p/FGT-…` signed out. |
-| F6 | **Partner sees impact** | Partner | Dashboard: people helped, recipient categories, CO₂e → **Impact report**: download the annual PDF, then copy the LinkedIn card and suggested post. |
+| F5 | **Sale and Device Passport** | Staff | Open a *Ready* device → set the price → **Record sale** (recipient: Student, optional Pay-It-Forward subsidy) → open its Device Passport `/p/FGT-…` signed out. |
+| F6 | **Partner sees impact** | Partner | Dashboard: people helped, certificates, every laptop's Device Passport → **Impact report**: download the annual PDF, then copy the LinkedIn card and suggested post. |
 
-Also try: `/donate` (the "Can I donate this?" checker), `/pay-it-forward` (contribute through the test checkout), `/pay-it-forward/round-up` (the round-up widget on a sample store page), **Membership** as a partner (upgrade to Champion), and **Pay-It-Forward** as staff (the fund ledger).
+Also included: `/pay-it-forward` (contribute through the test checkout), `/pay-it-forward/round-up` (the round-up widget on a sample store page), `/donate` (the "Can I donate this?" checker), **Membership** as a partner (optional upgrade to Champion), and **Pay-It-Forward** as staff (the fund ledger). On the public site these live in the footer and the landing page's "More ways to help".
 
 `DEMO_SCRIPT.md` has the exact click path for the video.
 
@@ -32,7 +54,7 @@ Also try: `/donate` (the "Can I donate this?" checker), `/pay-it-forward` (contr
 ```mermaid
 flowchart LR
   subgraph Browser
-    Public["Public site + Device Passport<br/>/, /p/[code], /impact, /donate"]
+    Public["Public site + Device Passport<br/>/, /become-a-partner, /p/[code], /impact, /donate"]
     Apps["Role apps<br/>/partner · /staff · /volunteer"]
   end
   subgraph Next["Next.js 16 on Vercel"]

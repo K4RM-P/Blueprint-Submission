@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, HandCoins, Leaf, Link2, RotateCcw, Share2 } from "lucide-react";
+import { Building2, Download, HandCoins, Leaf, Link2, RotateCcw, Share2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -79,16 +79,19 @@ export function ShareActions({ story, onReplay }: { story: PassportStory; onRepl
         <ClayButton size="sm" icon={<Link2 />} onClick={copyLink} className="w-full">
           Copy link
         </ClayButton>
+        <ClayButton size="sm" href="/become-a-partner" icon={<Building2 />} className="w-full">
+          Your company&apos;s laptops
+        </ClayButton>
         <ClayButton size="sm" href="/donate" icon={<Leaf />} className="w-full">
           Donate a laptop
-        </ClayButton>
-        <ClayButton size="sm" href="/pay-it-forward" icon={<HandCoins />} className="w-full">
-          Pay it forward
         </ClayButton>
       </div>
       <div className="flex items-center justify-between px-1 pt-0.5">
         <Link href={`/p/${story.code}?view=full`} className="inline-flex h-11 items-center text-[0.9375rem] font-semibold text-loop-deep underline-offset-4 hover:underline">
           View full passport
+        </Link>
+        <Link href="/pay-it-forward" className="inline-flex h-11 items-center gap-1.5 text-[0.9375rem] font-medium text-ink-2 underline-offset-4 hover:underline">
+          <HandCoins className="size-4" aria-hidden /> Pay it forward
         </Link>
         <button type="button" onClick={onReplay} className="inline-flex h-11 items-center gap-1.5 text-[0.9375rem] font-semibold text-ink underline-offset-4 hover:underline">
           <RotateCcw className="size-4" aria-hidden /> Replay

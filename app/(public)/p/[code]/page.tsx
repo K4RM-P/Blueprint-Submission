@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   if (!p) return { title: "Passport not found", robots: { index: false } };
   const story = buildPassportStory(p);
   const title = `${story.deviceName} · its second life`;
-  const description = `${shareText(story)} A refurbished ${story.deviceName} from Free Geek Toronto: donated, data wiped and verified, brought back to life by volunteers.`;
+  const description = `${shareText(story)} A refurbished ${story.deviceName} from Free Geek Toronto: donated, given a certified data wipe, brought back to life by volunteers.`;
   return {
     title: `${story.deviceName} · Device Passport`,
     description,
