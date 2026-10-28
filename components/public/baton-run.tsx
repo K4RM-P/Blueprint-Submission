@@ -46,7 +46,7 @@ export function BatonRun({ stations }: { stations: RelayStation[] }) {
 
   return (
     <section ref={ref} aria-labelledby="relay-title" className={cn("relative", reduced ? "" : "md:h-[200vh]")}>
-      <div className={cn("flex flex-col justify-center pb-20 pt-16", reduced ? "md:py-28" : "md:sticky md:top-0 md:h-dvh md:justify-start md:py-0 md:pt-[13vh]")}>
+      <div className={cn("flex flex-col justify-center pb-20 pt-16", reduced ? "md:py-28" : "md:sticky md:top-0 md:justify-start md:pb-16 md:pt-[10vh]")}>
         <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6">
           <SectionHead
             id="relay-title"

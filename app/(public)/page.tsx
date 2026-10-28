@@ -130,7 +130,7 @@ export default async function Landing() {
         </section>
       ) : null}
 
-      <Pour className="mt-10" />
+      <Pour className="mt-6" />
 
       {/* 2 · The relay (pinned, scroll-linked): business → certified wipe → bench → passport → impact back */}
       <BatonRun
