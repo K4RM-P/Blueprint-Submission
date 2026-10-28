@@ -1010,7 +1010,7 @@ html[data-reduced-motion="true"] .reveal {
 }
 .live-dot {
   box-shadow: 0 0 0 0 rgba(47, 191, 138, 0.7);
-  animation: live-ping 2.2s var(--ease-soft) infinite;
+  animation: live-ping 2.2s var(--ease-soft) 3;
 }
 @keyframes live-ping {
   0% {

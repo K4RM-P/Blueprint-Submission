@@ -71,6 +71,7 @@ export default async function StaffOverview() {
   const pifCents = (fundRes.data ?? []).filter((f) => f.amount_cents > 0 && f.created_at >= since).reduce((s, f) => s + f.amount_cents, 0);
   const activePartners = (orgsRes.data ?? []).filter((o) => o.donation_batches.some((b) => b.status !== "declined")).length;
   const activeVolunteers = new Set((activeVolRes.data ?? []).map((e) => e.actor_id)).size;
+  const stageCount = (statuses: string[]) => devices.filter((d) => statuses.includes(d.status)).length;
   const pipeline = DEVICE_STATUSES.map((s) => ({ label: PIPELINE_SHORT[s], value: devices.filter((d) => d.status === s).length, muted: s === "recycled" }));
   const checker = checkerRes.data ?? [];
   // OPS-07/OPS-08: wipes waiting on staff, and batches whose devices are all verified (or recycled) but have no certificate yet.
@@ -129,7 +130,8 @@ export default async function StaffOverview() {
 
   const kpis = [
     { label: "devices sold this month", value: soldThisMonth.length },
-    { label: "revenue this month", note: `Sales ${money(salesCents)} · memberships ${money(membershipCents)} · fund ${money(pifCents)}`, value: `$${Math.round((salesCents + membershipCents + pifCents) / 100).toLocaleString("en-CA")}` },
+    // Pay-It-Forward money is restricted to discounts, so it's shown beside revenue, not inside it.
+    { label: "revenue this month", note: `Sales ${money(salesCents)} · memberships ${money(membershipCents)} · plus ${money(pifCents)} into the Pay-It-Forward fund`, value: `$${Math.round((salesCents + membershipCents) / 100).toLocaleString("en-CA")}` },
     { label: "active partners", value: activePartners },
     { label: "volunteers active in the last 60 days", value: activeVolunteers },
   ];
@@ -138,7 +140,7 @@ export default async function StaffOverview() {
     <>
       <PageHeader
         title="Overview"
-        description={`Partner pipeline: ${pending.length > 0 ? `${pending.length} batch${pending.length === 1 ? "" : "es"} to review` : "no batches waiting"} · ${wipesPending} wipe${wipesPending === 1 ? "" : "s"} to verify · ${certsToIssue.length} certificate${certsToIssue.length === 1 ? "" : "s"} to issue. ${impact.devicesInProgress} devices are being refurbished.`}
+        description={`Partner pipeline: ${pending.length > 0 ? `${pending.length} batch${pending.length === 1 ? "" : "es"} to review` : "no batches waiting"} · ${wipesPending} wipe${wipesPending === 1 ? "" : "s"} to verify · ${certsToIssue.length} certificate${certsToIssue.length === 1 ? "" : "s"} to issue. ${stageCount(["received"])} waiting to start, ${stageCount(["testing", "wipe_pending_verification", "wipe_verified", "refurbishing"])} on the bench, ${stageCount(["ready", "listed"])} ready to sell.`}
         actions={
           pending.length > 0 ? (
             <ClayButton href="/staff/batches?status=submitted" variant="primary" icon={<ClipboardCheck />}>

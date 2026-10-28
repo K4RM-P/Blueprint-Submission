@@ -40,7 +40,7 @@ export function Hero({ devicesReused, backdrop, shot }: { devicesReused: number;
       <div className="mx-auto max-w-[1200px] px-4 pt-12 text-center sm:px-6 md:pt-20 lg:pt-24">
         <Link href="/impact" className="hero-in group inline-flex items-center gap-3 text-small text-ink-2 [--d:0ms]">
           <span className="inline-flex items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-loop-deep">
-            <span aria-hidden className="live-dot size-1.5 rounded-full bg-loop" /> Live
+            <span aria-hidden className="live-dot size-1.5 rounded-full bg-loop" /> Updated every minute
           </span>
           <span aria-hidden className="h-3.5 w-px bg-line" />
           <span>

@@ -195,7 +195,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
             Getting a computer ready for you takes real work: testing every part, wiping and verifying the drive so no one&apos;s data travels with it, and installing fresh software. Free
             Geek Toronto pays fair wages and trains people facing barriers to work, and keeps the lights on in its workshop.
           </p>
-          <p className="mt-3">Prices stay as low as possible and are tied to ability to pay — and the Pay-It-Forward fund lowers them further for students, newcomers and families who need it.</p>
+          <p className="mt-3">Free Geek Toronto&apos;s vision is that access to technology reflects ability to pay, and the Pay-It-Forward fund lowers them further for students, newcomers and families who need it.</p>
         </div>
       </section>
         </>

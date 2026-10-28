@@ -274,7 +274,7 @@ export interface PersonaInput {
 export function personaFor(i: PersonaInput): Persona {
   const traits = [
     i.wiped ? "Wiped clean" : null,
-    i.daysToReady !== null ? `Ready in ${i.daysToReady} day${i.daysToReady === 1 ? "" : "s"}` : null,
+    i.daysToReady !== null ? `${i.daysToReady} day${i.daysToReady === 1 ? "" : "s"} to ready` : null,
     i.openSource ? "Open source" : null,
     i.pifSubsidized ? "Paid forward" : null,
     i.ageAtDonation !== null && i.ageAtDonation >= 5 ? `${i.ageAtDonation} years young` : null,
@@ -327,7 +327,7 @@ export function cardFacts(s: PassportStory): CardFact[] {
     { label: "Donated by", value: s.donor.label },
     { label: s.stage === "recycled" ? "Tested by" : s.stage === "in_progress" ? "On the bench with" : "Refurbished by", value: s.volunteer.label },
   ];
-  if (s.daysToReady !== null) facts.push({ label: "Ready in", value: `${s.daysToReady} day${s.daysToReady === 1 ? "" : "s"}` });
+  if (s.daysToReady !== null) facts.push({ label: "Drop-off to ready", value: `${s.daysToReady} day${s.daysToReady === 1 ? "" : "s"}` });
   if (s.impact.kg > 0) facts.push({ label: s.stage === "recycled" ? "Recycled, not landfilled" : "Kept from landfill", value: `${s.impact.kg} kg` });
   if (s.os) facts.push({ label: "Running", value: s.os.name });
   return facts.slice(0, 6);

@@ -26,7 +26,7 @@ test("recycling an unverified device requires the drive handling, and the passpo
   const anon = await (await browser.newContext()).newPage();
   await anon.goto(`/p/${code}?view=full`);
   await settle(anon);
-  await expect(anon.getByText("Drive handled before recycling")).toBeVisible();
+  await expect(anon.getByText("Drive handled before recycling").first()).toBeVisible();
   await expect(anon.getByText("Wipe in progress")).toHaveCount(0);
   // A recycled laptop is never sold, so the pricing sections don't apply.
   await expect(anon.getByRole("heading", { name: "Where your money goes" })).toHaveCount(0);

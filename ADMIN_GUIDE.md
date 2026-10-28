@@ -54,7 +54,7 @@ If you need to give a device to a specific volunteer: open it under **Devices** 
 
 1. Overview → **Wipes awaiting verification** (or **Devices**, filtered to *Wipe pending verification*).
 2. Check each device's report in your data-sanitization software. Relay records the result; it does not perform the wipe.
-3. Tick the devices (or the box at the top to select all), press **Verify N wipes**, choose the method and enter the report or reference ID. Keyboard shortcut: `v`.
+3. Tick the devices (or the box at the top to select all) and press **Verify N wipes** (keyboard shortcut: `v`). Confirm the method as it appears in your sanitization report. Each device keeps the report ID its volunteer recorded; devices without one are skipped. To verify one device with a different reference, open it and use **Verify wipe** there.
 
 Relay won't let any device become Ready or be sold without a staff-verified wipe. This is enforced by the database, not just the screen.
 
@@ -71,7 +71,7 @@ The partner can download the PDF from their dashboard immediately.
 1. **Devices** → filter **Ready** → open the device.
 2. **Set price.** Free Geek Toronto sets every price; Relay only displays it and never suggests or changes one.
 3. **Record sale**: date, channel (in store, online or B2B) and, if you know it, the recipient category (for example *Student*). Never enter a name.
-4. If the buyer is a digital-inclusion recipient (student, newcomer or low-income household) you can apply a **Pay-It-Forward** discount, as long as the fund has enough money. The fund can't go negative.
+4. If the buyer is a digital-inclusion recipient (student, newcomer, senior, low-income household or non-profit) you can apply a **Pay-It-Forward** discount, as long as the fund has enough money. The fund can't go negative.
 
 The device's Device Passport now tells its story to the buyer, and the partner's dashboard counts one more person helped.
 
@@ -105,7 +105,7 @@ The device's Device Passport now tells its story to the buyer, and the partner's
 
 | Problem | Fix |
 |---|---|
-| A partner picked a week you can no longer take | Open the batch and reschedule it. Relay suggests the next open week. |
+| A partner picked a week you can no longer take | Open the batch and press **Reschedule**. Relay warns you if the new week is over capacity and suggests the next open week. |
 | A device fails its hardware test | Open it and press **Recycle**, with a reason. It still counts as e-waste kept out of landfill, and its passport says it was recycled responsibly. |
 | A wrong note was added | Notes can't be edited or deleted (the chain of custody is append-only). Add a new note that corrects it. |
 | Someone can't sign in | They can use **Forgot password** on the sign-in page. Staff and volunteer accounts only work for emails you invited. |

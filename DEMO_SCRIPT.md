@@ -33,7 +33,7 @@ How the time splits: about **75%** on the core (the Reuse Partner pipeline and t
 10. **Volunteer** (Aisha) → **Claim next device** → **Hardware test** → **hold** **Data wipe performed** (liquid fills) → **OS installed** → **Final QA**. A badge coin drops in.
 
 ### 1:55 – 2:20 · F4: the certified data wipe (Staff)
-11. **Devices** → filter *Wipe pending verification* → select all → **`v`** → verify. Say: *"Only staff can verify a wipe, and the database enforces it."* (The method field names Free Geek Toronto's own software until FGT confirms its standard.)
+11. **Devices** → filter *Wipe pending verification* → select all → **`v`** → **Verify** (each device keeps the report ID its volunteer recorded). Say: *"Only staff can verify a wipe, and the database enforces it."* (The method field names Free Geek Toronto's own software until FGT confirms its standard.)
 12. Open **Queen West Design Co.**'s fully verified batch → **Issue certificate** (sky stamp) → the PDF for two seconds → `/verify/GL-…`: genuine, no serial numbers.
 
 ### 2:20 – 2:50 · F5: the Device Passport (phone, signed out)

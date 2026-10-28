@@ -6,9 +6,10 @@ test("F4 — staff issues a certificate; it verifies publicly without serials (O
   await page.goto("/staff/batches?status=in_refurbishment");
   await page.getByRole("link", { name: "Queen West Design Co." }).click();
   await page.getByRole("button", { name: "Issue certificate" }).click();
-  const stamp = page.getByRole("status").filter({ hasText: /GL-\d{4}-\d{4}/ });
-  await expect(stamp).toBeVisible();
-  const number = (await stamp.textContent())!.match(/GL-\d{4}-\d{4}/)![0];
+  // The seal stamps in, then the page refreshes into the certificate panel: either shows the new number.
+  const issued = page.getByRole("main").getByText(/^GL-\d{4}-\d{4}$/).first();
+  await expect(issued).toBeVisible();
+  const number = (await issued.textContent())!.match(/GL-\d{4}-\d{4}/)![0];
 
   const pdf = await page.request.get(`/api/certificates/${number}`);
   expect(pdf.headers()["content-type"]).toContain("application/pdf");

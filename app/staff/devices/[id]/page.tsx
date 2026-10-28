@@ -139,7 +139,7 @@ export default async function StaffDevicePage({ params }: { params: Promise<{ id
                   </span>
                   <div className="min-w-0 text-small">
                     <p className="font-medium text-ink">{text}</p>
-                    {e.note && e.event_type !== "note" ? <p className="text-ink-2">{e.note}</p> : null}
+                    {e.note && e.note !== text ? <p className="text-ink-2">{e.note}</p> : null}
                     <p className="text-ink-3 tnum">
                       {new Date(e.created_at).toLocaleString("en-CA", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Toronto" })} · {name(e.actor_id)}
                     </p>

@@ -26,6 +26,9 @@ export function JourneyTimeline({ steps, orientation = "vertical", label, scroll
   const progress = steps.length > 1 ? Math.max(0, doneCount - 1) / (steps.length - 1) : 1;
 
   if (orientation === "horizontal") {
+    // On phones only the step you're at keeps its visible label, so six labels never collide.
+    const currentIdx = steps.findIndex((s) => s.current);
+    const active = currentIdx >= 0 ? currentIdx : Math.max(0, doneCount - 1);
     return (
       <ol aria-label={label} className={cn("flex w-full items-start", className)}>
         {steps.map((s, i) => (
@@ -44,8 +47,8 @@ export function JourneyTimeline({ steps, orientation = "vertical", label, scroll
             >
               {s.done ? <Check className="size-3.5" strokeWidth={3} /> : null}
             </span>
-            <span className={cn("mt-2 block px-0.5 text-[0.75rem] font-medium leading-tight", s.done || s.current ? "text-ink" : "text-ink-3")}>{s.label}</span>
-            {s.date ? <span className="block text-[0.6875rem] text-ink-2 tnum">{s.date}</span> : null}
+            <span className={cn("mt-2 block px-0.5 text-[0.75rem] font-medium leading-tight", s.done || s.current ? "text-ink" : "text-ink-3", i !== active && "max-sm:sr-only")}>{s.label}</span>
+            {s.date ? <span className={cn("block text-[0.6875rem] text-ink-2 tnum", i !== active && "max-sm:hidden")}>{s.date}</span> : null}
             <span className="sr-only">{s.done ? "done" : s.current ? "in progress" : "not yet"}</span>
           </li>
         ))}

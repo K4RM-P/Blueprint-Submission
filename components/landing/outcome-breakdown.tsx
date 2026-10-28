@@ -24,7 +24,7 @@ export function OutcomeBreakdown({ reused, inProgress, recycled }: { reused: num
   const total = reused + inProgress + recycled;
   const outcomes: Outcome[] = [
     { label: "Back in use", value: reused, swatch: "bg-loop" },
-    { label: "On the bench", value: inProgress, swatch: "bg-[#9fd6bd]" },
+    { label: "Being refurbished or for sale", value: inProgress, swatch: "bg-[#9fd6bd]" },
     { label: "Recycled responsibly", value: recycled, swatch: "bg-[#cfc6b8]" },
   ];
   const pct = (n: number) => (total ? Math.round((n / total) * 100) : 0);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PASSPORT_ALPHABET, generatePassportCode, generateUniqueCodes, isValidPassportCode, normalizePassportCode } from "@/lib/passport-code";
-import { formatCertificateNumber, isValidCertificateNumber, nextCertificateNumber, parseCertificateNumber } from "@/lib/certificate-number";
+import { batchReference, formatCertificateNumber, isValidCertificateNumber, nextCertificateNumber, parseCertificateNumber } from "@/lib/certificate-number";
 
 describe("passport codes", () => {
   it("uses the FGT- prefix and 8 unambiguous characters", () => {
@@ -44,5 +44,12 @@ describe("certificate numbers", () => {
   it("increments per year", () => {
     expect(nextCertificateNumber(2026, ["GL-2026-0001", "GL-2026-0004", "GL-2025-0009"])).toBe("GL-2026-0005");
     expect(nextCertificateNumber(2027, ["GL-2026-0001"])).toBe("GL-2027-0001");
+  });
+});
+
+describe("batch reference on certificates (CI-01)", () => {
+  it("is short, readable and stable for a batch id", () => {
+    expect(batchReference("e4c78be7-1a2b-4c3d-8e9f-001122334455")).toBe("B-E4C78BE7");
+    expect(batchReference("e4c78be7-1a2b-4c3d-8e9f-001122334455")).toBe(batchReference("e4c78be7-1a2b-4c3d-8e9f-001122334455"));
   });
 });

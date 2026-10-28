@@ -91,12 +91,12 @@ The demo shows these metrics computed from fictional demo data.
 | Item | Upfront | Ongoing |
 |---|---|---|
 | Software | $0 (open source, GPL-3.0) | — |
-| Hosting (Vercel) | $0 | $0–$20 a month |
+| Hosting (Vercel; Pro, since Hobby is for non-commercial use) | $0 | about $20 a month |
 | Database, sign-in and storage (Supabase) | $0 | $0–$25 a month |
 | Domain (optional) | $0–$20 | about $20 a year |
 | QR labels (existing printer, Avery 5160 sheets) | about $30 | about $10 a month |
 | Payments (Stripe, only for optional memberships and the fund) | $0 | per-transaction fees |
-| **Total** | **about $50** | **about $0–$55 a month** |
+| **Total** | **about $50** | **about $30–$55 a month** |
 | Staff time | about 4 hours to set up and learn | about 1–2 hours a week |
 
 It fits FGT's constraints: no new hardware or space, the existing data-sanitization software stays the system of record, the existing shop and online store keep selling, and volunteers do most of the data entry at the bench.

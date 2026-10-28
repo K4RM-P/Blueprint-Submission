@@ -322,7 +322,8 @@
   bottom: auto;
   top: 48%;
 }
-/* One slow pass per visit, never a looping marquee (UI §12.9); a slide is gone long before it ends. */
+/* Story ambients play for roughly the length of a slide and then rest (UI §12.9: nothing loops for attention).
+   One slow pass per visit, never a looping marquee (UI §12.9); a slide is gone long before it ends. */
 .story-ticker-track {
   display: inline-block;
   animation: story-marquee 28s linear 1 both;
@@ -347,7 +348,7 @@
   aspect-ratio: 1;
   right: -60cqw;
   top: -30cqw;
-  animation: story-breathe 9s ease-in-out infinite;
+  animation: story-breathe 9s ease-in-out 2;
 }
 .story-ring-b {
   width: 80cqw;
@@ -356,7 +357,7 @@
   bottom: 8cqh;
   border-style: dashed;
   border-width: 2px;
-  animation: story-spin 60s linear infinite;
+  animation: story-spin 60s linear 1;
 }
 @keyframes story-breathe {
   50% {
@@ -375,7 +376,7 @@
   inset: -20%;
   background: repeating-linear-gradient(-30deg, var(--shape) 0 18px, transparent 18px 46px);
   mask-image: linear-gradient(180deg, transparent 20%, #000 60%, transparent 95%);
-  animation: story-slide-stripes 6s linear infinite;
+  animation: story-slide-stripes 6s linear 2;
 }
 @keyframes story-slide-stripes {
   to {
@@ -390,7 +391,7 @@
   top: 0;
   height: 22cqh;
   background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.75) 80%, rgba(46, 104, 196, 0.35) 82%, transparent 84%);
-  animation: story-scan 3.2s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  animation: story-scan 3.2s cubic-bezier(0.45, 0, 0.25, 1) 3;
 }
 @keyframes story-scan {
   from {
@@ -412,7 +413,7 @@
   aspect-ratio: 1;
   right: -26cqw;
   top: 16cqh;
-  animation: story-spin 24s linear infinite;
+  animation: story-spin 24s linear 1;
 }
 .story-gear-b {
   width: 42cqw;
@@ -420,7 +421,7 @@
   right: 30cqw;
   top: 4cqh;
   border-width: 7px;
-  animation: story-spin 16s linear infinite reverse;
+  animation: story-spin 16s linear 1 reverse;
 }
 
 /* Speed lines. */
@@ -432,7 +433,7 @@
   border-radius: 99px;
   background: linear-gradient(90deg, transparent, var(--shape-strong));
   top: calc(18cqh + var(--i) * 13cqh);
-  animation: story-zoom calc(1.1s + var(--i) * 0.17s) linear infinite;
+  animation: story-zoom calc(1.1s + var(--i) * 0.17s) linear 8;
   animation-delay: calc(var(--i) * -0.4s);
 }
 @keyframes story-zoom {
@@ -451,7 +452,7 @@
   background-image: radial-gradient(var(--shape-strong) 1.6px, transparent 1.8px);
   background-size: 22px 22px;
   mask-image: radial-gradient(80% 60% at 80% 85%, #000, transparent);
-  animation: story-pan 14s linear infinite;
+  animation: story-pan 14s linear 1;
 }
 @keyframes story-pan {
   to {
@@ -470,7 +471,7 @@
   background: conic-gradient(from 0deg, #2fbf8a, #8ff5c4, #ffe0cb, #dceafe, #2fbf8a);
   filter: blur(48px);
   opacity: 0.45;
-  animation: story-spin 18s linear infinite;
+  animation: story-spin 18s linear 1;
 }
 .story-aura-lg {
   width: 150cqw;
@@ -491,7 +492,7 @@
   background: #f6f3ec;
   clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
   opacity: 0;
-  animation: story-twinkle 2.6s ease-in-out infinite;
+  animation: story-twinkle 2.6s ease-in-out 4;
   animation-delay: calc(var(--i) * 0.37s);
 }
 @keyframes story-twinkle {
@@ -507,7 +508,7 @@
   border-radius: 28px;
   padding: 2px;
   background: conic-gradient(from var(--holo-angle, 0deg), #8ff5c4, #ffe0cb, #dceafe, #fff1bf, #8ff5c4);
-  animation: story-holo 5s linear infinite;
+  animation: story-holo 5s linear 3;
 }
 @property --holo-angle {
   syntax: "<angle>";
@@ -523,7 +524,7 @@
 .story-foil {
   background: linear-gradient(180deg, #8ff5c4, #ffe0cb 30%, #dceafe 55%, #fff1bf 80%, #8ff5c4);
   background-size: 100% 300%;
-  animation: story-foil 6s ease-in-out infinite alternate;
+  animation: story-foil 6s ease-in-out 2 alternate;
 }
 @keyframes story-foil {
   to {

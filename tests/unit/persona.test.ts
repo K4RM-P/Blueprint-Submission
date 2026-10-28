@@ -15,7 +15,7 @@ describe("personaFor", () => {
   });
 
   it("lists at most four true traits and never invents missing ones", () => {
-    expect(personaFor(base).traits).toEqual(["Wiped clean", "Ready in 7 days", "Open source", "Paid forward"]);
+    expect(personaFor(base).traits).toEqual(["Wiped clean", "7 days to ready", "Open source", "Paid forward"]);
     const bare = personaFor({ stage: "in_progress", daysToReady: null, openSource: false, pifSubsidized: false, ageAtDonation: null, wiped: false, kg: 0, leg: 1 });
     expect(bare.traits).toEqual(["Leg 1 of 3"]);
   });

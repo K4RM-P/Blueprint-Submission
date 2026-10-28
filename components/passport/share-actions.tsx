@@ -79,11 +79,12 @@ export function ShareActions({ story, onReplay }: { story: PassportStory; onRepl
         <ClayButton size="sm" icon={<Link2 />} onClick={copyLink} className="w-full">
           Copy link
         </ClayButton>
-        <ClayButton size="sm" href="/become-a-partner" icon={<Building2 />} className="w-full">
-          Your company&apos;s laptops
+        {/* short labels so both fit side by side on a 390px phone; the accessible names start with the visible text */}
+        <ClayButton size="sm" href="/become-a-partner" icon={<Building2 />} className="w-full" aria-label="For businesses: donate your company's laptops">
+          For businesses
         </ClayButton>
-        <ClayButton size="sm" href="/donate" icon={<Leaf />} className="w-full">
-          Donate a laptop
+        <ClayButton size="sm" href="/donate" icon={<Leaf />} className="w-full" aria-label="From home: donate a laptop">
+          From home
         </ClayButton>
       </div>
       <div className="flex items-center justify-between px-1 pt-0.5">

@@ -358,7 +358,7 @@ function Why() {
     ["Refurbishing", "Testing every part and fixing what it can."],
     ["Data security", "Wiping and verifying every drive."],
     ["Fair wages & training", "Paid work and training for people facing barriers to employment."],
-    ["Fair prices", "Prices tied to what people can afford to pay."],
+    ["Fair prices", "Free Geek Toronto aims for access that reflects ability to pay."],
   ];
   return (
     <>

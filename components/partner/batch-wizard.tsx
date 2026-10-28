@@ -13,6 +13,7 @@ import { CapacityGlasses, LiquidFill, LiquidMeter, Stepper } from "@/components/
 import { BatonFlight, bumpNav, navTarget } from "@/components/liquid/baton-flight";
 import { ClayBaton } from "@/components/illustrations/clay-baton";
 import { computeBatchScore, scoreTip, type ScoreWeights } from "@/lib/batch-score";
+import { calendarForBatch, firstWeekForBatch } from "@/lib/capacity";
 import type { CapacityWeek } from "@/lib/capacity";
 import { DEVICE_CATEGORIES, DEVICE_CONDITIONS, labels, type PartnerTier } from "@/lib/domain";
 import { canRequestPickup } from "@/lib/pricing";
@@ -25,6 +26,8 @@ type FormValues = Omit<BatchInput, "dataHandlingAck"> & { dataHandlingAck: boole
 
 const STEPS = ["Devices", "Drop-off", "Data wipe", "Review"];
 const STEP_FIELDS: FieldPath<FormValues>[][] = [["lineItems"], ["logistics", "preferredWeek", "pickupAddress"], ["dataHandlingAck", "notes"], []];
+
+const totalQtyForCalendar = (items: { quantity?: number }[] | undefined) => (items ?? []).reduce((n, l) => n + (Number.isFinite(l.quantity) ? Number(l.quantity) : 0), 0);
 
 const blankItem = (): FormValues["lineItems"][number] => ({ category: "laptop", make: "", model: "", approxYear: null, quantity: 1, condition: "working" });
 
@@ -56,7 +59,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
       notes: "",
     },
   });
-  const { register, control, handleSubmit, trigger, setValue, formState } = form;
+  const { register, control, handleSubmit, trigger, setValue, getValues, formState } = form;
   const { fields, append, remove } = useFieldArray({ control, name: "lineItems" });
   const lineItems = useWatch({ control, name: "lineItems" });
   const logistics = useWatch({ control, name: "logistics" });
@@ -80,6 +83,8 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
   // The meter waits for one complete, valid row instead of scoring an empty form.
   const scoreReady = (lineItems ?? []).some((l) => (l.make ?? "").trim() && (l.model ?? "").trim() && Number.isFinite(l.quantity) && l.quantity >= 1 && l.quantity <= 500);
   const meter = scoreReady ? { value: score.score, verdict: score.label } : { value: 0, verdict: "Add a model" };
+  // Week statuses as this batch sees them: its own devices count on top of what's booked (PP-04).
+  const batchCalendar = useMemo(() => calendarForBatch(calendar, totalQtyForCalendar(lineItems)), [calendar, lineItems]);
   const pickupAllowed = canRequestPickup(tier);
   const totalQty = score.totalQuantity;
 
@@ -87,6 +92,11 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
     if (next > step) {
       const valid = await trigger(STEP_FIELDS[step], { shouldFocus: true });
       if (!valid) return;
+    }
+    // Arriving at the week picker: if the chosen week has no room for this batch, pick the first that does.
+    if (next === 1 && !batchCalendar.some((w) => w.week === getValues("preferredWeek") && w.status !== "full")) {
+      const fit = firstWeekForBatch(calendar, totalQty);
+      if (fit) setValue("preferredWeek", fit);
     }
     setDirection(next > step ? 1 : -1);
     setStep(next);
@@ -117,7 +127,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
   if (done) return <SubmittedCelebration id={done.id} score={done.score} label={score.label} />;
 
   const e = formState.errors;
-  const selectedWeek = calendar.find((w) => w.week === week);
+  const selectedWeek = batchCalendar.find((w) => w.week === week);
 
   return (
     <form
@@ -248,7 +258,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                         </Link>
                       </p>
                     ) : (
-                      <p className="text-small text-ink-2">Drop-off is at 180 Sudbury Street, Unit C3. Pickup works anywhere in Toronto.</p>
+                      <p className="text-small text-ink-2">Drop-off is at 180 Sudbury Street, Unit C3. Pickup is an Impact and Champion option, to be confirmed by Free Geek Toronto.</p>
                     )}
                   </div>
                   {logistics === "pickup" ? (
@@ -260,8 +270,8 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                     <p className="font-medium text-ink" id="week-label">
                       Preferred week
                     </p>
-                    <p className="mb-4 text-small text-ink-2">Each glass shows how full our bench is that week. Full weeks are closed.</p>
-                    <CapacityGlasses label="Preferred week" weeks={calendar} value={week} onSelect={(w) => setValue("preferredWeek", w, { shouldValidate: true })} />
+                    <p className="mb-4 text-small text-ink-2">Each glass shows how full our bench is that week. Weeks without room for your {totalQty} {totalQty === 1 ? "device" : "devices"} are closed.</p>
+                    <CapacityGlasses label="Preferred week" weeks={batchCalendar} value={week} onSelect={(w) => setValue("preferredWeek", w, { shouldValidate: true })} />
                     {e.preferredWeek ? (
                       <p role="alert" className="mt-3 text-small font-medium text-danger-ink">
                         {e.preferredWeek.message}
@@ -269,7 +279,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                     ) : selectedWeek ? (
                       <p className="mt-3 text-small text-ink-2" aria-live="polite">
                         Week of <span className="font-semibold text-ink">{selectedWeek.label}</span>: {selectedWeek.load} of {selectedWeek.capacity} bench spots booked.
-                        {selectedWeek.load + totalQty > selectedWeek.capacity ? " Your batch may be split across two weeks — we'll confirm." : ""}
+                        {totalQty > selectedWeek.capacity ? " A batch this size is split across two weeks; staff will confirm." : ""}
                       </p>
                     ) : null}
                   </div>
@@ -288,7 +298,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                       you get a numbered certificate listing every device.
                     </p>
                   </div>
-                  <div key={e.dataHandlingAck ? "err" : "ok"} className={e.dataHandlingAck ? "shake" : undefined}>
+                  <div className={e.dataHandlingAck ? "shake" : undefined}>
                     <Checkbox
                       label="Our devices will arrive with their drives intact, and Free Geek Toronto will sanitize them."
                       description="Please don't remove or destroy drives yourself — intact drives make devices reusable."
@@ -397,13 +407,13 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
         </LiquidMeter>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 px-2 text-small">
           <dt className="text-ink-2">Devices</dt>
-          <dd className="text-right font-semibold tnum">{totalQty}</dd>
+          <dd className="text-right font-semibold tnum">{scoreReady ? totalQty : "—"}</dd>
           <dt className="text-ink-2">Same model</dt>
-          <dd className="text-right font-semibold tnum">{Math.round(score.uniformity * 100)}%</dd>
+          <dd className="text-right font-semibold tnum">{scoreReady ? `${Math.round(score.uniformity * 100)}%` : "—"}</dd>
           <dt className="text-ink-2">Avg. age</dt>
-          <dd className="text-right font-semibold tnum">{score.avgAgeYears === null ? "—" : `${score.avgAgeYears.toFixed(1)} yrs`}</dd>
+          <dd className="text-right font-semibold tnum">{!scoreReady || score.avgAgeYears === null ? "—" : `${score.avgAgeYears.toFixed(1)} yrs`}</dd>
           <dt className="text-ink-2">Laptops</dt>
-          <dd className="text-right font-semibold tnum">{Math.round(score.laptopShare * 100)}%</dd>
+          <dd className="text-right font-semibold tnum">{scoreReady ? `${Math.round(score.laptopShare * 100)}%` : "—"}</dd>
         </dl>
       </aside>
     </form>

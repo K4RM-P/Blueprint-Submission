@@ -24,3 +24,8 @@ export function nextCertificateNumber(year: number, existing: string[]): string 
     .reduce((m, p) => Math.max(m, p.sequence), 0);
   return formatCertificateNumber(year, max + 1);
 }
+
+/** A short, readable batch reference for documents: "B-" + the first 8 characters of the batch's id. */
+export function batchReference(batchId: string): string {
+  return `B-${batchId.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+}

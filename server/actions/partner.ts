@@ -9,6 +9,7 @@ import { colleagueSchema, LOGO_MAX_BYTES, organizationSchema, sniffLogoType } fr
 import { computeBatchScore } from "@/lib/batch-score";
 import { canRequestPickup } from "@/lib/pricing";
 import { getCalendar, getSettings } from "@/lib/queries/common";
+import { calendarForBatch, firstWeekForBatch, partnerCanChoose } from "@/lib/capacity";
 import type { PartnerTier } from "@/lib/domain";
 
 async function partnerOrg() {
@@ -30,9 +31,12 @@ async function prepareBatch(s: Awaited<ReturnType<typeof partnerOrg>>, input: Ba
   if (!week) throw new ActionError("Choose one of the next 8 weeks.");
   // When editing an approved-but-not-yet-scheduled batch our own devices are already counted; submitted batches are not.
   const ownLoad = editingWeek && editingWeek.week === week.week ? editingWeek.devices : 0;
-  if (week.load - ownLoad > week.capacity) {
-    const next = calendar.find((w) => w.status !== "full");
-    throw new ActionError(`That week's bench is full${next ? ` — the next open week is ${next.label}` : ""}.`);
+  const qty = input.lineItems.reduce((n, l) => n + l.quantity, 0);
+  // Same rule the wizard shows (lib/capacity calendarForBatch): the week must have room for this batch.
+  const [mine] = calendarForBatch([{ ...week, load: Math.max(0, week.load - ownLoad) }], qty);
+  if (!partnerCanChoose(mine)) {
+    const next = calendar.find((w) => w.week === firstWeekForBatch(calendar, qty));
+    throw new ActionError(`That week's bench doesn't have room for this batch${next ? ` — the next week that does is ${next.label}` : ""}.`);
   }
   const score = computeBatchScore(
     input.lineItems.map((l) => ({ category: l.category, make: l.make, model: l.model, approxYear: l.approxYear, quantity: l.quantity })),

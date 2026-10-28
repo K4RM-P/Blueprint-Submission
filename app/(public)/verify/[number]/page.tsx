@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { BadgeCheck, SearchX } from "lucide-react";
+import { notFound } from "next/navigation";
+import { BadgeCheck } from "lucide-react";
 import { ClayCard } from "@/components/clay";
 import { Seal } from "@/components/clay/seal";
 import { createClient } from "@/lib/supabase/server";
@@ -23,48 +23,29 @@ export default async function VerifyPage({ params }: { params: Promise<{ number:
     const { data } = await supabase.rpc("verify_certificate", { p_number: number });
     cert = (data as Verified | null) ?? null;
   }
+  if (!cert) notFound();
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-4 py-16 sm:py-24">
-      <ClayCard tint={cert ? "sky" : "porcelain"} size="xl" material="glass" className="flex flex-col items-center gap-6 text-center">
-        {cert ? (
-          <Seal rim="VERIFIED · FREE GEEK TORONTO · " icon={<BadgeCheck />} size={128} tilt={-7} />
-        ) : (
-          <span data-tint="porcelain" className="clay grid size-24 place-items-center rounded-full">
-            <SearchX className="size-10 text-ink-2" strokeWidth={1.5} aria-hidden />
-          </span>
-        )}
-        {cert ? (
-          <>
-            <div>
-              <p className="eyebrow">Certificate verified</p>
-              <h1 className="font-display mt-2 text-[2.25rem] leading-tight">This certificate is genuine.</h1>
+      <ClayCard tint="sky" size="xl" material="glass" className="flex flex-col items-center gap-6 text-center">
+        <Seal rim="VERIFIED · FREE GEEK TORONTO · " icon={<BadgeCheck />} size={128} tilt={-7} />
+        <div>
+          <p className="eyebrow">Certificate verified</p>
+          <h1 className="font-display mt-2 text-[2.25rem] leading-tight">This certificate is genuine.</h1>
+        </div>
+        <dl className="w-full divide-y divide-white/70 text-left font-mono text-[0.9375rem]">
+          {[
+            ["Number", cert.certificate_number],
+            ["Issued to", cert.partner_name],
+            ["Devices", String(cert.device_count)],
+            ["Issued", longDate(cert.issued_at)],
+          ].map(([k, v]) => (
+            <div key={k} className="flex justify-between gap-4 py-3">
+              <dt className="text-ink-2">{k}</dt>
+              <dd className="text-right text-ink">{v}</dd>
             </div>
-            <dl className="w-full divide-y divide-white/70 text-left font-mono text-[0.9375rem]">
-              {[
-                ["Number", cert.certificate_number],
-                ["Issued to", cert.partner_name],
-                ["Devices", String(cert.device_count)],
-                ["Issued", longDate(cert.issued_at)],
-              ].map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-4 py-3">
-                  <dt className="text-ink-2">{k}</dt>
-                  <dd className="text-right text-ink">{v}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className="text-small text-ink-2">Issued by Free Geek Toronto, 180 Sudbury Street, Unit C3. Serial numbers stay on the partner&apos;s copy only.</p>
-          </>
-        ) : (
-          <>
-            <h1 className="font-display text-[2rem] leading-tight">We couldn&apos;t find that certificate.</h1>
-            <p className="text-ink-2">
-              Check the number — it looks like <span className="font-mono">GL-2026-0001</span>. If it still doesn&apos;t match, contact Free Geek Toronto.
-            </p>
-            <Link href="/about" className="font-semibold text-loop-deep underline underline-offset-4">
-              About our data-security process
-            </Link>
-          </>
-        )}
+          ))}
+        </dl>
+        <p className="text-small text-ink-2">Issued by Free Geek Toronto, 180 Sudbury Street, Unit C3. Serial numbers stay on the partner&apos;s copy only.</p>
       </ClayCard>
     </main>
   );

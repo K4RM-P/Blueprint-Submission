@@ -34,7 +34,7 @@ const fmt = (n: number) => n.toLocaleString("en-CA");
 
 /** Why a business picks Relay over a trade-in, a reseller or paid IT disposal. */
 const REASONS = [
-  { icon: <HandCoins />, title: "Free.", body: "No disposal fee and no contract. The Community tier costs nothing, for good." },
+  { icon: <HandCoins />, title: "Free.", body: "No disposal fee. The Community tier, which includes everything a Reuse Partner needs, is free." },
   { icon: <ShieldCheck />, title: "Certified data wipe.", body: "Staff verify every wipe. You get a numbered certificate with a public verification link." },
   { icon: <CalendarCheck />, title: "Zero hassle.", body: "One two-minute form. Pick a week the bench has room for, then drop off at 180 Sudbury Street." },
   { icon: <MapPin />, title: "A real local story.", body: "Each laptop's Device Passport and your impact dashboard show who it helps in Toronto." },
@@ -61,7 +61,7 @@ export default async function Landing() {
 
   const impactRow = [
     { value: t.kgDiverted, suffix: "kg", label: "of e-waste kept out of landfill" },
-    { value: t.co2eAvoidedKg, suffix: "kg", label: "CO₂e avoided (est.)" },
+    { value: t.co2eAvoidedKg, suffix: "kg", label: "CO₂e avoided (estimate; factors TO VERIFY)" },
     { value: t.volunteerHours, label: "volunteer hours on the bench" },
     { value: impact.activePartners, label: "Reuse Partners in the relay" },
   ];
@@ -138,7 +138,7 @@ export default async function Landing() {
           { hand: "Free Geek staff", title: "Certified data wipe", body: "Every drive is wiped, then a staff member verifies the report.", stat: fmt(impact.stages.verified), statLabel: "wipes verified" },
           { hand: "A volunteer", title: "Rebuilt on the bench", body: "Tested, refurbished and set up with open-source software.", stat: fmt(impact.stages.refurbished), statLabel: "refurbished" },
           { hand: "Its QR label", title: "Device Passport", body: "Scan the sticker: who gave it, when it was wiped, who rebuilt it.", stat: fmt(impact.passportViews), statLabel: "passport views" },
-          { hand: "Back to the business", title: "Impact, reported back", body: "Sold at prices tied to ability to pay. The business sees who it helps.", stat: fmt(t.devicesReused), statLabel: "in new homes" },
+          { hand: "Back to the business", title: "Impact, reported back", body: "Sold at Free Geek Toronto's affordable prices. The business sees who it helps.", stat: fmt(t.devicesReused), statLabel: "in new homes" },
         ]}
       />
 
@@ -234,9 +234,9 @@ export default async function Landing() {
           <Reveal>
             <SectionHead
               id="wall"
-              label="Partner Wall"
-              title="Toronto businesses"
-              muted="already in the relay."
+              label={env.demoMode ? "Partner Wall · demo" : "Partner Wall"}
+              title={env.demoMode ? "How the Partner Wall" : "Toronto businesses"}
+              muted={env.demoMode ? "will look." : "already in the relay."}
               aside={
                 <div className="flex flex-col items-start gap-2">
                   {env.demoMode ? <p className="text-small text-ink-2">Fictional demo partners, so you can see how the wall works.</p> : null}
@@ -317,10 +317,9 @@ export default async function Landing() {
             </Link>
           </div>
           <div className="md:col-span-5 md:border-l md:border-line md:pl-8">
-            <p className="font-display text-[3.5rem] font-semibold leading-none tracking-[-0.05em]">
-              <CountUp value={t.volunteerHours} />
-            </p>
-            <p className="mt-2 text-ink-2">bench hours logged by volunteers</p>
+            {/* Volunteer hours already appear in the impact row; this states how FGT brings volunteers in (case fact). */}
+            <p className="font-display text-[3.5rem] font-semibold leading-none tracking-[-0.05em]">2×</p>
+            <p className="mt-2 text-ink-2">a month, Free Geek Toronto runs a one-hour orientation for new volunteers</p>
           </div>
         </Reveal>
       </section>

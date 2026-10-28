@@ -59,6 +59,25 @@ export function nextOpenWeek(weeks: string[], devices: number, loads: WeekLoad[]
   return null;
 }
 
+/**
+ * The calendar as one partner's batch sees it (PP-04): a week that can't take the batch on top of
+ * what's booked is Full (a week with 7 of 20 spots taken is Full for a 20-laptop batch); weeks that
+ * can keep their usual Open/Limited label from the current load. A batch bigger than a whole week
+ * is judged by one week's worth (staff split it across weeks).
+ */
+export function calendarForBatch(calendar: CapacityWeek[], devices: number): CapacityWeek[] {
+  return calendar.map((w) => {
+    const add = Math.min(Math.max(devices, 0), w.capacity);
+    return { ...w, status: w.load + add > w.capacity ? "full" : weekStatus(w.load, w.capacity) };
+  });
+}
+
+/** First week the batch fits, preferring Open over Limited (the wizard's default pick). */
+export function firstWeekForBatch(calendar: CapacityWeek[], devices: number): string | null {
+  const view = calendarForBatch(calendar, devices);
+  return (view.find((w) => w.status === "open") ?? view.find((w) => w.status === "limited"))?.week ?? null;
+}
+
 /** Partners may only pick weeks that aren't Full (PP-04). */
 export function partnerCanChoose(week: CapacityWeek): boolean {
   return week.status !== "full";

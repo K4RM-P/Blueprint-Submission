@@ -92,14 +92,16 @@ describe.skipIf(!enabled)("RLS & database rules (PRD §12, §17)", () => {
   });
 
   it("volunteer cannot set wipe_verified", async () => {
-    const { data: pending } = await staff.from("devices").select("id").eq("status", "wipe_pending_verification").limit(1);
-    const id = pending![0].id;
+    // Prefer a wipe awaiting verification; any device not yet verified proves the same rule when earlier runs verified them all.
+    const { data: candidates } = await staff.from("devices").select("id, status").in("status", ["wipe_pending_verification", "testing", "received"]).order("status", { ascending: false }).limit(20);
+    const target = candidates!.find((d) => d.status === "wipe_pending_verification") ?? candidates![0];
+    const id = target.id;
     const { data: updated } = await volunteer.from("devices").update({ status: "wipe_verified" }).eq("id", id).select("id");
     expect(updated ?? []).toHaveLength(0);
     const { error } = await volunteer.rpc("complete_step", { p_device: id, p_step: "wipe_verified" });
     expect(error).not.toBeNull();
     const { data: still } = await staff.from("devices").select("status").eq("id", id).single();
-    expect(still!.status).toBe("wipe_pending_verification");
+    expect(still!.status).toBe(target.status);
   });
 
   it("device events cannot be updated or deleted, even by staff", async () => {

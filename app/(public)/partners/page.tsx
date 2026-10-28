@@ -22,7 +22,7 @@ export default async function PartnersPage() {
     <main className="mx-auto w-full max-w-[1200px] px-4 py-14 sm:px-6 md:py-24">
       <div className="grid gap-6 md:grid-cols-12 md:items-end">
         <div className="md:col-span-8">
-          <p className="eyebrow">Partner Wall</p>
+          <p className="eyebrow">{env.demoMode ? "Partner Wall · demo" : "Partner Wall"}</p>
           <h1 className="font-display mt-3 text-[2.75rem] leading-[0.98] sm:text-display-l">The businesses passing their laptops on.</h1>
         </div>
         <p className="text-ink-2 md:col-span-4">

@@ -31,6 +31,8 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
   const [open, setOpen] = useState<DialogKind>(null);
   const [busy, setBusy] = useState(false);
   const [price, setPriceVal] = useState(priceCents ? String(priceCents / 100) : "");
+  const priceValue = Number(price.replace(/[$,\s]/g, ""));
+  const priceError = price.trim() === "" ? "Enter a price." : !Number.isFinite(priceValue) || priceValue <= 0 ? "Enter a price in dollars, like 180." : null;
   const [sale, setSale] = useState({ soldAt: new Date().toISOString().slice(0, 10), channel: "in_store" as SaleChannel, recipient: "student" as RecipientCategory | "", subsidy: "" });
   const [reason, setReason] = useState("");
   const [drive, setDrive] = useState<DriveHandling | "">("");
@@ -121,14 +123,17 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
             <DialogTitle>Set price</DialogTitle>
             <DialogDescription>Free Geek Toronto sets every price. Relay only displays it.</DialogDescription>
           </DialogHeader>
-          <Field label="Price (CAD)">{({ id: fid }) => <Input id={fid} inputMode="decimal" value={price} onChange={(e) => setPriceVal(e.target.value)} />}</Field>
+          <Field label="Price (CAD)" error={price.trim() && priceError ? priceError : undefined}>
+            {({ id: fid, describedBy, invalid }) => <Input id={fid} inputMode="decimal" value={price} aria-describedby={describedBy} aria-invalid={invalid} onChange={(e) => setPriceVal(e.target.value)} />}
+          </Field>
           <DialogFooter>
             <ClayButton
               variant="primary"
               loading={busy}
+              disabled={priceError !== null}
               onClick={async () => {
                 setBusy(true);
-                done(await setPrice({ id, priceCents: Math.round(Number(price) * 100) }));
+                done(await setPrice({ id, priceCents: Math.round(priceValue * 100) }));
               }}
             >
               Save price

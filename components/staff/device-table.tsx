@@ -44,12 +44,18 @@ export function DeviceTable({ rows, volunteers }: { rows: DeviceRow[]; volunteer
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
-      if (target.closest("input, textarea, select, [role=dialog]")) return;
+      // Shortcuts work with focus on a row checkbox (where it is after selecting rows), never while typing.
+      const typing = target.closest("textarea, select, [role=dialog]") || (target instanceof HTMLInputElement && !["checkbox", "radio"].includes(target.type));
+      if (typing) return;
       if (e.key === "/") {
         e.preventDefault();
         document.getElementById("device-search")?.focus();
       }
-      if (e.key === "v" && pendingSel.length > 0) setVerifyOpen(true);
+      if (e.key === "v" && pendingSel.length > 0) {
+        // keep the keystroke from landing in the dialog's first field
+        e.preventDefault();
+        setVerifyOpen(true);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -190,6 +196,7 @@ export function DeviceTable({ rows, volunteers }: { rows: DeviceRow[]; volunteer
 
       <VerifyDialog
         ids={pendingSel.map((r) => r.id)}
+        keepRecorded
         open={verifyOpen}
         onOpenChange={setVerifyOpen}
         onDone={() => {

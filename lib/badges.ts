@@ -18,9 +18,9 @@ export interface VolunteerStats {
 }
 
 export const BADGES: readonly BadgeDef[] = [
-  { slug: "first-boot", name: "First Boot", description: "Completed final QA on your first device.", criterionType: "final_qa", threshold: 1 },
+  { slug: "first-boot", name: "First Boot", description: "Completed final QA on a first device.", criterionType: "final_qa", threshold: 1 },
   { slug: "diagnostician", name: "Diagnostician", description: "Ran 10 hardware tests.", criterionType: "hardware_test", threshold: 10 },
-  { slug: "data-guardian", name: "Data Guardian", description: "10 data wipes you performed were verified by staff.", criterionType: "wipe_verified", threshold: 10 },
+  { slug: "data-guardian", name: "Data Guardian", description: "10 data wipes performed and verified by staff.", criterionType: "wipe_verified", threshold: 10 },
   { slug: "open-source-installer", name: "Open Source Installer", description: "Installed an open-source OS on 10 devices.", criterionType: "open_source_install", threshold: 10 },
   { slug: "bench-regular", name: "Bench Regular", description: "Completed 25 devices.", criterionType: "final_qa", threshold: 25 },
   { slug: "century", name: "Century Club", description: "Completed 100 devices.", criterionType: "final_qa", threshold: 100 },

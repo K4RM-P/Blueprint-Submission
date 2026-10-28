@@ -36,7 +36,7 @@ export default function AboutPage() {
           </h2>
           <div className="measure mt-3 flex flex-col gap-3 text-ink-2">
             <p>Every computer is tested, securely wiped, repaired and reinstalled. That takes parts, tools, space and paid staff who train people facing barriers to employment.</p>
-            <p>Sales are how Free Geek Toronto pays for that work — most of its revenue comes from selling refurbished devices. Prices are kept as low as possible and tied to ability to pay.</p>
+            <p>Sales are how Free Geek Toronto pays for that work — most of its revenue comes from selling refurbished devices. Free Geek Toronto&apos;s vision is a Toronto where access to technology reflects people&apos;s ability to pay, so prices can&apos;t simply follow the market.</p>
             <p>Each Device Passport shows where your money goes. Reuse Partners never pay for reuse. Optional memberships add reporting and recognition — never priority access or influence over prices.</p>
           </div>
         </section>

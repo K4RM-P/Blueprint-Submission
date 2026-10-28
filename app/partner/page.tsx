@@ -45,7 +45,15 @@ export default async function PartnerDashboard() {
         <ClayCard tint="mint" size="lg" className="flex flex-col justify-between gap-6">
           <div>
             <p className="font-display text-[2.25rem] leading-[1.05] sm:text-[3rem]">
-              Your laptops are helping <span className="tnum">{people}</span> {people === 1 ? "person" : "people"}.
+              {people > 0 ? (
+                <>
+                  Your laptops are helping <span className="tnum">{people}</span> {people === 1 ? "person" : "people"}.
+                </>
+              ) : t.devicesReceived > 0 ? (
+                "Your laptops are on the bench."
+              ) : (
+                "Send your first batch."
+              )}
             </p>
             <div className="mt-5">
               <PeoplePebbles count={people} />
@@ -89,7 +97,7 @@ export default async function PartnerDashboard() {
         {batches.length === 0 ? (
           <FlatCard className="mt-4">
             <EmptyState title="No batches yet." tone="apricot" action={<ClayButton href="/partner/batches/new" variant="secondary" size="sm">Start your first batch</ClayButton>}>
-              Your first 5 laptops could reach a classroom next month.
+              List your laptops in about two minutes. Each one gets a certified data wipe and a Device Passport that shows who it helps.
             </EmptyState>
           </FlatCard>
         ) : (

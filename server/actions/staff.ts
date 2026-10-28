@@ -48,12 +48,14 @@ const scheduleSchema = z.object({ id: uuid, week: z.string().refine(isMonday, "C
 export async function scheduleBatch(input: unknown): Promise<ActionResult<{ warning?: string; suggestion?: string | null }>> {
   return runAction(scheduleSchema, input, async ({ id, week, overrideNote }) => {
     const s = await staff();
-    const { data: b } = await s.supabase.from("donation_batches").select("status, batch_line_items(quantity)").eq("id", id).single();
+    const { data: b } = await s.supabase.from("donation_batches").select("status, scheduled_week, batch_line_items(quantity)").eq("id", id).single();
     if (!b) return fail("Batch not found.");
+    if (!["submitted", "approved", "scheduled"].includes(b.status)) return fail("Only batches that haven't been received yet can be scheduled.");
     const qty = b.batch_line_items.reduce((a, l) => a + l.quantity, 0);
     const settings = await getSettings(s.supabase);
     const cal = await getCalendar(s.supabase, settings.weeklyCapacity, 12);
-    const loads = cal.map((w) => ({ week: w.week, devices: w.load }));
+    // When rescheduling, the batch's own devices no longer count against the week it's leaving.
+    const loads = cal.map((w) => ({ week: w.week, devices: b.status === "scheduled" && w.week === b.scheduled_week ? Math.max(0, w.load - qty) : w.load }));
     if (wouldExceed(week, qty, loads, settings.weeklyCapacity) && !overrideNote) {
       const suggestion = nextOpenWeek(cal.map((w) => w.week), qty, loads, settings.weeklyCapacity);
       return ok({ warning: `That week would be over capacity (${settings.weeklyCapacity} devices).`, suggestion });
@@ -61,14 +63,15 @@ export async function scheduleBatch(input: unknown): Promise<ActionResult<{ warn
     if (b.status === "submitted") {
       const { error } = await s.supabase.from("donation_batches").update({ status: "approved" }).eq("id", id);
       if (error) throw error;
-    } else if (b.status !== "approved") return fail("Only approved batches can be scheduled.");
+    }
+    const rescheduling = b.status === "scheduled";
     const { error } = await s.supabase
       .from("donation_batches")
-      .update({ status: "scheduled", scheduled_week: week, schedule_override_note: overrideNote || null })
+      .update({ ...(rescheduling ? {} : { status: "scheduled" as const }), scheduled_week: week, schedule_override_note: overrideNote || null })
       .eq("id", id);
     if (error) throw error;
     refresh("/staff");
-    return ok({}, "Batch scheduled. The partner sees the new week.");
+    return ok({}, rescheduling ? "Batch rescheduled. The partner sees the new week." : "Batch scheduled. The partner sees the new week.");
   });
 }
 
@@ -78,12 +81,20 @@ export async function receiveBatch(input: unknown): Promise<ActionResult<{ added
     const s = await staff();
     const { data: b } = await s.supabase.from("donation_batches").select("status, batch_line_items(*)").eq("id", id).single();
     if (!b) return fail("Batch not found.");
+    if (b.status === "received") {
+      // Recovery: a receive whose device insert failed part-way can be finished (adding is a top-up, never a duplicate).
+      const added = await addDevicesForLines(s.supabase, id, b.batch_line_items);
+      refresh("/staff");
+      return added > 0 ? ok({ added }, `${added} missing devices added with passport codes.`) : fail("This batch has already been received.");
+    }
     if (b.status === "approved") {
-      const { error } = await s.supabase.from("donation_batches").update({ status: "scheduled" }).eq("id", id);
+      const { error } = await s.supabase.from("donation_batches").update({ status: "scheduled" }).eq("id", id).eq("status", "approved");
       if (error) throw error;
     } else if (b.status !== "scheduled") return fail("Only approved or scheduled batches can be received.");
-    const { error } = await s.supabase.from("donation_batches").update({ status: "received" }).eq("id", id);
+    // Conditional on the status, so two people pressing Receive at once can't both add devices.
+    const { data: won, error } = await s.supabase.from("donation_batches").update({ status: "received" }).eq("id", id).eq("status", "scheduled").select("id");
     if (error) throw error;
+    if (!won?.length) return fail("Someone else just received this batch.");
     const added = await addDevicesForLines(s.supabase, id, b.batch_line_items);
     refresh("/staff");
     return ok({ added }, `Received. ${added} devices added with passport codes.`);

@@ -3,14 +3,8 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { ClayCard, Segmented } from "@/components/clay";
-import { TIER_BENEFITS, TIER_PRICE_CENTS } from "@/lib/pricing";
+import { TIER_BENEFITS, TIER_PITCH as PITCH, TIER_PRICE_CENTS } from "@/lib/pricing";
 import { labels, type PartnerTier } from "@/lib/domain";
-
-const PITCH: Record<PartnerTier, string> = {
-  community: "Everything the core needs: certified data wipe, a certificate for every batch, a Device Passport for every laptop and your impact summary.",
-  impact: "Optional: a detailed impact dashboard, annual report and LinkedIn card for your team, clients and board.",
-  champion: "Optional: everything in Impact, plus a team day at the bench and laptops sponsored for families.",
-};
 
 /**
  * The free Community tier leads (raised, full width on desktop); the paid tiers follow as

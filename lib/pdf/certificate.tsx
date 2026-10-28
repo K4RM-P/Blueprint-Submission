@@ -1,4 +1,5 @@
 import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
+import { batchReference } from "@/lib/certificate-number";
 
 /**
  * Data-sanitization certificate (CI-01). Flat, formal, print-professional:
@@ -78,7 +79,7 @@ export function CertificateDocument({ data }: { data: CertificateData }) {
         <View style={s.grid}>
           {[
             ["Issued to", data.partnerName],
-            ["Batch ID", data.batchId],
+            ["Batch reference", batchReference(data.batchId)],
             ["Date received", fmt(data.receivedAt)],
             ["Date issued", fmt(data.issuedAt)],
             ["Issued by", data.issuedBy],

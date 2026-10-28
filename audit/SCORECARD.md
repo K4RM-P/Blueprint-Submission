@@ -105,3 +105,80 @@ Severity: **C** Critical · **H** High · **M** Medium · **L** Low. Status: ✅
 | S2 | M | B6 | Partner-facing "Free Geek Toronto is a non-profit, not a registered charity" (PRD open question 6) | ✅ removed |
 
 **C5 measurements after the iteration-1 fixes** (mobile, simulated throttling, median of 5, behind a local HTTP/2 proxy; the deployed Vercel build of the previous commit scores within ±3 of this setup): landing 78 (LCP 3.6 s, TBT 0.48 s), Become a Partner 91 (LCP 2.7 s), passport story 80 (LCP 3.5 s), partner dashboard 75 (LCP 3.4 s, TBT 0.68 s). CLS ≤ 0.001 everywhere.
+
+---
+
+## Iteration 2 (audit of `3a917ab`, the iteration-1 build)
+
+**Evidence collected:** screenshots of every route at 390 and 1440 px, plus 768 and 1920 px for the core screens, in `audit/iter-2/`. Typecheck and lint clean. A second independent reviewer (fresh agent, no access to iteration 1's review) walked the whole loop as partner, staff and volunteer, ran a 34-route layout sweep at 390/1920 px and ran Lighthouse.
+
+| Item | Self | Reviewer | Final | Evidence (short) |
+|---|---|---|---|---|
+| A1 Problem identification | 8 | 7 | **7** | "Why Relay exists" is real and sourced but sits ~1,800 px down at 1440 |
+| A2 Solution clarity | 7 | 7 | **7** | One change consistent across `/`, `/become-a-partner`, `/demo`; landing long; mock nav differs from the real portal |
+| A3 Feasibility | 7 | 6 | **6** | Week picker ignored batch size (Nov 2 at 7/20 offered for 20 laptops); Reschedule broken; ADMIN_GUIDE clear |
+| A4 Presentation | 7 | 7 | **7** | Screens strong; DEMO_SCRIPT step 11 (`v`) broke on camera; stepper labels collide at 390 |
+| A5 Technical execution | 7 | 6 | **6** | Reschedule, `v` shortcut and wizard double-click bugs; Receive race |
+| B1 One change | 8 | 8 | **8** | Every core screen serves the pipeline; tier 3 quiet |
+| B2 Target user fit | 7 | 7 | **7** | Raw UUID batch ID on the certificate; pickup wording inconsistent |
+| B3 Mission | 8 | 8 | **8** | Guardrails in code; "tied to ability to pay" stated as fact; fund money counted as revenue |
+| B4 Differentiation | 8 | 8 | **8** | Options table + "Better than a trade-in" are clear and fair |
+| B5 Measurable value | 6 | 6 | **6** | Program metrics labelled; "devices being refurbished" included ready/listed; views inflated by image fetches; wallet hours |
+| B6 Honesty | 6 | 6 | **6** | Recycled passport called an unverified drive a "certified data wipe"; landing CO₂e untagged; wall heading; pickup; "for good" |
+| B7 FGT-specificity | 9 | 9 | **9** | Address, drop-off, independence note, case stats, Linux Mint, existing software |
+| C1 Functional completeness | 7 | 6 | **6** | Reschedule dead; single verify from the table lost the report ID; no failed-hardware-test path for volunteers |
+| C2 Robustness | 7 | 6 | **6** | `v` bug, wizard double click, soft 404 on `/verify/XYZ`, non-atomic receive, price NaN |
+| C3 Security | 7 | 7 | **7** | RLS, guards, append-only custody, private passport HTML; partner can still write `value_score`/week/logistics over REST while submitted |
+| C4 Tests | 7 | 6 | **6** | No tests for reschedule, the shortcut, wizard recovery, concurrency |
+| C5 Performance | 5 | 5 | **5** | Reviewer: landing 81–84, passport 80–82, partner 74–75, Become a Partner 95 |
+| C6 Code & docs | 7 | 7 | **7** | ADMIN_GUIDE told staff to use a broken Reschedule; PIF eligibility list wrong; Vercel Hobby non-commercial; GL/geekloop relics |
+| D1 5-second test | 7 | 7 | **7** | New partner's dashboard led with "helping 0 people" |
+| D2 Hierarchy | 7 | 7 | **7** | Landing long and repeats "91 volunteer hours"; custody rows printed labels twice |
+| D3 Consistency | 7 | 7 | **7** | Tier descriptions differed across pages; mock ≠ real portal |
+| D4 Not vibe-coded / §12 | 6 | 6 | **6** | Glass beyond dialogs (§12.2); infinite `live-ping`; >10 infinite story loops (§12.9) |
+| D5 Motion & craft | 8 | 8 | **8** | Hold-to-confirm, glasses, vessel, story genuinely crafted |
+| D6 Copy | 7 | 7 | **7** | Required terms consistent; small slips |
+| D7 Friction | 7 | 7 | **7** | Double click, retyping the report ID, `v` |
+| D8 Responsive | 7 | 7 | **7** | No overflow on 34 routes; stepper overlap at 390; story buttons truncated |
+
+### Issues found in iteration 2 and what happened to them
+
+| # | Sev | Item | Issue | Status |
+|---|---|---|---|---|
+| C-01 | H | A5/C1 | Reschedule always failed ("Only approved batches…"); the batch's own load counted against it | ✅ `scheduleBatch` accepts scheduled batches and subtracts the batch's own devices; e2e `ops-regressions.spec.ts` |
+| C-02 | H | A4/C2 | `v` typed "v" into the method field; ignored when focus was on a row checkbox | ✅ `preventDefault`, dialog resets on open, shortcut works from checkboxes; e2e |
+| C-03 | H | B6/C1 | Recycled passport: "certified data wipe" for an unverified drive, "in progress / not yet" forever | ✅ "Its drive · Drive handled before recycling"; no refurbish/software sections; legs read correctly (`full-passport.tsx`) |
+| C-04 | H | A3 | Week picker ignored batch size; staff then saw "over capacity" | ✅ `calendarForBatch` / `firstWeekForBatch` in `lib/capacity.ts` (tested), used by the wizard and the server. 🔒 submitted batches still aren't in `week_loads()` (needs a DB change) |
+| C-05 | H | C5 | Lighthouse < 90 on 4 of 5 pages | ⏳ partly: ClayButton without motion, charts on demand; see measurements below |
+| M-01 | M | B6 | "Prices tied to ability to pay" as fact | ✅ phrased as FGT's vision (case wording) in 5 places |
+| M-02 | M | B6 | Landing CO₂e untagged | ✅ "estimate; factors TO VERIFY" |
+| M-03 | M | B6 | Wall heading implied real partners | ✅ demo mode: "Partner Wall · demo — How the Partner Wall will look." |
+| M-04 | M | B6/D3 | Pickup and tier descriptions inconsistent | ✅ one `TIER_PITCH` + `TIER_BENEFITS` in `lib/pricing.ts`; pickup "to be confirmed" everywhere; FAQ updated |
+| M-05 | M | B5 | Wallet hours | 🔒 migration `20261028000003` (formula already unified) |
+| M-06 | M | B5 | "being refurbished" included ready/listed; fund counted as revenue; views inflated | ✅ waiting / on the bench / ready to sell; revenue excludes the fund (shown beside it); share images use a cached lookup so they count at most once per 10 min per code |
+| M-07 | M | D7/C2 | Wizard swallowed a click after the acknowledgement error | ✅ no remount; e2e |
+| M-08 | M | D7/C1 | Single verify from the table didn't keep the report ID | ✅ table verify always keeps each device's recorded ID |
+| M-09 | M | C3 | Partner can write score/week/logistics over REST while submitted | 🔒 needs a BEFORE trigger (DB migration + push); server actions recompute and validate |
+| M-10 | M | C2 | Non-atomic receive/sale | ✅ receive is conditional on status (no double insert) and recoverable; 🔒 sale atomicity needs an RPC |
+| M-11 | M | D4 | Glass beyond dialogs; infinite live dot; story loops | ✅ live dot pings 3×; every story ambient is finite. ⛔ glass on header/sidebar/dock was a deliberate, recorded team direction (PROGRESS, Stage 3) |
+| M-12 | M | C6 | Docs drift | ✅ ADMIN_GUIDE (reschedule, PIF eligibility, bulk verify), DEMO_SCRIPT, HOW_IT_WORKS hosting (Vercel Pro) |
+| M-13 | M | D8 | Stepper labels collide at 390 | ✅ phones show only the current step's label |
+| M-14 | M | A2/D3 | Mock ≠ real portal | ✅ real nav labels, no fake batch IDs |
+| L-01 | L | B2 | UUID batch ID on certificate | ✅ `batchReference()` "B-XXXXXXXX" (tested) |
+| L-02 | L | D8 | Story final buttons truncated | ✅ "For businesses" / "From home" (accessible names start with the visible text) |
+| L-03 | L | C2 | Soft 404s | ✅ `/verify/<unknown>` is a real 404 with the friendly page. ⛔ `/partner/batches/<bad id>` renders the not-found UI but streams with 200 because of the segment's `loading.tsx` (Next.js behaviour) |
+| L-04 | L | C2 | Price dialog NaN | ✅ validated in the dialog with a field error |
+| L-05 | L | C1 | Volunteer can't record a failed hardware test | 🔒 needs the `complete_step` RPC changed (DB); staff use Recycle |
+| L-06 | L | D1 | New partner: "helping 0 people", time promise | ✅ "Send your first batch." / "Your laptops are on the bench." |
+| L-07 | L | D1/C2 | Empty wizard sidebar stats | ✅ dashes until a row is valid |
+| L-08 | L | D6 | Second person on public badges; "Ready in" vs bench days; duplicated custody labels; GL/geekloop | ✅ badges neutral; "Drop-off to ready"; custody note only when different. ⛔ `GL-` is the PRD CI-01 format; `@geekloop.test` is the documented demo domain |
+| L-09 | L | B5 | "Live" vs ISR | ✅ "Updated every minute" |
+| L-10 | L | D2 | "91 volunteer hours" twice | ✅ volunteer section now states FGT's twice-monthly orientation (case fact) |
+| L-11 | L | D8 | Mock unreadable at 390 | ⛔ it's captioned as an example; the real dashboard is one tap away from `/demo` |
+| L-12 | L | B6 | "for good", "no contract" | ✅ removed |
+| S3 | M | A3 | A 20-laptop batch saw no "Open" week | ✅ week labels follow the bench's current load; weeks without room close |
+| S4 | M | C4 | RLS and F4 tests depended on earlier runs | ✅ both order-independent (61/61 e2e, 121/121 unit, unit run after e2e) |
+
+**C5 after the iteration-2 fixes** (median of 5, mobile, simulated throttling, HTTP/2 proxy): landing 83 (LCP 2.9 s, TBT 0.44 s), Become a Partner 90, passport story 78 (LCP 3.8 s), partner dashboard 82 (LCP 3.2 s, TBT 0.47 s). CLS ≤ 0.001.
+
+**D7 friction** (`audit/scripts/friction.mjs`): landing → submitted batch for a brand-new partner = **18 interactions** (10 clicks, 8 fields, 119 characters), 8.4 s scripted, **about 73 s** for a person. Staff per 20-laptop batch: approve & schedule 3, receive 1, labels 2, bulk verify 3, certificate 1 = 10 interactions (0.5 per device). Volunteer per device: claim + 4 steps + report ID + OS ≈ 7.

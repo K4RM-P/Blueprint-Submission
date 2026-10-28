@@ -37,6 +37,13 @@ export function splitPrice(priceCents: number, slices: BreakdownSlice[]): number
 /** Annual membership prices in cents [ASSUMPTION — PRD §6.1]. */
 export const TIER_PRICE_CENTS: Record<PartnerTier, number> = { community: 0, impact: 50_000, champion: 150_000 };
 
+/** One-line pitch per tier, used wherever tiers are compared (Become a Partner, Membership). */
+export const TIER_PITCH: Record<PartnerTier, string> = {
+  community: "Everything the core needs: certified data wipe, a certificate for every batch, a Device Passport for every laptop and your impact summary.",
+  impact: "Optional: a detailed impact dashboard, annual report and LinkedIn card for your team, clients and board, plus pickup requests (to be confirmed by Free Geek Toronto).",
+  champion: "Optional: everything in Impact, plus a hosted employee volunteer day at the FGT Community Hub and 10 laptops sponsored through the Pay-It-Forward fund.",
+};
+
 export const TIER_BENEFITS: Record<PartnerTier, string[]> = {
   community: [
     "Batch submission and drop-off scheduling",

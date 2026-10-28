@@ -48,7 +48,7 @@ export default function BecomeAPartnerPage() {
         <div className="self-end md:col-span-4">
           <p className="text-ink-2">
             <span className="font-display block text-[3.5rem] leading-none text-ink">Free</span>
-            The Community tier costs nothing, for good. It includes everything below:
+            The Community tier is free. It includes everything below:
           </p>
           <ul className="mt-4 flex flex-col gap-2 text-ink">
             {["Certified data wipe for every drive", "A numbered certificate for every batch", "Your impact dashboard", "Your name on the Partner Wall, if you opt in"].map((t) => (
@@ -174,12 +174,12 @@ export default function BecomeAPartnerPage() {
                 q: "How do we know our data is destroyed?",
                 a: "Free Geek Toronto wipes every drive with its data-sanitization software and records the result for each device. A staff member verifies each one, and your numbered certificate lists every device with a public verification link.",
               },
-              { q: "What does it cost?", a: "Nothing. The Community tier is free, for good. Paid memberships are optional extras for more reporting and recognition." },
+              { q: "What does it cost?", a: "Nothing. The Community tier is free. Paid memberships are optional extras for more reporting and recognition." },
               { q: "Is the membership a donation?", a: "No. Memberships are a business service, reporting and recognition, so they don't come with a tax receipt." },
               { q: "Do I need to remove or destroy the drives?", a: "Please don't. Intact drives make a laptop reusable. Free Geek Toronto wipes and verifies every drive and lists each one on your certificate." },
               { q: "What do you accept?", a: "Laptops, desktops, flat-screen monitors, tablets and accessories. Batches of 5+ identical laptops under 5 years old help the most, but every batch is welcome." },
-              { q: "Does paying get my devices processed first?", a: "No. Every partner's batch is scheduled by bench capacity. Tiers buy reporting and recognition, never priority or influence over prices." },
-              { q: "Who buys the devices?", a: "Students, newcomers, seniors and families who need an affordable computer. Prices are set by Free Geek Toronto and tied to ability to pay." },
+              { q: "Does paying get my devices processed first?", a: "No. Every partner's batch is scheduled by bench capacity and Batch Value Score. Paid tiers add reporting, recognition and pickup requests, never priority or influence over prices." },
+              { q: "Who buys the devices?", a: "Students, newcomers, seniors and families who need an affordable computer. Free Geek Toronto sets every price; its vision is that access to technology reflects ability to pay." },
             ]}
           />
         </div>

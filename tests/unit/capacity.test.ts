@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCalendar, nextOpenWeek, partnerCanChoose, upcomingWeeks, weekStatus, wouldExceed } from "@/lib/capacity";
+import { buildCalendar, calendarForBatch, firstWeekForBatch, nextOpenWeek, partnerCanChoose, upcomingWeeks, weekStatus, wouldExceed } from "@/lib/capacity";
 import { isMonday } from "@/lib/dates";
 
 describe("capacity (PRD §9.4)", () => {
@@ -34,5 +34,20 @@ describe("capacity (PRD §9.4)", () => {
     expect(nextOpenWeek(weeks, 15, loads, 20)).toBe("2026-11-16");
     expect(nextOpenWeek(weeks, 25, loads, 20)).toBeNull();
     expect(nextOpenWeek(weeks, 1, loads, 20, "2026-11-02")).toBe("2026-11-09");
+  });
+
+  it("judges each week with the partner's own batch on top (PP-04)", () => {
+    const cal = buildCalendar(["2026-11-02", "2026-11-09", "2026-11-16"], [{ week: "2026-11-02", devices: 7 }, { week: "2026-11-09", devices: 2 }], 20);
+    expect(calendarForBatch(cal, 20).map((w) => w.status)).toEqual(["full", "full", "open"]);
+    expect(calendarForBatch(cal, 5).map((w) => w.status)).toEqual(["open", "open", "open"]);
+    // a 30-laptop batch is judged by one week's worth, so an empty week stays choosable
+    expect(calendarForBatch(cal, 30).map((w) => w.status)).toEqual(["full", "full", "open"]);
+    // a week at 15 of 20 is Limited for a small batch and closed for one that doesn't fit
+    const busy = buildCalendar(["2026-11-23"], [{ week: "2026-11-23", devices: 15 }], 20);
+    expect(calendarForBatch(busy, 3)[0].status).toBe("limited");
+    expect(calendarForBatch(busy, 6)[0].status).toBe("full");
+    expect(firstWeekForBatch(cal, 20)).toBe("2026-11-16");
+    expect(firstWeekForBatch(cal, 5)).toBe("2026-11-02");
+    expect(firstWeekForBatch(buildCalendar(["2026-11-02"], [{ week: "2026-11-02", devices: 20 }], 20), 1)).toBeNull();
   });
 });
