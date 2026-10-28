@@ -7,6 +7,7 @@ import { DEFAULT_WEIGHTS, type ScoreWeights } from "@/lib/batch-score";
 import type { BreakdownSlice } from "@/lib/pricing";
 import type { AcceptedItem } from "@/lib/checker";
 import { env } from "@/lib/env";
+import { certificateWording, safeStoreUrl, type CertificateWording } from "@/lib/certificate-wording";
 
 export type DB = SupabaseClient<Database>;
 
@@ -18,6 +19,12 @@ export interface AppSettings {
   priceBreakdown: BreakdownSlice[];
   priceBreakdownConfirmed: boolean;
   acceptedItems: AcceptedItem[];
+  /** Certificate wording (optional standard, process, disclaimer). Defaults until staff edit it. */
+  certificate: CertificateWording;
+  /** FGT's existing online store; passports of ready/listed devices link to it. */
+  storeUrl: string | null;
+  /** False until migration 20261027000001 is applied (the new settings columns are missing). */
+  alignmentColumns: boolean;
 }
 
 export async function getSettings(db: DB): Promise<AppSettings> {
@@ -30,6 +37,9 @@ export async function getSettings(db: DB): Promise<AppSettings> {
     priceBreakdown: (data?.price_breakdown as unknown as BreakdownSlice[] | null) ?? [],
     priceBreakdownConfirmed: data?.price_breakdown_confirmed ?? false,
     acceptedItems: (data?.accepted_items as unknown as AcceptedItem[] | null) ?? [],
+    certificate: certificateWording(data),
+    storeUrl: safeStoreUrl(data?.store_url),
+    alignmentColumns: Boolean(data && "store_url" in data),
   };
 }
 
@@ -56,4 +66,11 @@ export async function getCalendar(db: DB, capacity: number, count = 8, today = n
 export function logoUrl(path: string | null | undefined): string | null {
   if (!path) return null;
   return `${env.supabaseUrl}/storage/v1/object/public/logos/${path}`;
+}
+
+/** Public, anon-safe settings (store link + certificate wording). Missing keys fall back to defaults. */
+export async function getPublicSettings(db: DB): Promise<{ storeUrl: string | null; certificate: CertificateWording }> {
+  const { data } = await db.rpc("public_settings");
+  const row = (data ?? null) as { store_url?: string | null; sanitization_standard?: string | null; sanitization_process?: string | null; certificate_disclaimer?: string | null } | null;
+  return { storeUrl: safeStoreUrl(row?.store_url), certificate: certificateWording(row) };
 }

@@ -41,11 +41,12 @@ export async function signUpPartner(input: unknown): Promise<ActionResult<{ redi
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName, organization_name: organizationName }, emailRedirectTo: `${env.siteUrl}/partner/settings?welcome=1` },
+      options: { data: { full_name: fullName, organization_name: organizationName }, emailRedirectTo: `${env.siteUrl}/partner/batches/new?welcome=1` },
     });
     if (error) return fail(/registered|exists/i.test(error.message) ? "An account with that email already exists. Try signing in." : error.message);
     if (!data.session) return ok({ redirectTo: "/login?check=email" }, "Check your email to confirm your account.");
-    return ok({ redirectTo: await landingFor("/partner/settings?welcome=1") });
+    // Straight to the first batch: logo, website and recognition opt-ins can wait (Settings, any time).
+    return ok({ redirectTo: await landingFor("/partner/batches/new?welcome=1") });
   });
 }
 

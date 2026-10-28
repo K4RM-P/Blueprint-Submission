@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useFieldArray, useForm, useWatch, type FieldPath } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, ArrowRight, HardDrive, Plus, ShieldCheck, Trash2, Truck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, ShieldCheck, Trash2, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox, ClayButton, ClayCard, Field, IconTile, Input, Segmented, Select, Textarea } from "@/components/clay";
 import { CapacityGlasses, LiquidFill, LiquidMeter, Stepper } from "@/components/liquid";
@@ -20,11 +20,13 @@ import { useMotionPrefs } from "@/lib/motion";
 import { batchSchema, type BatchInput } from "@/lib/validation/batch";
 import { submitBatch, updateBatch } from "@/server/actions/partner";
 import { cn } from "@/lib/utils";
+import { PARTNER_FAQ } from "@/lib/partner-faq";
 
 type FormValues = Omit<BatchInput, "dataHandlingAck"> & { dataHandlingAck: boolean };
 
-const STEPS = ["Devices", "Drop-off", "Data wipe", "Review"];
-const STEP_FIELDS: FieldPath<FormValues>[][] = [["lineItems"], ["logistics", "preferredWeek", "pickupAddress"], ["dataHandlingAck", "notes"], []];
+// Three steps: what, when, then review + the one data-handling confirmation (PP-03).
+const STEPS = ["Devices", "Drop-off", "Review"];
+const STEP_FIELDS: FieldPath<FormValues>[][] = [["lineItems"], ["logistics", "preferredWeek", "pickupAddress"], ["dataHandlingAck", "notes"]];
 
 const blankItem = (): FormValues["lineItems"][number] => ({ category: "laptop", make: "", model: "", approxYear: null, quantity: 1, condition: "working" });
 
@@ -40,7 +42,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
   const router = useRouter();
   const { reduced, t } = useMotionPrefs();
   const [step, setStep] = useState(0);
-  const [maxReached, setMaxReached] = useState(editing ? 3 : 0);
+  const [maxReached, setMaxReached] = useState(editing ? STEPS.length - 1 : 0);
   const [direction, setDirection] = useState(1);
   const [done, setDone] = useState<{ id: string; score: number } | null>(null);
 
@@ -274,37 +276,6 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
               ) : null}
 
               {step === 2 ? (
-                <fieldset className="flex flex-col gap-6">
-                  <legend className="text-title font-semibold">Leave the drives in. We&apos;ll wipe them.</legend>
-                  <div className="flex items-start gap-4">
-                    <IconTile tint="sky">
-                      <ShieldCheck />
-                    </IconTile>
-                    <p className="measure text-ink-2">
-                      Free Geek Toronto wipes every drive with its own sanitization software and records a report for each device. Staff verify every wipe before a device can be sold, and
-                      you get a numbered certificate listing every device.
-                    </p>
-                  </div>
-                  <div key={e.dataHandlingAck ? "err" : "ok"} className={e.dataHandlingAck ? "shake" : undefined}>
-                    <Checkbox
-                      label="Our devices will arrive with their drives intact, and Free Geek Toronto will sanitize them."
-                      description="Please don't remove or destroy drives yourself — intact drives make devices reusable."
-                      aria-invalid={Boolean(e.dataHandlingAck)}
-                      {...register("dataHandlingAck")}
-                    />
-                    {e.dataHandlingAck ? (
-                      <p role="alert" className="ml-10 mt-2 text-small font-medium text-danger-ink">
-                        {e.dataHandlingAck.message}
-                      </p>
-                    ) : null}
-                  </div>
-                  <Field label="Notes for our team (optional)" hint="Chargers included? Anything we should know?" error={e.notes?.message}>
-                    {({ id, describedBy }) => <Textarea id={id} aria-describedby={describedBy} {...register("notes")} />}
-                  </Field>
-                </fieldset>
-              ) : null}
-
-              {step === 3 ? (
                 <div className="flex flex-col gap-6">
                   <h2 className="text-title font-semibold">Review your batch</h2>
                   <div className="flat overflow-x-auto !p-0">
@@ -337,7 +308,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                       </tbody>
                     </table>
                   </div>
-                  <dl className="grid gap-4 sm:grid-cols-2">
+                  <dl className="grid gap-4">
                     <div className="flex items-start gap-3">
                       <IconTile>
                         <Truck />
@@ -349,17 +320,35 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                         </dd>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <IconTile tint="sky">
-                        <HardDrive />
-                      </IconTile>
-                      <div>
-                        <dt className="text-small text-ink-2">Data wipe</dt>
-                        <dd className="font-semibold">Drives left in · Free Geek wipes them</dd>
-                      </div>
-                    </div>
                   </dl>
-                  {values.notes ? <p className="measure text-ink-2">&ldquo;{values.notes}&rdquo;</p> : null}
+                  <fieldset className="flex flex-col gap-5 border-t border-line pt-6">
+                    <legend className="sr-only">Data handling</legend>
+                  <div className="flex items-start gap-4">
+                    <IconTile tint="sky">
+                      <ShieldCheck />
+                    </IconTile>
+                    <p className="measure text-ink-2">
+                      Leave the drives in. Free Geek Toronto runs every drive through its data sanitization software and staff check each report before a device can be sold. Your
+                      numbered certificate documents it for every device.
+                    </p>
+                  </div>
+                  <div key={e.dataHandlingAck ? "err" : "ok"} className={e.dataHandlingAck ? "shake" : undefined}>
+                    <Checkbox
+                      label="Our devices will arrive with their drives intact, and Free Geek Toronto will sanitize them."
+                      description="Please don't remove or destroy drives yourself — intact drives make devices reusable."
+                      aria-invalid={Boolean(e.dataHandlingAck)}
+                      {...register("dataHandlingAck")}
+                    />
+                    {e.dataHandlingAck ? (
+                      <p role="alert" className="ml-10 mt-2 text-small font-medium text-danger-ink">
+                        {e.dataHandlingAck.message}
+                      </p>
+                    ) : null}
+                  </div>
+                  <Field label="Notes for our team (optional)" hint="Chargers included? Anything we should know?" error={e.notes?.message}>
+                    {({ id, describedBy }) => <Textarea id={id} aria-describedby={describedBy} {...register("notes")} />}
+                  </Field>
+                  </fieldset>
                 </div>
               ) : null}
             </motion.div>
@@ -402,8 +391,36 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
           <dt className="text-ink-2">Laptops</dt>
           <dd className="text-right font-semibold tnum">{Math.round(score.laptopShare * 100)}%</dd>
         </dl>
+        <QuickAnswers />
       </aside>
+      <div className="lg:hidden">
+        <QuickAnswers />
+      </div>
     </form>
+  );
+}
+
+/** Short answers to what businesses ask, right where they decide (PP-03). Native disclosure: no tooltips, no tour. */
+function QuickAnswers() {
+  return (
+    <section aria-labelledby="quick-answers" className="px-2">
+      <h2 id="quick-answers" className="text-small font-semibold text-ink">
+        Quick answers
+      </h2>
+      <ul className="mt-2 divide-y divide-line border-y border-line">
+        {PARTNER_FAQ.map((f) => (
+          <li key={f.q}>
+            <details className="group py-2.5">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-small font-medium text-ink">
+                {f.q}
+                <Plus aria-hidden className="size-4 shrink-0 text-loop-deep transition-transform group-open:rotate-45" />
+              </summary>
+              <p className="pb-1 text-small text-ink-2">{f.a}</p>
+            </details>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -481,7 +498,7 @@ function SubmittedCelebration({ id, score, label }: { id: string; score: number;
       <div role="status">
         <p className="eyebrow !text-loop-deep">Batch Value Score · {score} · {label}</p>
         <h2 className="font-display mt-2 text-[2.25rem] leading-tight">Batch sent. The baton&apos;s with us now.</h2>
-        <p className="mt-2 text-body-l text-ink-2">We&apos;ll confirm your drop-off week within 2 business days.</p>
+        <p className="mt-2 text-body-l text-ink-2">Free Geek Toronto staff will review it and confirm your week. You can follow every step from your dashboard.</p>
       </div>
       <div className={cn("flex flex-wrap justify-center gap-3")}>
         <ClayButton href={`/partner/batches/${id}`} variant="secondary">

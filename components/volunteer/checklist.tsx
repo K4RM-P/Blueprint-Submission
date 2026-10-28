@@ -25,7 +25,7 @@ const ICON: Record<ChecklistStep, React.ReactNode> = {
 
 const HINT: Record<ChecklistStep, string> = {
   hardware_test: "Power on, check screen, keyboard, battery, ports and drive health.",
-  wipe_performed: "Run the wipe in FGT's sanitization software, then enter its report ID.",
+  wipe_performed: "Run the wipe in your sanitization software, then enter the report/reference ID it gives you.",
   os_installed: "Default is an open-source OS like Linux Mint.",
   final_qa: "Boots cleanly, Wi-Fi works, clean case, charger packed.",
 };
@@ -84,8 +84,8 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
                         </p>
                         <p className="text-small text-ink-2">{HINT[step]}</p>
                       </div>
-                      <Field label="Sanitization report ID" error={errors.reportRef} hint="Printed by the wipe software, e.g. BL-482913.">
-                        {({ id, describedBy, invalid }) => <Input id={id} className="font-mono" value={reportRef} onChange={(e) => setReportRef(e.target.value)} aria-describedby={describedBy} aria-invalid={invalid} />}
+                      <Field label="Report/reference ID" error={errors.reportRef} hint="The report/reference ID from your sanitization software, e.g. BL-482913. A scanner works too.">
+                        {({ id, describedBy, invalid }) => <Input id={id} className="font-mono" autoComplete="off" value={reportRef} onChange={(e) => setReportRef(e.target.value)} aria-describedby={describedBy} aria-invalid={invalid} />}
                       </Field>
                       <HoldToConfirm label="Hold to confirm wipe" hint={reportRef.trim() ? "Press and hold for about a second" : "Enter the report ID first"} disabled={!reportRef.trim() || busy !== null} icon={<HardDrive />} onConfirm={() => run(step)} />
                     </div>

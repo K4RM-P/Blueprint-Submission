@@ -1,51 +1,60 @@
 # Relay
 
-**Relay gives Toronto small businesses free, certified data destruction and a visible record of who their retired laptops help, turning them into a steady supply of uniform laptops for Free Geek Toronto, without raising prices for the communities it serves.** Built for the FUSE Society Blueprint 2026 hackathon, with Free Geek Toronto (FGT) as the partner business.
+**Relay turns Toronto small businesses into a recurring source of uniform laptops for Free Geek Toronto.**
 
-**The problem.** FGT's supply of high-value, uniform laptops is shrinking and it has zero corporate partners, while device sales are about 77% of its revenue. Businesses have no reason to choose FGT over trade-in programs, resellers or paid IT disposal: no proof of data destruction, no visible impact, no recognition. Relay introduces a **Reuse Partnership** to fix that (FGT has no partner or membership program today).
+Built for the FUSE Society Blueprint 2026 hackathon, with Free Geek Toronto (FGT) as the partner business.
+Every screen in Relay serves that one change.
 
-**Who it's for.** The office manager or IT lead at a Toronto small or medium business retiring 10–50 laptops.
+**Why it matters.** FGT's supply of high-value, uniform laptops is shrinking and it has no corporate
+partners, while device sales are about 77% of its revenue. A business retiring a fleet has no reason to
+pick FGT over a trade-in, a reseller or paid IT disposal. Relay gives it three: a **free, certified data
+wipe** documented on a certificate, **zero hassle** (a two-minute sign-up and batch form), and **visible
+proof** that its laptops helped real people in Toronto: a Device Passport for every laptop. Relay
+*introduces* the **Reuse Partnership**; FGT doesn't run a partner or membership program today.
 
-- **Live demo:** _add the Vercel URL here after deploying_ → open **`/demo`** for one-click sign-in
-- **Demo accounts:** `demo-partner@geekloop.test`, `demo-staff@geekloop.test`, `demo-volunteer@geekloop.test`. The shared password is shown on `/demo` in demo mode. Every organization and person in the data is fictional.
+**Who it's for.** The office manager or IT lead at a Toronto small or medium business retiring a fleet of laptops.
+
+## The core loop
+
+```
+Business signs up and submits a batch → staff intake → volunteers refurbish
+→ certified data wipe (staff verify every one) → certificate → Device Passport (the partner's proof of impact)
+```
+
+1. **Reuse Partner pipeline.** Become a Reuse Partner (free) → submit a **batch** in three steps, with a live
+   **Batch Value Score** and a capacity-aware calendar → staff approve, schedule and receive it → every drive
+   gets a **certified data wipe** (a volunteer records it with the reference ID from FGT's sanitization
+   software; only staff can verify it) → the business downloads a numbered certificate that documents the
+   process for each device, with a public verification page.
+2. **Device Passport.** Every laptop gets a QR label. Its passport tells its story: the donating business (if
+   it opted in), its certified data wipe, the volunteer who rebuilt it (if they opted in), its impact and
+   where the buyer's money goes. The business sees every one of its laptops on its dashboard ("Your laptops":
+   stage, "now helping a student", total passport views), and its own laptops' passports open with
+   "This was one of your laptops" and end with a thank-you.
+
+**Supporting:** the **Staff Console** and the **Volunteer Bench** are how FGT's small team handles the volume:
+bulk intake with pasted or scanned serials, set mode for identical laptops, whole-batch wipe verification,
+and Reuse Partnership metrics. See `audit/FRICTION.md`: about 83% fewer interactions per device.
+
+**Included but quiet:** Pay-It-Forward fund, the "Can I donate this?" household checker, Skills Wallet
+badges, and optional paid memberships (the free Community tier *is* the program; paid tiers are optional
+extras, never the main value). They live in the footer and a small "More ways to help" area.
+
+- **Live demo:** _add the Vercel URL here after deploying_ → open **`/demo`**
+- **Demo accounts:** `demo-partner@geekloop.test`, `demo-staff@geekloop.test`, `demo-volunteer@geekloop.test`. The shared password is shown on `/demo` in demo mode. Every organization, person and number in the demo data is fictional.
 - **Payments:** test mode only. With `PAYMENT_PROVIDER=mock` (the default) nothing is charged anywhere.
 
----
+## How to explore (about 5 minutes)
 
-## What Relay does
+1. Open **`/demo`**. (Shared demo? Press **Reset demo** first: it puts fresh work in every queue. The four showcase passports never change.)
+2. **Partner** → **Donate a batch** → 20 × Dell Latitude 5420, 2021 → watch the Batch Value Score reach *Excellent* → Continue (drop-off and the next open week are preselected) → tick the drives-intact box → **Submit**.
+3. **Staff** → Overview → **Batches** → open the batch → **Approve & schedule** → **Receive & add 20 devices** → paste serials → **QR labels**.
+4. **Volunteer** → **Claim 5 at once** → **Work on all … together** → hardware test, wipe references (paste or scan), OS, final QA for the whole set.
+5. **Staff** → the batch → **Verify N wipes** → **Issue certificate** on a fully verified batch → open the PDF and `/verify/GL-…`.
+6. **Partner** → **Your laptops** → open a Device Passport (`FGT-WRAPPED2` is a sold one) to see the personalized story. Open it signed out to see the public version.
 
-### Core
-1. **The Reuse Partner pipeline (the engine).** Become a Reuse Partner (free) → submit a **batch** with a live **Batch Value Score** and a capacity-aware calendar → staff approve, schedule and receive it → every drive gets a **certified data wipe** (a volunteer wipes, only staff can verify) → the partner downloads a numbered certificate with a public verification link.
-2. **The QR Device Passport ("Relay Wrapped").** Every device gets a QR label. Scanning it opens the device's story: donated by which Reuse Partner (if they opted in), its certified data wipe, the volunteer who rebuilt it, its impact, and where the buyer's money goes. This is what makes the impact visible to buyers and partners.
-
-### Supporting (how the core works)
-3. **Partner impact dashboard and certificates:** why partners stay. People helped, recipient categories, every device linked to its Device Passport, an annual report and a LinkedIn card.
-4. **Volunteer Bench and Skills Wallet:** how FGT handles the extra volume. Volunteers claim the best-scoring partner devices first, their work is stamped on each Device Passport, and they earn verifiable skill badges.
-5. **Staff Console:** how a tiny team runs it all in minutes. The overview leads with incoming partner batches, capacity, wipes awaiting verification and certificates to issue.
-
-### Also included (fully working, quieter)
-6. **Pay-It-Forward fund:** optional contributions that lower prices for digital-inclusion buyers.
-7. **"Can I donate this?" household checker:** triages household donations and routes businesses with 5+ devices to the Reuse Partnership.
-8. **Paid membership tiers:** the free **Community** tier is the headline and includes everything above. Impact ($500) and Champion ($1,500) are optional extras for businesses that want more reporting and recognition. The main value to FGT is more and better laptops, not fees. Fees are memberships, not donations, and come with no tax receipt. Prices are [ASSUMPTION] until FGT confirms them.
-
----
-
-## Guided tour (about 6 minutes)
-
-These are flows F1–F6 from `PRD.md` §8. Start at `/demo`: Partner first, then a showcase Device Passport, then Staff and Volunteer.
-
-| # | Flow | Sign in as | What to do |
-|---|---|---|---|
-| F1 | **Partner's first donation** | Partner | **Donate a batch** → add 20 × Dell Latitude 5420 (2021, working) → watch the Batch Value Score fill to *Excellent* → pick an open week from the capacity glasses → submit. |
-| F2 | **Staff process the batch** | Staff | Overview: the partner pipeline tiles → **Batches** (sorted by score) → open Maple Ledger's batch → approve → schedule (capacity check) → receive → bulk-add 20 devices → **QR labels** prints a 30-up sheet. |
-| F3 | **Volunteer refurbishes** | Volunteer | **Claim next device** (it says which kind of batch it came from) → hardware test → hold to confirm the data wipe (or press Enter twice) → install Linux Mint → final QA → a badge unlocks. |
-| F4 | **Staff verify and certify** | Staff | **Devices** → select wipes pending verification → press `v` to bulk-verify → open a fully verified batch → **Issue certificate** (stamp) → download the PDF → open `/verify/GL-…` (no serials shown). |
-| F5 | **Sale and Device Passport** | Staff | Open a *Ready* device → set the price → **Record sale** (recipient: Student, optional Pay-It-Forward subsidy) → open its Device Passport `/p/FGT-…` signed out. |
-| F6 | **Partner sees impact** | Partner | Dashboard: people helped, certificates, every laptop's Device Passport → **Impact report**: download the annual PDF, then copy the LinkedIn card and suggested post. |
-
-Also included: `/pay-it-forward` (contribute through the test checkout), `/pay-it-forward/round-up` (the round-up widget on a sample store page), `/donate` (the "Can I donate this?" checker), **Membership** as a partner (optional upgrade to Champion), and **Pay-It-Forward** as staff (the fund ledger). On the public site these live in the footer and the landing page's "More ways to help".
-
-`DEMO_SCRIPT.md` has the exact click path for the video.
+`DEMO_SCRIPT.md` is the exact click path for the video. `HOW_IT_WORKS.md` explains the permission model,
+status machine, certificates, passport privacy and the scoring. `ADMIN_GUIDE.md` is the guide for FGT staff.
 
 ---
 
@@ -104,24 +113,24 @@ Next.js 16 (App Router, Turbopack, `proxy.ts`) · TypeScript strict · Tailwind 
 pnpm install
 cp .env.example .env.local      # Supabase URL + keys, DEMO_PASSWORD, PAYMENT_PROVIDER=mock
 supabase login && supabase link --project-ref <your-ref>
-pnpm db:push                    # apply migrations
+pnpm db:push                    # apply migrations (includes 20261027000001_alignment.sql)
 pnpm seed                       # fictional demo data (idempotent: safe to re-run)
 pnpm dev                        # http://localhost:3000/demo
 ```
 
-Stripe (optional): set `PAYMENT_PROVIDER=stripe`, `STRIPE_SECRET_KEY=sk_test_…` and `STRIPE_WEBHOOK_SECRET`. Relay refuses to start a Stripe checkout with anything other than a test key and rejects live-mode webhook events.
+Production check: `pnpm build && pnpm start`. Stripe (optional): set `PAYMENT_PROVIDER=stripe`, `STRIPE_SECRET_KEY=sk_test_…` and `STRIPE_WEBHOOK_SECRET`. Relay refuses anything other than a test key and rejects live-mode webhook events.
 
 ## Tests
 
 ```bash
 pnpm typecheck && pnpm lint
-pnpm test                       # Vitest: every lib/ module + RLS checks against the live project
-pnpm build && pnpm test:e2e     # Playwright: F1–F5, payments (mock), checker, report, axe accessibility
+pnpm test                       # Vitest: every lib/ module, certificate contents, RLS checks against the live project
+pnpm build && pnpm test:e2e     # Playwright against the production build
 ```
 
-- **Unit:** batch score, capacity, impact, status machine, badges, passport codes, certificate numbers, ledger and round-ups, membership periods, payment token and Stripe signature checks, checker rules, report helpers, plus PDF and PNG render smoke tests.
-- **Security (`tests/unit/rls.test.ts`):** anonymous users can't read base tables, partner A can't read partner B's batches, volunteers can't verify wipes, and events can't be updated.
-- **End to end:** each flow above, unauthorized-role redirects, passport privacy (the serial number, report ID and sale price never appear in its HTML), and axe WCAG 2.1 AA scans of the public pages.
+- **Unit:** batch score, capacity, impact, status machine, badges, passport codes, certificate numbers and wording, certificate PDF contents, bulk entry (paste/scan), program metrics, passport story and personalization, ledger, membership, payments, checker, report.
+- **Security (`tests/unit/rls.test.ts`):** anonymous users can't read base tables, partner A can't read partner B's batches, volunteers can't verify wipes, events can't be updated.
+- **End to end:** the new-partner journey (step count and under 2 minutes), flows F1–F5, volunteer set mode, privacy and consent (every opt-in, personalized passport only for its owner, no private fields on public or partner pages), two sessions at once plus Reset demo, invalid input on every core form, payments (mock), checker, report, and axe WCAG 2.1 AA scans.
 
 ## AI-use disclosure
 

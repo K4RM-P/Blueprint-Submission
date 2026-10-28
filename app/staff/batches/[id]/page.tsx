@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/shell/page-header";
 import { BatchOps } from "@/components/staff/batch-ops";
 import { SerialGrid } from "@/components/staff/serial-grid";
 import { CertificatePanel } from "@/components/staff/certificate-panel";
+import { BatchDeviceActions } from "@/components/staff/batch-device-actions";
 import { requireRole } from "@/lib/auth";
 import { getCalendar, getSettings } from "@/lib/queries/common";
 import { batchSteps } from "@/lib/batch-timeline";
@@ -97,6 +98,7 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
         {list.length > 0 ? (
           <div className="flex min-w-0 flex-col gap-6">
             <CertificatePanel batchId={batch.id} certificate={batch.certificates} canIssue={canIssue} pendingWipes={pendingWipes} total={list.length} />
+            <BatchDeviceActions devices={list} />
             {notes}
           </div>
         ) : null}

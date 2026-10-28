@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DemoDataNote } from "@/components/shell/demo-data-note";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, CalendarCheck, HandCoins, HeartHandshake, MapPin, PackageCheck, ShieldCheck } from "lucide-react";
 import { ClayButton } from "@/components/clay";
@@ -161,7 +162,7 @@ export default async function Landing() {
               <h3 className="font-display relative mt-4 max-w-md text-[2rem] font-semibold leading-[1.02] tracking-[-0.045em] sm:text-[2.5rem]">A certificate for every batch. A dashboard of who it helps.</h3>
               <ul className="relative mt-5 flex flex-col gap-2 text-ink-2">
                 <li className="flex gap-2.5">
-                  <BadgeCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-loop-deep" /> Numbered data-destruction certificate, listing every device
+                  <BadgeCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-loop-deep" /> Numbered certificate documenting every device&apos;s certified data wipe
                 </li>
                 <li className="flex gap-2.5">
                   <PackageCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-loop-deep" /> Every device tracked from drop-off to its next owner
@@ -226,7 +227,8 @@ export default async function Landing() {
             }
           />
         </Reveal>
-        <dl className="mt-16 grid grid-cols-2 gap-y-10 md:grid-cols-4">
+        <DemoDataNote className="mt-8" />
+        <dl className="mt-10 grid grid-cols-2 gap-y-10 md:grid-cols-4">
           {impactRow.map((s, i) => (
             <Reveal key={s.label} delay={i * 0.08} className={i % 2 ? "border-l border-line pl-5 md:pl-6" : i ? "md:border-l md:border-line md:pl-6" : undefined}>
               <dt className="sr-only">{s.label}</dt>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ANON_BUSINESS, ANON_HOUSEHOLD, ANON_VOLUNTEER, buildPassportStory, daysBetween, shareText, slideIndexFromParam, type PassportStoryData } from "@/lib/passport-story";
+import { ANON_BUSINESS, ANON_HOUSEHOLD, ANON_VOLUNTEER, buildPassportStory, coverLine, daysBetween, ownerThanks, personalizeForOwner, shareText, slideIndexFromParam, type PassportStoryData } from "@/lib/passport-story";
 
 /** Relay Wrapped story builder (DP-02…DP-06, PIF-06). */
 const sold: PassportStoryData = {
@@ -145,5 +145,21 @@ describe("story helpers", () => {
   it("never puts private fields in share copy", () => {
     const text = shareText(buildPassportStory(sold));
     expect(text).toBe("My laptop has had 3 lives. Every device deserves a second leg. Pass it on.");
+  });
+});
+
+describe("owner personalization (partner's own laptop)", () => {
+  it("opens and ends with the partner only when personalized; nothing else changes", () => {
+    const pub = buildPassportStory(sold);
+    expect(pub.owner).toBeUndefined();
+    expect(coverLine(pub)).toBe("This laptop has a *story.*");
+    expect(ownerThanks(pub)).toBeNull();
+    const mine = personalizeForOwner(pub, "Maple Ledger Accounting");
+    expect(coverLine(mine)).toBe("This was one of your laptops, *Maple Ledger Accounting.*");
+    expect(ownerThanks(mine)).toMatch(/^Thank you, Maple Ledger Accounting\./);
+    expect(mine.slides).toEqual(pub.slides);
+    expect(mine.donor).toEqual(pub.donor);
+    expect(shareText(mine)).not.toContain("Maple Ledger");
+    expect(personalizeForOwner(pub, "  ")).toBe(pub);
   });
 });

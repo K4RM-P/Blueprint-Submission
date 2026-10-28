@@ -2,10 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Wrench } from "lucide-react";
+import { Layers, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { ClayButton } from "@/components/clay";
-import { claimNextDevice } from "@/server/actions/volunteer";
+import { claimDevices, claimNextDevice } from "@/server/actions/volunteer";
 import { cn } from "@/lib/utils";
 
 /** VW-01: "Claim next device" — floats above the dock on phones. */
@@ -27,5 +27,26 @@ export function ClaimButton({ waiting, floating }: { waiting: number; floating?:
         {waiting === 0 ? "Queue is empty" : `Claim next device · ${waiting} waiting`}
       </ClayButton>
     </div>
+  );
+}
+
+/** VW-01 for uniform batches: claim several devices in one tap; identical ones open as a set. */
+export function ClaimSetButton({ waiting, size = 5 }: { waiting: number; size?: number }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const n = Math.min(size, waiting);
+  if (n < 2) return null;
+  const claim = async () => {
+    setBusy(true);
+    const res = await claimDevices({ count: n });
+    setBusy(false);
+    if (!res.ok) return toast.error(res.error);
+    toast.success(res.message ?? "Claimed.");
+    router.refresh();
+  };
+  return (
+    <ClayButton variant="ghost" size="sm" icon={<Layers />} loading={busy} onClick={claim}>
+      Claim {n} at once
+    </ClayButton>
   );
 }

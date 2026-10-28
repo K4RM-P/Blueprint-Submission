@@ -5,6 +5,7 @@ import { DemoCards } from "@/components/auth/demo-cards";
 import { PassportQrImage } from "@/components/journey/passport-qr";
 import { SHOWCASE_PASSPORTS } from "@/lib/showcase-passports";
 import { env } from "@/lib/env";
+import { ResetDemoButton } from "@/components/auth/reset-demo-button";
 
 export const metadata: Metadata = { title: "Demo", description: "Explore Relay as a Reuse Partner, open a Device Passport, or look behind the scenes as staff or a volunteer — no sign-up needed." };
 
@@ -58,7 +59,12 @@ export default function DemoPage() {
         <DemoCards roles={["staff", "volunteer"]} className="mt-6 grid gap-5 md:grid-cols-2" />
       </section>
 
-      <details className="mt-10 max-w-2xl text-small text-ink-2">
+      <div className="mt-10 flex max-w-2xl flex-wrap items-center gap-3 text-small text-ink-2">
+        <ResetDemoButton />
+        <span>Shared demo? This puts fresh work in the staff queue and on the volunteer bench. Showcase passports never change.</span>
+      </div>
+
+      <details className="mt-6 max-w-2xl text-small text-ink-2">
         <summary className="cursor-pointer font-medium text-ink">Sign in with email instead</summary>
         <div className="flat mt-3 p-5">
           <p>All demo accounts share one password:</p>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { recipientPhrase } from "@/lib/domain";
+import { helpingLine, recipientPhrase } from "@/lib/domain";
 
 describe("recipientPhrase (PP-04 copy)", () => {
   it("pluralises regular and -s endings", () => {
@@ -9,5 +9,14 @@ describe("recipientPhrase (PP-04 copy)", () => {
   });
   it("keeps the singular for one", () => {
     expect(recipientPhrase("newcomer", 1)).toBe("1 newcomer");
+  });
+});
+
+describe("helpingLine (partner dashboard)", () => {
+  it("names the category, never a person", () => {
+    expect(helpingLine("student")).toBe("Now helping a student");
+    expect(helpingLine("low_income_household")).toBe("Now helping a low-income household");
+    expect(helpingLine("undisclosed")).toBe("In a new home");
+    expect(helpingLine(null)).toBe("In a new home");
   });
 });

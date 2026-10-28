@@ -6,14 +6,15 @@ import { env } from "@/lib/env";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+// Mono is only for codes and labels, never the first thing painted: no preload, so it doesn't compete with the page.
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], preload: false });
 const bricolage = Bricolage_Grotesque({ variable: "--font-bricolage", subsets: ["latin"], axes: ["opsz"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.siteUrl),
   title: { default: "Relay · Free Geek Toronto", template: "%s · Relay" },
   description:
-    "Relay shows the full journey of every refurbished computer at Free Geek Toronto — from the business that donated it to the person now using it.",
+    "Relay turns Toronto small businesses into a recurring source of uniform laptops for Free Geek Toronto: free, certified data wipes documented on a certificate, and a Device Passport that shows who each laptop helps.",
   openGraph: { siteName: "Relay", type: "website", locale: "en_CA" },
 };
 

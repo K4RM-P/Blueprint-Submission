@@ -53,7 +53,7 @@ export function KineticLine({ text, className, delay = 0.25, as = "h2", size = "
           <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
             <motion.span
               className={cn("inline-block", em && "story-em")}
-              initial={reduced ? false : { y: "0.9em", opacity: 0, rotate: 2 }}
+              initial={reduced ? false : { y: "0.9em", opacity: 0.01, rotate: 2 }}
               animate={{ y: 0, opacity: 1, rotate: 0 }}
               transition={reduced ? { duration: 0.15 } : { type: "spring", stiffness: 210, damping: 26, delay: delay + i * 0.045 }}
             >

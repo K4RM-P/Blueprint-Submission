@@ -3,8 +3,13 @@
 Hackathon project, built by two collaborators who both use Claude Code on this repo at the same time. Staying in sync matters more than anything else.
 
 ## Project overview
-Relay: a web app for Free Geek Toronto. It has a Partner Portal (businesses donate laptop batches and get certificates and ESG impact), a Staff Console, a Volunteer Bench with a Skills Wallet, and a public Device Passport for each device.
-**Product hierarchy (apply on every screen and doc):** Tier 1 core = the Reuse Partner pipeline (Become a Partner → batch with Batch Value Score + capacity → staff approval/intake → certified data wipe → certificate) and the QR Device Passport. Tier 2 supporting = partner impact dashboard + certificates, Volunteer Bench + Skills Wallet, Staff Console. Tier 3 also included (working but quieter) = Pay-It-Forward, the "Can I donate this?" checker, paid membership tiers (the free Community tier is the headline; never sell fees as the main revenue story). Primary customer: the office manager or IT lead at a Toronto SMB retiring 10–50 laptops. Relay *introduces* the Reuse Partnership; FGT had no partner or membership program. Use the exact terms "Reuse Partner", "Reuse Partnership", "Device Passport", "certified data wipe", "batch".
+Relay: a web app for Free Geek Toronto. It has a Partner Portal (businesses donate laptop batches and get certificates documenting their data wipe and a Device Passport for every laptop), a Staff Console, a Volunteer Bench with a Skills Wallet, and a public Device Passport for each device.
+**The ONE change (everything must serve it):** Relay turns Toronto small businesses into a recurring source of uniform laptops for Free Geek Toronto. Primary user: the office manager or IT lead at a Toronto SMB retiring a fleet of laptops. Why they pick FGT over trade-in, resale or paid disposal: free certified data wiping (certificates *document* FGT's process; no unconfirmed standard or guarantee), zero hassle, and visible proof their laptops helped people in Toronto.
+**Feature hierarchy (apply on every screen and doc):**
+- Core loop: partner signs up and submits a batch → staff intake → volunteers refurbish → certified data wipe → certificate → Device Passport (the partner's proof of impact; partners see "Your laptops" and a personalized passport for their own devices).
+- Supporting: Staff Console and Volunteer Bench, i.e. how FGT's tiny team handles the volume (bulk intake, set mode, whole-batch verification, Reuse Partnership metrics). Keep per-device friction low (`audit/FRICTION.md`).
+- Included but quiet: Pay-It-Forward, the household checker, badges/Skills Wallet extras, paid membership tiers (the free Community tier is the program; never sell fees as the main value). Footer + "More ways to help" only, never on the main path or /demo's main options.
+Relay *introduces* the Reuse Partnership; FGT had no partner or membership program. Relay doesn't replace FGT's online store, sanitization software or volunteer scheduling. Use the exact terms "Reuse Partner", "Reuse Partnership", "Device Passport", "certified data wipe", "batch". No "ESG" language. Label demo metrics as fictional seed data.
 Sources of truth: `PRD.md` (what to build), `UI_UX_DESIGN.md` (look and motion; supersedes PRD §15), `KICKOFF_PROMPT.md` (stages). Never edit those three files.
 
 - **Stack:** Next.js 16 (App Router, Turbopack, `proxy.ts` instead of middleware, cacheComponents OFF), TypeScript strict, Tailwind v4, shadcn primitives (radix) restyled to tokens, `motion`, Supabase (`@supabase/ssr`), Zod, React Hook Form, Recharts, qrcode, @react-pdf/renderer, Vitest, Playwright, pnpm.
@@ -21,6 +26,8 @@ Sources of truth: `PRD.md` (what to build), `UI_UX_DESIGN.md` (look and motion; 
 
 ## Current stage
 All build stages (0–10) are done. What's left is deployment (Vercel), replacing the TO VERIFY / [ASSUMPTION] values, and the video. The database is live: migrations pushed and seeded, and the Supabase CLI is linked; `pnpm db:push`, `pnpm db:types` and `pnpm seed` all work.
+Alignment pass (Oct 27) added migration `20261027000001_alignment.sql` (certificate wording + store URL settings, `partner_passport_views()`, `certificate_devices()`, richer `verify_certificate`/`public_settings`). Code falls back to defaults until it's pushed: run `pnpm db:push`, then `pnpm db:types` and `pnpm seed`.
+Docs: `HOW_IT_WORKS.md` (team explainer), `ADMIN_GUIDE.md` (FGT staff guide), `audit/FRICTION.md` (interaction counts).
 See `PROGRESS.md` for the stage log, deferred items, decisions and the security review. `README.md` is judge-facing; `DEMO_SCRIPT.md` is the video click path.
 - Payments: `lib/payments/` (mock by default, Stripe test mode only). The webhook is the only service-role path besides the seed.
 - Colour tokens: `--ink-3` is `#5A635E` and the ember button surface is `#C24A16`. Both were darkened from the UI spec values to pass axe/WCAG AA; don't revert them.

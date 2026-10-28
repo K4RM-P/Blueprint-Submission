@@ -64,7 +64,7 @@ test("slides auto-advance, and the pause button and holding both stop them", asy
 test("deep links open a slide, and the finale offers sharing", async ({ page }) => {
   await page.goto(`/p/${FULL}?s=4`);
   await expectSlide(page, "erased");
-  await expect(current(page)).toContainText(/Every byte erased/);
+  await expect(current(page)).toContainText(/Its data wipe, on the record/);
 
   await page.goto(`/p/${FULL}?s=99`);
   await expectSlide(page, "finale");

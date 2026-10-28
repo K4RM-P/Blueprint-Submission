@@ -4,7 +4,10 @@ import { z } from "zod";
 import { FullPassport } from "@/components/passport/full-passport";
 import { StoryPlayer } from "@/components/passport/story-player";
 import { getPassportStory } from "@/lib/queries/passport";
-import { buildPassportStory, shareText, slideIndexFromParam } from "@/lib/passport-story";
+import { buildPassportStory, personalizeForOwner, shareText, slideIndexFromParam } from "@/lib/passport-story";
+import { getPassportOwner } from "@/lib/queries/passport";
+import { getPublicSettings } from "@/lib/queries/common";
+import { createClient } from "@/lib/supabase/server";
 
 type Params = Promise<{ code: string }>;
 type Search = Promise<Record<string, string | string[] | undefined>>;
@@ -36,16 +39,20 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function PassportPage({ params, searchParams }: { params: Params; searchParams: Search }) {
   const p = await getPassportStory((await params).code);
   if (!p) notFound();
-  const story = buildPassportStory(p);
+  // A signed-in Reuse Partner opening one of its own laptops gets its story personalized.
+  const [owner, settings] = await Promise.all([getPassportOwner(p.code), getPublicSettings(await createClient())]);
+  const base = buildPassportStory(p);
+  const story = owner ? personalizeForOwner(base, owner.orgName) : base;
   const q = SearchSchema.parse(await searchParams);
+  const storeUrl = p.status === "ready" || p.status === "listed" ? settings.storeUrl : null;
 
-  if (q.view === "full") return <FullPassport p={p} story={story} />;
+  if (q.view === "full") return <FullPassport p={p} story={story} storeUrl={storeUrl} />;
 
   return (
     <>
-      <StoryPlayer story={story} initialIndex={slideIndexFromParam(q.s, story.slides.length)} />
+      <StoryPlayer story={story} storeUrl={storeUrl} initialIndex={slideIndexFromParam(q.s, story.slides.length)} />
       <div className="story-print-only">
-        <FullPassport p={p} story={story} printOnly />
+        <FullPassport p={p} story={story} storeUrl={storeUrl} printOnly />
       </div>
     </>
   );

@@ -3,9 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { assertRole } from "@/lib/auth";
-import { fail, ok, runAction, type ActionResult } from "@/lib/action";
+import { fail, friendlyError, ok, runAction, type ActionResult } from "@/lib/action";
 import { BADGES, newBadges, type VolunteerStats } from "@/lib/badges";
 import { CHECKLIST_STEPS } from "@/lib/domain";
+import { DEFAULT_WIPE_METHOD } from "@/lib/certificate-wording";
 
 export interface AwardedBadge {
   slug: string;
@@ -44,6 +45,23 @@ export async function claimNextDevice(): Promise<ActionResult<{ id: string | nul
   });
 }
 
+/** VW-01 for uniform batches: claim up to `count` devices from the queue in one tap (each claim is still atomic). */
+export async function claimDevices(input: unknown): Promise<ActionResult<{ ids: string[] }>> {
+  return runAction(z.object({ count: z.number().int().min(1).max(10) }), input, async ({ count }) => {
+    const s = await assertRole("volunteer");
+    const ids: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const { data, error } = await s.supabase.rpc("claim_next_device");
+      if (error) throw error;
+      if (!data) break;
+      ids.push(data as string);
+    }
+    revalidatePath("/volunteer", "layout");
+    if (ids.length === 0) return ok({ ids }, "The queue is empty right now — nice work, everyone.");
+    return ok({ ids }, `${ids.length} device${ids.length === 1 ? "" : "s"} claimed. They're on your bench.`);
+  });
+}
+
 const stepSchema = z.object({
   deviceId: z.uuid(),
   step: z.enum(CHECKLIST_STEPS),
@@ -63,6 +81,8 @@ export async function completeStep(input: unknown): Promise<ActionResult<{ statu
       p_device: d.deviceId,
       p_step: d.step,
       p_report_ref: d.reportRef ?? undefined,
+      // Neutral label: the certificate names a standard only when staff set one.
+      p_wipe_method: d.step === "wipe_performed" ? DEFAULT_WIPE_METHOD : undefined,
       p_os: d.os ?? undefined,
       p_open_source: d.openSource ?? true,
       p_note: d.note ?? undefined,
@@ -71,6 +91,52 @@ export async function completeStep(input: unknown): Promise<ActionResult<{ statu
     const badges = await awardNewBadges(s);
     revalidatePath("/volunteer", "layout");
     return ok({ status: (data as { status: string }).status, badges });
+  });
+}
+
+const bulkStepSchema = z.object({
+  step: z.enum(CHECKLIST_STEPS),
+  items: z
+    .array(z.object({ deviceId: z.uuid(), reportRef: z.string().trim().max(120).optional() }))
+    .min(1, "Select at least one device.")
+    .max(50),
+  os: z.string().trim().max(80).optional(),
+  openSource: z.boolean().optional(),
+});
+
+/**
+ * VW-02 for a set of identical devices: one step for many devices at once. Each device
+ * still gets its own complete_step() call, so every rule holds per device: assigned to
+ * you, step order, a per-device sanitization reference, and its own device_events row.
+ */
+export async function completeStepBulk(input: unknown): Promise<ActionResult<{ done: string[]; failed: { deviceId: string; reason: string }[]; badges: AwardedBadge[] }>> {
+  return runAction(bulkStepSchema, input, async (d) => {
+    const s = await assertRole("volunteer");
+    if (d.step === "wipe_performed") {
+      const missing = d.items.filter((i) => !i.reportRef);
+      if (missing.length) return fail(`Enter a sanitization reference for every device (${missing.length} missing).`, { reportRefs: "Every device needs its own reference." });
+      const refs = d.items.map((i) => i.reportRef!.toUpperCase());
+      if (new Set(refs).size !== refs.length) return fail("Two devices have the same reference. Each wipe has its own report.", { reportRefs: "Duplicate reference." });
+    }
+    if (d.step === "os_installed" && !d.os) return fail("Enter the operating system you installed.", { os: "Enter the OS." });
+    const done: string[] = [];
+    const failed: { deviceId: string; reason: string }[] = [];
+    for (const item of d.items) {
+      const { error } = await s.supabase.rpc("complete_step", {
+        p_device: item.deviceId,
+        p_step: d.step,
+        p_report_ref: d.step === "wipe_performed" ? item.reportRef : undefined,
+        p_wipe_method: d.step === "wipe_performed" ? DEFAULT_WIPE_METHOD : undefined,
+        p_os: d.step === "os_installed" ? d.os : undefined,
+        p_open_source: d.openSource ?? true,
+      });
+      if (error) failed.push({ deviceId: item.deviceId, reason: friendlyError(error) });
+      else done.push(item.deviceId);
+    }
+    const badges = done.length ? await awardNewBadges(s) : [];
+    revalidatePath("/volunteer", "layout");
+    if (done.length === 0) return fail(failed[0]?.reason ?? "Nothing was recorded.");
+    return ok({ done, failed, badges }, `${done.length} device${done.length === 1 ? "" : "s"} done${failed.length ? ` · ${failed.length} skipped: ${failed[0].reason}` : ""}.`);
   });
 }
 

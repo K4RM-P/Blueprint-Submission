@@ -9,7 +9,8 @@ import { PassportBooklet } from "@/components/journey/passport-booklet";
 import { MoneyBar } from "@/components/public/money-bar";
 import { longDate } from "@/lib/dates";
 import { labels } from "@/lib/domain";
-import type { PassportStory, PassportStoryData } from "@/lib/passport-story";
+import { ownerThanks, type PassportStory, type PassportStoryData } from "@/lib/passport-story";
+import { CopyLinkButton } from "./copy-link-button";
 
 /**
  * The static, scrollable passport (DP-02…DP-06, DP-11, PIF-06). Reached from the
@@ -17,7 +18,7 @@ import type { PassportStory, PassportStoryData } from "@/lib/passport-story";
  * from the story URL. Names and impact come from the story builder, so the two
  * views can never disagree.
  */
-export function FullPassport({ p, story, printOnly = false }: { p: PassportStoryData; story: PassportStory; printOnly?: boolean }) {
+export function FullPassport({ p, story, printOnly = false, storeUrl = null }: { p: PassportStoryData; story: PassportStory; printOnly?: boolean; storeUrl?: string | null }) {
   const donor = story.donor.label;
   const volunteer = story.volunteer.label;
   const impact = { kg: story.impact.kg, co2eKg: story.impact.co2eKg ?? 0 };
@@ -65,6 +66,20 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
           </Link>
         </div>
       )}
+      {story.owner && !printOnly ? (
+        <ClayCard tint="mint" className="no-print mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-display text-[1.5rem] leading-tight">This was one of your laptops, {story.owner.orgName}.</p>
+            <p className="mt-1 text-ink-2">{ownerThanks(story)} Only you see this note; everyone else sees the public passport.</p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-3">
+            <CopyLinkButton path={`/p/${p.code}`} />
+            <ClayButton href="/partner" variant="ghost" size="sm">
+              Your laptops
+            </ClayButton>
+          </div>
+        </ClayCard>
+      ) : null}
       {/* 1 · Passport cover */}
       <section className="relative" aria-labelledby="device-name">
         <LiquidBlob className="-right-24 -top-10 size-[380px]" tone="apricot" />
@@ -211,6 +226,11 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
 
       {/* 7 · CTAs: the core first (businesses join the relay), Pay-It-Forward stays a quiet extra */}
       <div className="no-print mt-12 flex flex-col gap-5">
+        {storeUrl ? (
+          <a href={storeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 self-start text-[1.0625rem] font-semibold text-loop-deep underline underline-offset-4">
+            Find laptops like this at Free Geek Toronto
+          </a>
+        ) : null}
         <div className="flex flex-wrap gap-4">
           <ClayButton href="/become-a-partner" variant="primary" icon={<Building2 />}>
             Donate your company&apos;s laptops

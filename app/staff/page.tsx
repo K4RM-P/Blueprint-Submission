@@ -18,6 +18,8 @@ import { scoreLabel } from "@/lib/batch-score";
 import { batchCanIssueCertificate } from "@/lib/status-machine";
 import { fundBalance } from "@/lib/ledger";
 import { SHOWCASE_PASSPORTS } from "@/lib/showcase-passports";
+import { computeProgramMetrics } from "@/lib/program-metrics";
+import { DemoDataNote } from "@/components/shell/demo-data-note";
 
 export const metadata: Metadata = { title: "Overview" };
 
@@ -41,7 +43,7 @@ export default async function StaffOverview() {
   const [calendar, factors, devicesRes, pendingRes, membershipsRes, fundRes, orgsRes, activeVolRes, checkerRes, certBatchesRes] = await Promise.all([
     getCalendar(supabase, settings.weeklyCapacity, 4),
     getFactors(supabase),
-    supabase.from("devices").select("status, source, batch_id, category, weight_kg, recipient_category, refurbished_at, sold_at, price_cents, batch_line_items(quantity)"),
+    supabase.from("devices").select("id, created_at, passport_views, status, source, batch_id, category, weight_kg, recipient_category, refurbished_at, sold_at, price_cents, batch_line_items(quantity)"),
     supabase.from("donation_batches").select("id, created_at, value_score, preferred_week, organizations(name, tier), batch_line_items(quantity, make, model)").eq("status", "submitted").order("value_score", { ascending: false }),
     supabase.from("membership_payments").select("amount_cents").gte("created_at", since),
     supabase.from("fund_transactions").select("amount_cents, type, created_at"),
@@ -51,6 +53,31 @@ export default async function StaffOverview() {
     // Received partner batches without a certificate yet: candidates for "certificates to issue".
     supabase.from("donation_batches").select("id, organizations(name), certificates(id)").in("status", ["received", "in_refurbishment", "completed"]),
   ]);
+  // Reuse Partnership program metrics: batches + the append-only "ready" events.
+  const [{ data: programBatches }, { data: readyEvents }] = await Promise.all([
+    supabase.from("donation_batches").select("id, organization_id, status, received_at"),
+    supabase.from("device_events").select("device_id, created_at").eq("to_status", "ready").order("created_at"),
+  ]);
+  const readyAt = new Map<string, string>();
+  for (const e of readyEvents ?? []) if (!readyAt.has(e.device_id)) readyAt.set(e.device_id, e.created_at);
+  const program = computeProgramMetrics({
+    today: new Date(),
+    readyAt,
+    batches: (programBatches ?? []).map((b) => ({ id: b.id, organizationId: b.organization_id, status: b.status, receivedAt: b.received_at })),
+    devices: (devicesRes.data ?? []).map((d) => ({
+      id: d.id,
+      source: d.source,
+      category: d.category,
+      status: d.status,
+      batchId: d.batch_id,
+      lineQuantity: d.batch_line_items?.quantity ?? null,
+      receivedAt: d.created_at,
+      soldAt: d.sold_at,
+      priceCents: d.price_cents,
+      passportViews: d.passport_views,
+    })),
+  });
+  const days = (n: number | null) => (n === null ? "—" : `${n.toLocaleString("en-CA")} days`);
   // The demo passport with a full three-leg story (seeded, fixed code).
   const showcase = SHOWCASE_PASSPORTS[0];
   // DP-06: anonymous story analytics (counts only).
@@ -93,7 +120,7 @@ export default async function StaffOverview() {
 
   const kpis = [
     { label: "devices sold this month", value: soldThisMonth.length },
-    { label: "revenue this month", note: `Sales ${money(salesCents)} · memberships ${money(membershipCents)} · fund ${money(pifCents)}`, value: `$${Math.round((salesCents + membershipCents + pifCents) / 100).toLocaleString("en-CA")}` },
+    { label: "device sales this month", note: `Also: optional memberships ${money(membershipCents)} · Pay-It-Forward ${money(pifCents)}`, value: money(salesCents) },
     { label: "active partners", value: activePartners },
     { label: "volunteers active in the last 60 days", value: activeVolunteers },
   ];
@@ -206,6 +233,45 @@ export default async function StaffOverview() {
         </div>
         <div className="mt-4">
           <PipelineTrack stages={pipeline} label="Devices by pipeline status" />
+        </div>
+      </section>
+
+      <section aria-labelledby="program" className="flat mt-6 p-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <h2 id="program" className="font-semibold">
+            Reuse Partnership
+          </h2>
+          <DemoDataNote>Demo figures from fictional seed data</DemoDataNote>
+        </div>
+        <p className="mt-1 text-small text-ink-2">Is the program bringing in more, better laptops? Computed from batches, devices and their chain-of-custody timestamps.</p>
+        <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+          <div>
+            <BarsChart
+              label="Partner laptops received per month"
+              unit="laptops"
+              height={180}
+              data={program.partnerLaptopsByMonth.map((m, i, all) => ({ label: m.label, value: m.laptops, highlight: i === all.length - 1 }))}
+            />
+            <p className="mt-1 text-small text-ink-2">Partner laptops received per month</p>
+          </div>
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-5">
+            {[
+              ["active Reuse Partners", program.activePartners.toLocaleString("en-CA"), `${program.returningPartners} sent a second batch${program.retention === null ? "" : ` (${Math.round(program.retention * 100)}% retention)`}`],
+              ["passport views on partner laptops", program.partnerPassportViews.toLocaleString("en-CA"), "Aggregate count only"],
+              ["intake to ready · partner uniform batches", days(program.daysToReady.partnerUniform), `average of ${program.daysToReady.partnerUniformN} devices`],
+              ["intake to ready · household donations", days(program.daysToReady.household), `average of ${program.daysToReady.householdN} devices`],
+              ["sold · partner-sourced", program.sales.partner.count.toLocaleString("en-CA"), `${money(program.sales.partner.revenueCents)} from ${program.sales.partner.priced} recorded prices`],
+              ["sold · household", program.sales.household.count.toLocaleString("en-CA"), `${money(program.sales.household.revenueCents)} from ${program.sales.household.priced} recorded prices`],
+            ].map(([k, v, note]) => (
+              <div key={k} className="flex flex-col-reverse justify-end gap-1">
+                <dt className="text-small text-ink-2">
+                  {k}
+                  <span className="block text-[0.8125rem] text-ink-3">{note}</span>
+                </dt>
+                <dd className="font-display text-[1.5rem] leading-none tnum">{v}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 

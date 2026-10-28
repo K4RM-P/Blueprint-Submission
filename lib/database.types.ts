@@ -788,6 +788,10 @@ export type Database = {
           price_breakdown_confirmed: boolean
           refurb_minutes_mixed: number
           refurb_minutes_uniform: number
+          sanitization_process: string | null
+          sanitization_standard: string | null
+          store_url: string | null
+          certificate_disclaimer: string | null
           weekly_capacity_devices: number
         }
         Insert: {
@@ -800,6 +804,10 @@ export type Database = {
           price_breakdown_confirmed?: boolean
           refurb_minutes_mixed?: number
           refurb_minutes_uniform?: number
+          sanitization_process?: string | null
+          sanitization_standard?: string | null
+          store_url?: string | null
+          certificate_disclaimer?: string | null
           weekly_capacity_devices?: number
         }
         Update: {
@@ -812,6 +820,10 @@ export type Database = {
           price_breakdown_confirmed?: boolean
           refurb_minutes_mixed?: number
           refurb_minutes_uniform?: number
+          sanitization_process?: string | null
+          sanitization_standard?: string | null
+          store_url?: string | null
+          certificate_disclaimer?: string | null
           weekly_capacity_devices?: number
         }
         Relationships: []
@@ -972,6 +984,21 @@ export type Database = {
       passport_story_summary: { Args: never; Returns: Json }
       public_fund_summary: { Args: never; Returns: Json }
       public_impact_totals: { Args: never; Returns: Json }
+      partner_passport_views: { Args: never; Returns: number }
+      certificate_devices: {
+        Args: { p_batch: string }
+        Returns: {
+          category: Database["public"]["Enums"]["device_category"]
+          make: string
+          model: string
+          serial_number: string | null
+          status: Database["public"]["Enums"]["device_status"]
+          wipe_method: string | null
+          wipe_report_ref: string | null
+          wipe_verified_at: string | null
+          verified_by: string | null
+        }[]
+      }
       public_settings: { Args: never; Returns: Json }
       public_volunteer_profile: { Args: { p_handle: string }; Returns: Json }
       slugify: { Args: { p: string }; Returns: string }
