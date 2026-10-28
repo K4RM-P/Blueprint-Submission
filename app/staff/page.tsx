@@ -136,7 +136,7 @@ export default async function StaffOverview() {
     {
       value: program.passportViewsPerSold == null ? "—" : program.passportViewsPerSold.toFixed(1),
       label: "passport views per sold device",
-      note: `Target ${PROGRAM_TARGETS.passportViewsPerSold}`,
+      note: `Target ${PROGRAM_TARGETS.passportViewsPerSold} · approximate: every open counts, including repeat visits`,
     },
   ];
 
