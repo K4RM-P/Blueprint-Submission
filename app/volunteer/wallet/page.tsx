@@ -90,7 +90,7 @@ export default async function WalletPage() {
           <ul className="-mx-4 mt-5 flex snap-x gap-4 overflow-x-auto px-4 pb-4">
             {list.map((p) => (
               <li key={p.id} className="w-56 shrink-0 snap-start">
-                <ClayCard tint="apricot" href={`/p/${p.passport_code}`} aria-label={`Open Device Passport ${p.passport_code}`} className="flex h-40 flex-col justify-between !p-5">
+                <ClayCard tint="apricot" href={`/p/${p.passport_code}`} prefetch={false} aria-label={`Open Device Passport ${p.passport_code}`} className="flex h-40 flex-col justify-between !p-5">
                   <p className="font-mono text-[0.8125rem] text-ink-2">{p.passport_code}</p>
                   <div>
                     <p className="font-semibold leading-tight">

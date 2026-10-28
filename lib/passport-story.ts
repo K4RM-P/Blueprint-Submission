@@ -284,7 +284,7 @@ export function personaFor(i: PersonaInput): Persona {
   const pick = (key: Persona["key"], name: string, tagline: string): Persona => ({ key, name, tagline, traits: traits.slice(0, 4) });
 
   if (i.stage === "recycled") return pick("phoenix", "The Phoenix", "Its parts rise again in something new.");
-  if (i.daysToReady !== null && i.daysToReady <= 10) return pick("sprinter", "The Sprinter", "Donation to ready faster than most deliveries.");
+  if (i.daysToReady !== null && i.daysToReady <= 10) return pick("sprinter", "The Sprinter", "From drop-off to ready in under two weeks.");
   if (i.ageAtDonation !== null && i.ageAtDonation >= 6) return pick("veteran", "The Veteran", "Years of service behind it. Plenty still ahead.");
   if (i.openSource) return pick("free_spirit", "The Free Spirit", "Running free, open software. No licence fees, ever.");
   if (i.pifSubsidized) return pick("gift", "The Gift", "A stranger chipped in so it could go further.");

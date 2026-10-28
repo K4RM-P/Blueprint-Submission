@@ -33,7 +33,7 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
   const [price, setPriceVal] = useState(priceCents ? String(priceCents / 100) : "");
   const priceValue = Number(price.replace(/[$,\s]/g, ""));
   const priceError = price.trim() === "" ? "Enter a price." : !Number.isFinite(priceValue) || priceValue <= 0 ? "Enter a price in dollars, like 180." : null;
-  const [sale, setSale] = useState({ soldAt: new Date().toISOString().slice(0, 10), channel: "in_store" as SaleChannel, recipient: "student" as RecipientCategory | "", subsidy: "" });
+  const [sale, setSale] = useState({ soldAt: new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" }), channel: "in_store" as SaleChannel, recipient: "" as RecipientCategory | "", subsidy: "" });
   const [reason, setReason] = useState("");
   const [drive, setDrive] = useState<DriveHandling | "">("");
   // Before staff verify the wipe, recycling must record what happened to the drive.

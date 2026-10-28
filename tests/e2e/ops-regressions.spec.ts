@@ -50,3 +50,31 @@ test("PP-03 — after the data-handling error, ticking the box and one Continue 
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("cell", { name: /Lenovo ThinkPad T14/ })).toBeVisible();
 });
+
+test("OPS-03 — approve first, then schedule in the partner's preferred week: no false capacity warning", async ({ page }) => {
+  await signInAs(page, "staff");
+  await page.goto("/staff/batches?status=submitted");
+  await page.getByRole("link", { name: "Kensington Code Collective" }).first().click();
+  await page.getByRole("button", { name: "Approve", exact: true }).click();
+  await expect(page.getByText(/Batch approved/)).toBeVisible();
+  await page.getByRole("button", { name: /^Schedule/ }).first().click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("button", { name: /^Schedule week of/ }).click();
+  await expect(page.getByText(/Batch scheduled/)).toBeVisible();
+  await expect(dialog.getByText(/over capacity/)).toHaveCount(0);
+});
+
+test("VW-02 — a volunteer flags a failed hardware test and staff see it on the Overview", async ({ page, browser }) => {
+  await signInAs(page, "volunteer");
+  await page.getByRole("button", { name: /Claim next device/ }).last().click();
+  await page.waitForURL(/\/volunteer\/devices\//);
+  await page.getByRole("button", { name: "Didn't pass? Tell staff" }).click();
+  await page.getByLabel("What didn't pass?").fill("Screen stays black on power-up");
+  await page.getByRole("button", { name: "Tell staff" }).click();
+  await expect(page.getByText(/Sent to staff/).first()).toBeVisible();
+
+  const staff = await (await browser.newContext()).newPage();
+  await signInAs(staff, "staff");
+  await expect(staff.getByRole("heading", { name: "Flagged by volunteers" })).toBeVisible();
+  await expect(staff.getByText("Screen stays black on power-up")).toBeVisible();
+});

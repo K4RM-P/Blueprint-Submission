@@ -40,7 +40,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
         description={
           reused > 0 ? (
             <>
-              <span className="font-semibold text-ink">{reused} of these devices are already helping people</span> — {recycled > 0 ? `${recycled} were recycled responsibly.` : "the rest are on the way."}
+              <span className="font-semibold text-ink">{reused} of these devices {reused === 1 ? "is" : "are"} already back in use</span> — {recycled > 0 ? `${recycled} were recycled responsibly.` : "the rest are on the way."}
             </>
           ) : batch.status === "declined" ? (
             "This batch was declined. Here's why, and what to do next."
@@ -73,7 +73,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
             <h2 id="journeys" className="text-title font-semibold">
               Devices{devices.length > 0 ? ` (${devices.length})` : ""}
             </h2>
-            <p className="mt-1 text-small text-ink-2">Every laptop has its own Device Passport. Open one to see its certified data wipe, its volunteer and who it helps — never personal details.</p>
+            <p className="mt-1 text-small text-ink-2">Every laptop has its own Device Passport. Open one to see its certified data wipe, its volunteer and where it is now. The table shows who each sold laptop helps, by category only.</p>
             <div className="flat mt-4 overflow-x-auto !p-0">
               {devices.length === 0 ? (
                 <div className="px-6">
@@ -99,6 +99,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
                         <td>
                           <Link
                             href={`/p/${d.passport_code}`}
+                            prefetch={false}
                             aria-label={`Open Device Passport ${d.passport_code}`}
                             className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap font-mono text-[0.875rem] font-semibold text-loop-deep underline underline-offset-4"
                           >

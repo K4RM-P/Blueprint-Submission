@@ -63,7 +63,7 @@ export function Hero({ devicesReused, backdrop, shot }: { devicesReused: number;
 
         <p className="hero-in mx-auto mt-8 max-w-[44rem] text-[1.1875rem] font-medium leading-[1.4] tracking-[-0.012em] text-ink sm:text-[1.375rem] md:mt-10 [--d:380ms]">
           Retiring your company&apos;s laptops? Give them to Free Geek Toronto for free.{" "}
-          <span className="text-ink-3">Every drive gets a certified data wipe, and each laptop&apos;s Device Passport shows you who it helps in Toronto.</span>
+          <span className="text-ink-3">Every drive gets a certified data wipe, each laptop gets a Device Passport, and your dashboard shows who it helps in Toronto.</span>
         </p>
 
         <div className="hero-in mt-9 flex flex-col items-center justify-center gap-3 min-[420px]:flex-row [--d:480ms]">

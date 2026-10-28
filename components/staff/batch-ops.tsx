@@ -6,6 +6,7 @@ import { CalendarClock, Check, PackageCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import { ClayButton, Field, Textarea } from "@/components/clay";
 import { CapacityGlasses } from "@/components/liquid";
+import { calendarForBatch } from "@/lib/capacity";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { CapacityWeek } from "@/lib/capacity";
 import type { BatchStatus } from "@/lib/domain";
@@ -13,7 +14,28 @@ import { shortDate } from "@/lib/dates";
 import { approveBatch, declineBatch, receiveBatch, scheduleBatch } from "@/server/actions/staff";
 
 /** OPS-03 / OPS-04 actions for one batch. */
-export function BatchOps({ id, status, preferredWeek, quantity, calendar }: { id: string; status: BatchStatus; preferredWeek: string; quantity: number; calendar: CapacityWeek[] }) {
+export function BatchOps({
+  id,
+  status,
+  preferredWeek,
+  scheduledWeek,
+  quantity,
+  calendar: booked,
+}: {
+  id: string;
+  status: BatchStatus;
+  preferredWeek: string;
+  scheduledWeek?: string | null;
+  quantity: number;
+  calendar: CapacityWeek[];
+}) {
+  // Weeks as this batch sees them, the same rule partners see (lib/capacity calendarForBatch): its own
+  // devices come out of the week it already holds, then each week shows whether the batch fits.
+  const ownWeek = status === "approved" || status === "scheduled" ? (scheduledWeek ?? preferredWeek) : null;
+  const calendar = calendarForBatch(
+    booked.map((w) => (w.week === ownWeek ? { ...w, load: Math.max(0, w.load - quantity) } : w)),
+    quantity,
+  );
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
   const [dialog, setDialog] = useState<"decline" | "schedule" | null>(null);

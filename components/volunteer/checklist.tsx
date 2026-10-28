@@ -5,7 +5,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { Check, ClipboardCheck, HardDrive, Lock, MonitorCog, ShieldCheck, Stethoscope } from "lucide-react";
 import { toast } from "sonner";
-import { ClayToggle, Field, Input } from "@/components/clay";
+import { ClayButton, ClayToggle, Field, Input, Textarea } from "@/components/clay";
 import { FlowLine, HoldToConfirm } from "@/components/liquid";
 import { Stamp } from "@/components/clay/stamp";
 import { Seal } from "@/components/clay/seal";
@@ -13,7 +13,7 @@ import { ClayBaton } from "@/components/illustrations/clay-baton";
 import { CHECKLIST_STEPS, labels, type ChecklistStep, type DeviceStatus } from "@/lib/domain";
 import { useMotionPrefs } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { completeStep, type AwardedBadge } from "@/server/actions/volunteer";
+import { completeStep, flagForStaff, type AwardedBadge } from "@/server/actions/volunteer";
 import { BadgeCelebration } from "./badge-celebration";
 
 const ICON: Record<ChecklistStep, React.ReactNode> = {
@@ -43,6 +43,20 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
   const [badges, setBadges] = useState<AwardedBadge[]>([]);
   // Steps finished in this visit get the stamp moments; steps done earlier just show their state.
   const [fresh, setFresh] = useState<Set<ChecklistStep>>(new Set());
+  // The hardware test's failure branch: tell staff instead of completing the step.
+  const [flagOpen, setFlagOpen] = useState(false);
+  const [flagNote, setFlagNote] = useState("");
+  const [flagged, setFlagged] = useState(false);
+  const sendFlag = async () => {
+    setBusy("hardware_test");
+    const res = await flagForStaff({ deviceId, note: flagNote });
+    setBusy(null);
+    if (!res.ok) return toast.error(res.error);
+    toast.success(res.message ?? "Sent to staff.");
+    setFlagged(true);
+    setFlagOpen(false);
+    router.refresh();
+  };
 
   const next = CHECKLIST_STEPS.find((s) => !done.has(s)) ?? null;
 
@@ -132,6 +146,31 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
                       )}
                     </button>
                   )}
+                  {step === "hardware_test" && !isDone && !locked ? (
+                    flagged ? (
+                      <p role="status" className="mt-2 px-1 text-small text-ink-2">
+                        Sent to staff. Leave this laptop on the shelf; they&apos;ll decide whether it&apos;s repaired or recycled.
+                      </p>
+                    ) : flagOpen ? (
+                      <div className="mt-3 flex flex-col gap-3 rounded-[var(--r-md)] border border-line bg-surface-flat p-4">
+                        <Field label="What didn't pass?" hint="Staff see this on the device's record.">
+                          {({ id }) => <Textarea id={id} value={flagNote} onChange={(e) => setFlagNote(e.target.value)} placeholder="No display; battery swollen" />}
+                        </Field>
+                        <div className="flex gap-2.5">
+                          <ClayButton size="sm" onClick={sendFlag} loading={busy === "hardware_test"} disabled={flagNote.trim().length < 5}>
+                            Tell staff
+                          </ClayButton>
+                          <ClayButton size="sm" variant="ghost" onClick={() => setFlagOpen(false)}>
+                            Cancel
+                          </ClayButton>
+                        </div>
+                      </div>
+                    ) : (
+                      <button type="button" onClick={() => setFlagOpen(true)} className="mt-2 min-h-11 px-1 text-small font-semibold text-loop-deep underline-offset-4 hover:underline">
+                        Didn&apos;t pass? Tell staff
+                      </button>
+                    )
+                  ) : null}
                 </div>
               </motion.li>
             );

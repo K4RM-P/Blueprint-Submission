@@ -8,6 +8,7 @@
 
 - **Live demo:** https://freegeek-relay.vercel.app → open **`/demo`** for one-click sign-in
 - **Demo accounts:** `demo-partner@geekloop.test`, `demo-staff@geekloop.test`, `demo-volunteer@geekloop.test`. The shared password is shown on `/demo` in demo mode. Every organization and person in the data is fictional.
+- **Shared demo data:** the live demo and any local copy run on the same Supabase project, so whatever anyone does in the demo is visible to everyone. Run `pnpm seed` to reset it (the team does this before judging).
 - **Payments:** test mode only. With `PAYMENT_PROVIDER=mock` (the default) nothing is charged anywhere.
 - **More docs:** `HOW_IT_WORKS.md` (the loop, formulas, metrics, cost and launch timeline) · `ADMIN_GUIDE.md` (the staff routine, for a non-technical reader) · `DEMO_SCRIPT.md` (the video click path).
 
@@ -31,7 +32,7 @@
 
 ---
 
-## Guided tour (about 6 minutes)
+## Core flows (about 6 minutes)
 
 These are flows F1–F6 from `PRD.md` §8. Start at `/demo`: Partner first, then a showcase Device Passport, then Staff and Volunteer.
 

@@ -23,9 +23,10 @@ const refresh = (...paths: string[]) => paths.forEach((p) => revalidatePath(p, "
 export async function approveBatch(input: unknown): Promise<ActionResult<null>> {
   return runAction(z.object({ id: uuid }), input, async ({ id }) => {
     const s = await staff();
-    const { error } = await s.supabase.from("donation_batches").update({ status: "approved" }).eq("id", id).eq("status", "submitted");
+    const { data: changed, error } = await s.supabase.from("donation_batches").update({ status: "approved" }).eq("id", id).eq("status", "submitted").select("id");
     if (error) throw error;
     refresh("/staff");
+    if (!changed?.length) return fail("This batch changed since you opened it (approved, declined or withdrawn). Refresh to see it.");
     return ok(null, "Batch approved. Schedule it next.");
   });
 }
@@ -35,9 +36,10 @@ export async function declineBatch(input: unknown): Promise<ActionResult<null>> 
     const s = await staff();
     const check = canTransitionBatch("submitted", "declined", { declineReason: reason });
     if (!check.ok) return fail(check.reason);
-    const { error } = await s.supabase.from("donation_batches").update({ status: "declined", decline_reason: reason }).eq("id", id).eq("status", "submitted");
+    const { data: changed, error } = await s.supabase.from("donation_batches").update({ status: "declined", decline_reason: reason }).eq("id", id).eq("status", "submitted").select("id");
     if (error) throw error;
     refresh("/staff");
+    if (!changed?.length) return fail("This batch changed since you opened it (approved, declined or withdrawn). Refresh to see it.");
     return ok(null, "Batch declined. The partner can see your reason.");
   });
 }
@@ -48,14 +50,16 @@ const scheduleSchema = z.object({ id: uuid, week: z.string().refine(isMonday, "C
 export async function scheduleBatch(input: unknown): Promise<ActionResult<{ warning?: string; suggestion?: string | null }>> {
   return runAction(scheduleSchema, input, async ({ id, week, overrideNote }) => {
     const s = await staff();
-    const { data: b } = await s.supabase.from("donation_batches").select("status, scheduled_week, batch_line_items(quantity)").eq("id", id).single();
+    const { data: b } = await s.supabase.from("donation_batches").select("status, scheduled_week, preferred_week, batch_line_items(quantity)").eq("id", id).single();
     if (!b) return fail("Batch not found.");
     if (!["submitted", "approved", "scheduled"].includes(b.status)) return fail("Only batches that haven't been received yet can be scheduled.");
     const qty = b.batch_line_items.reduce((a, l) => a + l.quantity, 0);
     const settings = await getSettings(s.supabase);
     const cal = await getCalendar(s.supabase, settings.weeklyCapacity, 12);
-    // When rescheduling, the batch's own devices no longer count against the week it's leaving.
-    const loads = cal.map((w) => ({ week: w.week, devices: b.status === "scheduled" && w.week === b.scheduled_week ? Math.max(0, w.load - qty) : w.load }));
+    // An approved or scheduled batch is already in the calendar (at its scheduled, else preferred, week):
+    // take its own devices out before checking, so it isn't counted twice.
+    const ownWeek = b.status === "approved" || b.status === "scheduled" ? (b.scheduled_week ?? b.preferred_week) : null;
+    const loads = cal.map((w) => ({ week: w.week, devices: w.week === ownWeek ? Math.max(0, w.load - qty) : w.load }));
     if (wouldExceed(week, qty, loads, settings.weeklyCapacity) && !overrideNote) {
       const suggestion = nextOpenWeek(cal.map((w) => w.week), qty, loads, settings.weeklyCapacity);
       return ok({ warning: `That week would be over capacity (${settings.weeklyCapacity} devices).`, suggestion });

@@ -28,5 +28,5 @@ export function BatchStatusChip({ status }: { status: BatchStatus }) {
 }
 
 export function DeviceStatusChip({ status }: { status: DeviceStatus }) {
-  return <StatusChip tone={DEVICE_TONE[status]}>{status === "sold" ? "Reused" : labels.deviceStatus[status]}</StatusChip>;
+  return <StatusChip tone={DEVICE_TONE[status]}>{status === "sold" ? "Back in use" : labels.deviceStatus[status]}</StatusChip>;
 }

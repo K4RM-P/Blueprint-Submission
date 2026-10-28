@@ -26,7 +26,7 @@ How the time splits: about **75%** on the core (the Reuse Partner pipeline and t
 
 ### 1:10 – 1:40 · F2: staff run intake (Staff)
 7. **Staff** → Overview: the four partner-pipeline tiles and the capacity glasses.
-8. **Batches** (open batches, best score first) → Maple Ledger's batch → **Approve & schedule** → pick a week → **Receive & add 20 devices**. Each gets its own `FGT-` Device Passport code.
+8. **Batches** (open batches, best score first) → Maple Ledger's batch for the week you just picked (the seed has another 20 × Dell batch from Maple Ledger for a different week; either works) → **Approve & schedule** → pick a week → **Receive & add 20 devices**. Each gets its own `FGT-` Device Passport code.
 9. **QR labels** → the 30-up sheet. *"Each laptop gets its passport sticker."*
 
 ### 1:40 – 1:55 · F3: the volunteer bench (Volunteer, on a phone)
@@ -34,7 +34,7 @@ How the time splits: about **75%** on the core (the Reuse Partner pipeline and t
 
 ### 1:55 – 2:20 · F4: the certified data wipe (Staff)
 11. **Devices** → filter *Wipe pending verification* → select all → **`v`** → **Verify** (each device keeps the report ID its volunteer recorded). Say: *"Only staff can verify a wipe, and the database enforces it."* (The method field names Free Geek Toronto's own software until FGT confirms its standard.)
-12. Open **Queen West Design Co.**'s fully verified batch → **Issue certificate** (sky stamp) → the PDF for two seconds → `/verify/GL-…`: genuine, no serial numbers.
+12. Open **Queen West Design Co.**'s fully verified batch → **Issue certificate** (this works once per seed: run `pnpm seed` before each take) (sky stamp) → the PDF for two seconds → `/verify/GL-…`: genuine, no serial numbers.
 
 ### 2:20 – 2:50 · F5: the Device Passport (phone, signed out)
 13. Open `/p/FGT-WRAPPED2` (already sold to a student, so no need to record the sale live). **Tap to begin** and let it play, or tap right: donated by **Maple Ledger Accounting** → **Certified data wipe: Its old data, wiped** (sky seal) → *Aisha brought it back to life* → Linux Mint → kg kept out of landfill → **Where your money goes** (*Illustrative*) → **Why isn't it free?** → the collectible card.

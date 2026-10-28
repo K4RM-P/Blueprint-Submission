@@ -18,20 +18,20 @@ export function PublicFooter() {
         </div>
         <nav aria-label="Relay" className="flex flex-col gap-2 text-small">
           <p className="eyebrow mb-1">Relay</p>
-          <Link className="text-ink-2 hover:text-ink" href="/become-a-partner">Become a Reuse Partner</Link>
-          <Link className="text-ink-2 hover:text-ink" href="/#passport">Look up a Device Passport</Link>
-          <Link className="text-ink-2 hover:text-ink" href="/partners">Partner Wall</Link>
-          <Link className="text-ink-2 hover:text-ink" href="/impact">Impact and methodology</Link>
-          <Link className="text-ink-2 hover:text-ink" href="/about">About and pricing</Link>
+          <Link className="inline-flex min-h-6 items-center text-ink-2 hover:text-ink" href="/become-a-partner">Become a Reuse Partner</Link>
+          <Link className="inline-flex min-h-6 items-center text-ink-2 hover:text-ink" href="/#passport">Look up a Device Passport</Link>
+          <Link className="inline-flex min-h-6 items-center text-ink-2 hover:text-ink" href="/partners">Partner Wall</Link>
+          <Link className="inline-flex min-h-6 items-center text-ink-2 hover:text-ink" href="/impact">Impact and methodology</Link>
+          <Link className="inline-flex min-h-6 items-center text-ink-2 hover:text-ink" href="/about">About and pricing</Link>
         </nav>
         <nav aria-label="More ways to help" className="flex flex-col gap-2 text-small">
           <p className="eyebrow mb-1">More ways to help</p>
-          <Link className="text-ink-2 hover:text-ink" href="/pay-it-forward">Pay it forward</Link>
-          <Link className="text-ink-2 hover:text-ink" href="/donate">Can I donate this?</Link>
-          <Link className="text-ink-2 hover:text-ink" href="/about#volunteer">Volunteer</Link>
-          <Link className="text-ink-2 hover:text-ink" href="/login">Sign in or join</Link>
+          <Link className="inline-flex min-h-6 items-center text-ink-2 hover:text-ink" href="/pay-it-forward">Pay it forward</Link>
+          <Link className="inline-flex min-h-6 items-center text-ink-2 hover:text-ink" href="/donate">Can I donate this?</Link>
+          <Link className="inline-flex min-h-6 items-center text-ink-2 hover:text-ink" href="/about#volunteer">Volunteer</Link>
+          <Link className="inline-flex min-h-6 items-center text-ink-2 hover:text-ink" href="/login">Sign in or join</Link>
           {process.env.NEXT_PUBLIC_DEMO_MODE === "true" ? (
-            <Link className="text-ink-2 hover:text-ink" href="/demo">Demo accounts</Link>
+            <Link className="inline-flex min-h-6 items-center text-ink-2 hover:text-ink" href="/demo">Demo accounts</Link>
           ) : null}
         </nav>
       </div>

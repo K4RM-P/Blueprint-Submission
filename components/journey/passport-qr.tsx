@@ -27,9 +27,9 @@ export async function PassportQrCard({ code, deviceId, title = "Device Passport"
           <QrCode className="size-4" aria-hidden /> {title}
         </p>
         <p className="font-mono text-lg font-semibold text-ink">{code}</p>
-        <p className="text-small text-ink-2">Scan with a phone camera to see where this laptop came from, who refurbished it and who it helps now.</p>
+        <p className="text-small text-ink-2">Scan with a phone camera to see where this laptop came from, how its data was wiped and who refurbished it.</p>
         <div className="mt-1 flex flex-wrap gap-2.5">
-          <ClayButton href={`/p/${code}`} size="sm" icon={<ExternalLink />}>
+          <ClayButton href={`/p/${code}`} prefetch={false} size="sm" icon={<ExternalLink />}>
             Open Device Passport
           </ClayButton>
           {deviceId ? (

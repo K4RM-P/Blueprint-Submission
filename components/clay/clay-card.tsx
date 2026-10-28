@@ -8,6 +8,8 @@ interface ClayCardProps extends ComponentPropsWithoutRef<"div"> {
   tint?: Tint;
   /** Openable cards lift on hover; static cards don't (§8). */
   href?: string;
+  /** Pass false for links whose page counts views (Device Passports). */
+  prefetch?: boolean;
   size?: "md" | "lg" | "xl";
   as?: "div" | "section" | "article";
   /** "glass" = frosted clay skin (chrome, cards over imagery). */
@@ -17,13 +19,13 @@ interface ClayCardProps extends ComponentPropsWithoutRef<"div"> {
 
 const pad = { md: "p-6", lg: "p-6 sm:p-8", xl: "p-7 sm:p-10" } as const;
 
-export function ClayCard({ tint = "porcelain", href, size = "md", material = "clay", as: TagName = "div", className, children, ...rest }: ClayCardProps) {
+export function ClayCard({ tint = "porcelain", href, prefetch, size = "md", material = "clay", as: TagName = "div", className, children, ...rest }: ClayCardProps) {
   const Tag = TagName as "div";
   const classes = cn(material === "glass" ? "clay-glass hairline-top relative" : "clay relative", size === "xl" && "rounded-[var(--r-xl)]", pad[size], className);
   if (href) {
     return (
       <Tag data-tint={tint} className={cn(classes, "lift group")} {...rest}>
-        <Link href={href} className="absolute inset-0 z-[1] rounded-[inherit] focus-visible:outline-offset-4" aria-label={typeof rest["aria-label"] === "string" ? rest["aria-label"] : undefined}>
+        <Link href={href} prefetch={prefetch} className="absolute inset-0 z-[1] rounded-[inherit] focus-visible:outline-offset-4" aria-label={typeof rest["aria-label"] === "string" ? rest["aria-label"] : undefined}>
           <span className="sr-only">Open</span>
         </Link>
         {children}

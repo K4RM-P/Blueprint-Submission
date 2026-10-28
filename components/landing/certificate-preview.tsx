@@ -22,7 +22,7 @@ export function CertificatePreview({ className }: { className?: string }) {
           <LoopMark className="size-5" />
           <span className="font-display text-[0.9375rem] font-semibold tracking-[-0.03em]">Relay</span>
         </span>
-        <span className="font-mono text-[0.625rem] tracking-[0.06em] text-ink-3">GL-2026-0131</span>
+        <span className="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-ink-3">Example</span>
       </div>
       <p className="mt-5 font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-ink-3">Certificate of</p>
       <p className="font-display text-[1.375rem] font-semibold leading-tight tracking-[-0.035em]">Data sanitization</p>

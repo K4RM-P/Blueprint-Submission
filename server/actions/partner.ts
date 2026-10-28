@@ -124,8 +124,10 @@ export async function withdrawBatch(input: unknown): Promise<ActionResult<null>>
     const { data: existing } = await s.supabase.from("donation_batches").select("status").eq("id", id).maybeSingle();
     if (!existing) return fail("We couldn't find that batch.");
     if (existing.status !== "submitted") return fail("Only batches that haven't been reviewed yet can be withdrawn.");
-    const { error } = await s.supabase.from("donation_batches").delete().eq("id", id);
+    // RLS only lets a partner delete a still-submitted batch; zero rows means staff reviewed it meanwhile.
+    const { data: gone, error } = await s.supabase.from("donation_batches").delete().eq("id", id).select("id");
     if (error) throw error;
+    if (!gone?.length) return fail("Free Geek Toronto staff already reviewed this batch, so it can no longer be withdrawn. Refresh to see it.");
     revalidatePath("/partner", "layout");
     return ok(null, "Batch withdrawn.");
   });

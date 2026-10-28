@@ -77,7 +77,9 @@ function Cover({ story, onBegin }: SlideProps) {
             <ClayLaptop className="mx-auto w-[78%]" tint="porcelain" pointerLight={false} />
             <div>
               <p className="font-display text-[clamp(1.25rem,6.2cqw,1.75rem)] leading-[1.02]">{story.deviceName}</p>
-              <p className="mt-1 text-[0.75rem] text-ink-2">Refurbished by Free Geek Toronto</p>
+              <p className="mt-1 text-[0.75rem] text-ink-2">
+                {story.stage === "recycled" ? "Recycled responsibly by" : story.stage === "in_progress" ? "Being refurbished by" : "Refurbished by"} Free Geek Toronto
+              </p>
             </div>
           </div>
         </PassportBooklet>

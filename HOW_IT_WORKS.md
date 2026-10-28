@@ -17,6 +17,9 @@ A plain-language explanation of what Relay changes for Free Geek Toronto (FGT), 
 ### Why businesses don't donate today
 A business retiring 10–50 laptops has no reason to pick FGT over a trade-in, a reseller, paid IT disposal or a recycling drop-off: there's no documented data wipe, no visible impact and no recognition.
 
+### Who else a business could call
+Toronto businesses can also give laptops to other charitable refurbishers or IT asset disposition (ITAD) firms; the case names RCT, reBOOT Canada and Quantum Lifecycle Partners. Relay doesn't compete on scale. It gives Free Geek Toronto something a business can see: a numbered certificate per batch, a public Device Passport for every laptop, and a dashboard of who the laptops help in Toronto, on top of FGT's mission of affordable technology and jobs for people facing barriers.
+
 ### Why this problem, and not another
 | Alternative | Why we didn't lead with it |
 |---|---|
@@ -46,7 +49,7 @@ Reuse Partner signs up (free)
 | Step | Who | What Relay records | What's enforced |
 |---|---|---|---|
 | Become a Reuse Partner | Business office manager or IT lead | Organization, contact, recognition opt-ins | Free tier needs no payment. |
-| Submit a batch | Partner | Models, quantities, years, condition, week | Score recomputed on the server; full weeks can't be chosen. |
+| Submit a batch | Partner | Models, quantities, years, condition, week | Score recomputed on the server (and again on every staff screen); weeks without room for the batch can't be chosen by the partner, though staff can override with a note. |
 | Approve and schedule | Staff | Decision, week, override note | Over-capacity scheduling needs a written note. |
 | Receive | Staff | One device per laptop, unique passport code | Codes use an unambiguous alphabet and are unique. |
 | Refurbish | Volunteer | Hardware test, wipe performed (report ID), OS, final QA | Volunteers only touch devices assigned to them. |
@@ -85,6 +88,10 @@ All formulas live once in `lib/` with unit tests; every screen calls the same fu
 The demo shows these metrics computed from fictional demo data.
 
 ---
+
+## What it could earn FGT (illustrative)
+
+Using the PRD's placeholder unit economics, all **[ASSUMPTION]** until FGT confirms them: 10 Reuse Partners × 25 laptops a year = 250 laptops; 80% sellable × an average price of $180 = **about $36,000 a year in additional device sales**, roughly 15% on top of FGT's ~$240K average annual revenue (2023–25), with no price increase. Optional memberships might add about $3,000 (3 × $500 + 1 × $1,500). A conservative case (5 partners) halves this; an ambitious one (20 partners) doubles it, and bench capacity, not demand, becomes the limit, which is why intake is capacity-aware. The volunteer time saved versus the same number of mixed household devices is about 200 hours a year (60 vs 120 minutes each).
 
 ## What it costs FGT
 

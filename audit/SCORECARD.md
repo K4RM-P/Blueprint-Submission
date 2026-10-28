@@ -182,3 +182,78 @@ Severity: **C** Critical · **H** High · **M** Medium · **L** Low. Status: ✅
 **C5 after the iteration-2 fixes** (median of 5, mobile, simulated throttling, HTTP/2 proxy): landing 83 (LCP 2.9 s, TBT 0.44 s), Become a Partner 90, passport story 78 (LCP 3.8 s), partner dashboard 82 (LCP 3.2 s, TBT 0.47 s). CLS ≤ 0.001.
 
 **D7 friction** (`audit/scripts/friction.mjs`): landing → submitted batch for a brand-new partner = **18 interactions** (10 clicks, 8 fields, 119 characters), 8.4 s scripted, **about 73 s** for a person. Staff per 20-laptop batch: approve & schedule 3, receive 1, labels 2, bulk verify 3, certificate 1 = 10 interactions (0.5 per device). Volunteer per device: claim + 4 steps + report ID + OS ≈ 7.
+
+---
+
+## Iteration 3 (audit of `f974901` + `87d4dc3`)
+
+**Evidence collected:** `audit/iter-3/` screenshots (390/1440 for every route; 768/1920 for core screens). A third independent reviewer (fresh agent) walked F1–F5, tried invalid inputs, checked authorization across roles, ran Lighthouse (3 runs per page) and followed DEMO_SCRIPT.
+
+| Item | Self | Reviewer | Final | Evidence (short) |
+|---|---|---|---|---|
+| A1 Problem identification | 8 | 7 | **7** | Problem sits under the hero mock; no row for the case's named competitors |
+| A2 Solution clarity | 7 | 6 | **6** | "Device Passport shows who it helps" not true (passport never shows the recipient, DP-05); landing long |
+| A3 Feasibility | 7 | 6 | **6** | Approve-then-Schedule false capacity warning; partner and staff week labels disagree; no volunteer fail path |
+| A4 Presentation | 7 | 6 | **6** | Shared live DB (review activity visible on the deployed demo); DEMO_SCRIPT twin batch, one-shot step 12 |
+| A5 Technical execution | 8 | 7 | **7** | Capacity double count, inflated views, wallet hours, stale-row success toasts |
+| B1 One change | 8 | 7 | **7** | Landing's first visual was a paid-tier portal |
+| B2 Target user fit | 8 | 7 | **7** | "None for you" catch row not honest |
+| B3 Mission | 8 | 8 | **8** | Small-business buyers counted as "people"; sale dialog defaulted to Student |
+| B4 Differentiation | 7 | 6 | **6** | No row for other refurbishers / ITAD (RCT, reBOOT, Quantum) |
+| B5 Measurable value | 6 | 5 | **5** | Views inflated by link prefetch; ambiguous "75% of all intake"; no revenue projection vs $240K |
+| B6 Honesty | 7 | 6 | **6** | Hard-coded "Now helping a student"; "Refurbished by" on recycled/bench story covers; unlabelled PIF figures and certificate mock; "new from FGT" eyebrow |
+| B7 FGT-specificity | 9 | 8 | **8** | "Free Geek wipes them"; GL- prefix |
+| C1 Functional completeness | 7 | 7 | **7** | Approve→Schedule bug; no volunteer fail path |
+| C2 Robustness | 6 | 5 | **5** | Shared DB; stale-row actions report success; live score accepted 2.5 devices / 1890 |
+| C3 Security | 7 | 7 | **7** | Cross-role checks hold; sequential certificate numbers expose partner names on `/verify` |
+| C4 Tests | 7 | 7 | **7** | No tests for schedule-after-approve, prefetch views, wallet hours, stale rows |
+| C5 Performance | 5 | 5 | **5** | Reviewer medians: home 78, Become a Partner 88, passport 80, partner 80 |
+| C6 Code & docs | 7 | 7 | **7** | DEMO/ADMIN/HOW_IT_WORKS inaccuracies listed below |
+| D1 5-second test | 7 | 7 | **7** | "Pass it on." headline; desktop passport says "Tap to begin" |
+| D2 Hierarchy | 6 | 6 | **6** | Landing and staff overview long; the free/certified message repeated ~8× |
+| D3 Consistency | 7 | 7 | **7** | Five names for one device state; Approve vs Approve & schedule |
+| D4 Not vibe-coded | 7 | 7 | **7** | Invented mock numbers (captioned); persona gimmick; tickers |
+| D5 Motion & craft | 7 | 7 | **7** | Wizard heading overlaps its icon mid-transition; OG word spacing |
+| D6 Copy | 7 | 7 | **7** | Grammar slips; sign-up page said "Sign in to Relay." |
+| D7 Friction | 8 | 8 | **8** | 4 fields to an account, 10 interactions to a batch |
+| D8 Responsive | 9 | 9 | **9** | No overflow on 23 routes at 390/1920; footer links and table checkboxes under 24 px |
+
+### Issues found in iteration 3 and what happened to them
+
+| # | Sev | Item | Issue | Status |
+|---|---|---|---|---|
+| C-1 | C | A4/C2 | Local and deployed demo share one Supabase project; reviewer activity visible to judges | ✅ reviewer accounts and orgs removed, database re-seeded; README now says the demo data is shared and how to reset it. 🔒 a separate production project is the team's call (needs their Supabase/Vercel access) |
+| H-1 | H | A3/C1 | Approved batch counted twice when scheduled | ✅ `scheduleBatch` removes the batch's own load from its current (scheduled or preferred) week; e2e "approve first, then schedule" |
+| H-2 | H | B5 | Passport views inflated by `<Link>` prefetch and staff/partner page loads | ✅ `prefetch={false}` on every passport link (incl. `ClayCard`), share images use the cached lookup |
+| H-3 | H | B6/A2 | "Device Passport shows who it helps" false; hard-coded "Now helping a student" | ✅ reworded everywhere: the passport shows the journey, the partner's dashboard shows who it helps (by category) |
+| H-4 | H | B5/C1 | Skills Wallet hours double | 🔒 migration `20261028000003` must be pushed (formula already single-sourced) |
+| H-5 | H | B6 | Story cover "Refurbished by FGT" for recycled/bench devices | ✅ stage-aware ("Recycled responsibly by", "Being refurbished by") |
+| H-6 | H | B4 | No row for other refurbishers / ITAD | ✅ "Another refurbisher or IT disposal firm" row (no claims about named firms); HOW_IT_WORKS names RCT, reBOOT, Quantum from the case |
+| M-1 | M | B6 | "None for you" catch | ✅ "You give up any trade-in credit and drop off at 180 Sudbury Street…" |
+| M-2 | M | A3/D6 | Partner and staff week labels disagree | ✅ staff schedule dialog uses `calendarForBatch` with the batch's own size |
+| M-3 | M | B5/B6 | Sale dialog defaulted to Student | ✅ "Not recorded" by default; local (Toronto) sale date |
+| M-4 | M | C3/B6 | `/verify` enumerable partner names | ⛔ CI-02 requires the partner name on verification and CI-01 fixes the `GL-YYYY-NNNN` format; documented as a known trade-off |
+| M-5 | M | C2 | Stale-row approve/decline/withdraw report success | ✅ all three check the affected row and say "This batch changed…" |
+| M-6 | M | B6 | Unlabelled PIF figures, certificate mock | ✅ "Fictional demo data." on `/pay-it-forward`; certificate mock marked "EXAMPLE" |
+| M-7 | M | B6 | CO₂e headline | ✅ labelled "if each reused device replaces a new one (estimate; factors TO VERIFY)" |
+| M-8 | M | B6 | "New from Free Geek Toronto" eyebrow | ✅ "a new way to work with Free Geek Toronto" |
+| M-9 | M | B1 | Landing mock was a paid-tier portal | ✅ "Community Partner", "Download certificate" |
+| M-10 | M | A4/C6 | DEMO_SCRIPT twin batch, one-shot step 12 | ✅ script names which batch to open and says to re-seed before each take |
+| M-11 | M | C5 | Lighthouse < 90 | ⏳ see measurements; on this shared container results swing ±5–10 |
+| M-12 | M | B5/D6 | Ambiguous metric labels | ✅ "actual: N% of all devices received came from partners", "Target: 70% come back" |
+| M-13 | M | D6/D3 | Five names for one state | ✅ partners and public: "Back in use"; staff keeps "Sold" where a sale is recorded |
+| M-14 | M | A3/C1 | No volunteer fail path | ✅ "Didn't pass? Tell staff" on the hardware-test step writes a note to the device's chain of custody (existing RLS); "Flagged by volunteers" on the staff Overview; e2e |
+| M-15 | M | B5/A3 | No revenue figure vs $240K | ✅ HOW_IT_WORKS "What it could earn FGT (illustrative)", every input [ASSUMPTION] |
+| M-16 | M | B3 | Businesses counted as people | ✅ "helping N people and M organizations" |
+| L-1 | L | D6 | Sign-up heading | ✅ "Join as a Reuse Partner." in sign-up mode |
+| L-2 | L | D6 | Grammar | ✅ all four fixed |
+| L-3 | L | C2 | Live score accepted invalid rows | ✅ meter scores only rows that pass the server's own Zod schema |
+| L-4 | L | C2 | Sale date in UTC | ✅ Toronto date |
+| L-5 | L | C3 | Report ID free text; in-memory rate limit; public `/styleguide` | ⛔ report IDs come from FGT's software in unknown formats (output is escaped); per-instance limiting is documented; the styleguide is part of the design-system evidence |
+| L-6 | L | B6 | "Faster than most deliveries" | ✅ "From drop-off to ready in under two weeks" |
+| L-7 | L | D5 | Craft details | ⏳ wizard transition overlap and OG spacing not reproduced in our captures |
+| L-8 | L | D8 | Small tap targets | ✅ footer links ≥ 24 px |
+| L-9 | L | C6 | Docs | ✅ README "Core flows"; ADMIN_GUIDE explains Approve vs Approve & schedule and volunteer flags; HOW_IT_WORKS staff override |
+| L-10 | L | D2 | Repetition | ⏳ |
+
+**C5 after iteration-3 fixes** (median of 5): landing 79, Become a Partner 86, passport story 79, partner dashboard 83. **Tests:** 63/63 e2e, 122/122 unit.

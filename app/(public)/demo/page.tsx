@@ -32,11 +32,11 @@ export default function DemoPage() {
         <div className="flex flex-col lg:col-span-7">
           <p className="eyebrow mb-3">2 · Scan a Device Passport</p>
           <div className="flat flex flex-1 flex-col gap-5 p-5 sm:p-6">
-            <p className="text-ink-2">Every refurbished laptop carries a QR label. Scan one with your phone, or click to see its story, from the business that donated it to who it helps now.</p>
+            <p className="text-ink-2">Every refurbished laptop carries a QR label. Scan one with your phone, or click to see its story, from the business that donated it to where it is now.</p>
             <ul className="grid gap-3 sm:grid-cols-2">
               {SHOWCASE_PASSPORTS.map((p) => (
                 <li key={p.code}>
-                  <Link href={`/p/${p.code}`} className="flat lift flex h-full items-start gap-4 p-4">
+                  <Link href={`/p/${p.code}`} prefetch={false} className="flat lift flex h-full items-start gap-4 p-4">
                     <PassportQrImage code={p.code} size={88} className="shrink-0 border border-line" />
                     <span className="flex min-w-0 flex-col gap-1">
                       <span className="font-semibold text-ink">{p.label}</span>

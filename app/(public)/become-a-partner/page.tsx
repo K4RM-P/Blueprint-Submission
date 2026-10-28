@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 const OPTIONS = [
   { option: "Trade-in or buyback", get: "Some credit toward new hardware.", catch: "Proof of the wipe depends on the program, and the laptop's story ends there." },
   { option: "Reseller", get: "A little cash for newer models.", catch: "Older laptops fetch little, and wiping them is usually your job." },
+  {
+    option: "Another refurbisher or IT disposal firm",
+    get: "Data destruction, then reuse or recycling. Terms vary by provider.",
+    catch: "You rarely get a public record of each laptop or see who it helps.",
+  },
   { option: "Paid IT disposal", get: "Drives destroyed, with paperwork.", catch: "You pay per device, and working laptops are often recycled instead of reused." },
   { option: "Recycling drop-off", get: "Free and responsible.", catch: "Working laptops are broken down for materials, and you get no record of the wipe." },
   { option: "A drawer or storage room", get: "Nothing to do today.", catch: "Your data sits on old drives while the laptops lose value every month." },
@@ -22,7 +27,7 @@ const STEPS = [
   { icon: <ClipboardList />, title: "Tell us what you have", body: "List your laptops in a 4-step form. It takes about two minutes." },
   { icon: <CalendarCheck />, title: "Pick a week", body: "Choose a week our bench has room for, then drop off at 180 Sudbury Street." },
   { icon: <HardDrive />, title: "Certified data wipe", body: "Staff verify every wipe. Volunteers refurbish each laptop and it gets a Device Passport." },
-  { icon: <HeartHandshake />, title: "See who it helps", body: "Get your certificate, then follow each laptop's passport to the student or family it reaches." },
+  { icon: <HeartHandshake />, title: "See who it helps", body: "Get your certificate, follow each laptop on its Device Passport, and see on your dashboard who it helps: students, newcomers, seniors, never names." },
 ];
 
 export default function BecomeAPartnerPage() {
@@ -30,7 +35,7 @@ export default function BecomeAPartnerPage() {
     <main>
       <section className="mx-auto grid max-w-[1200px] gap-10 px-4 pb-16 pt-14 sm:px-6 md:grid-cols-12 md:pb-24 md:pt-24">
         <div className="md:col-span-8">
-          <p className="eyebrow">Reuse Partnership · new from Free Geek Toronto</p>
+          <p className="eyebrow">Reuse Partnership · a new way to work with Free Geek Toronto</p>
           <h1 className="font-display mt-4 text-[2.75rem] leading-[0.98] sm:text-display-l">Retire your laptops. Get proof they&apos;re wiped. See exactly who they help.</h1>
           <p className="measure mt-6 text-body-l text-ink-2">
             For Toronto offices retiring 10–50 laptops. Send them to Free Geek Toronto instead of a trade-in, a drawer or a shredder: every drive gets a certified data wipe, and each
@@ -91,7 +96,7 @@ export default function BecomeAPartnerPage() {
               <tr className="bg-mint/50 max-md:flex max-md:flex-col max-md:gap-1 max-md:px-5 max-md:py-4">
                 <th scope="row" className="font-semibold text-loop-deep md:px-5 md:py-4">Reuse Partnership</th>
                 <td className="md:px-5 md:py-4">Free. A certified data wipe for every drive and a numbered certificate for every batch.</td>
-                <td className="md:px-5 md:py-4">None for you. Each laptop&apos;s Device Passport shows who it helps in Toronto.</td>
+                <td className="md:px-5 md:py-4">You give up any trade-in credit and drop off at 180 Sudbury Street in a week with room. In return, your dashboard shows who each laptop helps in Toronto.</td>
               </tr>
             </tbody>
           </table>

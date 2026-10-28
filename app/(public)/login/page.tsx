@@ -15,7 +15,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <AuthLayout
       eyebrow={invited ? "You're invited" : "Sign in or join"}
-      title={invited ? "Join the Relay team." : "Sign in to Relay."}
+      title={invited ? "Join the Relay team." : mode === "signup" ? "Join as a Reuse Partner." : "Sign in to Relay."}
       lead={
         invited ? (
           <p>Someone at Free Geek Toronto or your organization invited you. Sign up with the email they used.</p>

@@ -27,7 +27,7 @@ This guide is for the person who runs Relay day to day at Free Geek Toronto. You
 
 1. **Batches** (or the first Overview tile). Batches are sorted by **Batch Value Score**: uniform batches of newer laptops score highest because they are the fastest to refurbish and sell.
 2. Open the batch. You see the partner, what they're sending, their preferred week and their notes.
-3. Press **Approve & schedule**, pick a week, and press **Schedule week of …**.
+3. Press **Approve & schedule**, pick a week, and press **Schedule week of …**. (Plain **Approve** accepts the batch now and lets you pick the week later with **Schedule**.)
    - Weeks are marked **Open**, **Limited** or **Full** using your weekly capacity (Settings).
    - If you pick a Full week, Relay warns you and suggests the next open week. You can still press **Schedule anyway**, but you must write a short note saying why.
 4. If you can't take the batch, press **Decline** and give a reason. The partner sees the reason.
@@ -49,6 +49,8 @@ You don't need to do anything here. Volunteers open **My Bench** on their phone,
 When a volunteer finishes the wipe, the device waits for you: **volunteers can never verify a wipe.**
 
 If you need to give a device to a specific volunteer: open it under **Devices** and use **Assign volunteer**.
+
+If a laptop fails its hardware test, the volunteer presses **Didn't pass? Tell staff** and writes what's wrong. It appears under **Flagged by volunteers** at the top of the Overview; open the device and repair it or press **Recycle**.
 
 ## 4. Verify wipes (staff only)
 

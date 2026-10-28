@@ -88,7 +88,7 @@ export function ShareActions({ story, onReplay }: { story: PassportStory; onRepl
         </ClayButton>
       </div>
       <div className="flex items-center justify-between px-1 pt-0.5">
-        <Link href={`/p/${story.code}?view=full`} className="inline-flex h-11 items-center text-[0.9375rem] font-semibold text-loop-deep underline-offset-4 hover:underline">
+        <Link href={`/p/${story.code}?view=full`} prefetch={false} className="inline-flex h-11 items-center text-[0.9375rem] font-semibold text-loop-deep underline-offset-4 hover:underline">
           View full passport
         </Link>
         <Link href="/pay-it-forward" className="inline-flex h-11 items-center gap-1.5 text-[0.9375rem] font-medium text-ink-2 underline-offset-4 hover:underline">

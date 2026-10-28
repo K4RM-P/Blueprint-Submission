@@ -21,7 +21,9 @@ export default async function PartnerDashboard() {
   const { supabase, org, profile } = await getPartnerContext();
   const [batches, impact] = await Promise.all([listBatches(supabase, org.id), getPartnerImpact(supabase)]);
   const t = impact.totals;
-  const people = t.devicesReused;
+  // A sale to a non-profit or a small business helps an organization, not one person (B3 honesty).
+  const orgs = (t.recipients.nonprofit ?? 0) + (t.recipients.small_business ?? 0);
+  const people = t.devicesReused - orgs;
   const recipients = (Object.entries(t.recipients) as [RecipientCategory, number][]).filter(([k]) => k !== "undisclosed").sort((a, b) => b[1] - a[1]);
   const full = hasFullDashboard(org.tier);
   const certificates = batches.filter((b) => b.certificates).length;
@@ -45,9 +47,16 @@ export default async function PartnerDashboard() {
         <ClayCard tint="mint" size="lg" className="flex flex-col justify-between gap-6">
           <div>
             <p className="font-display text-[2.25rem] leading-[1.05] sm:text-[3rem]">
-              {people > 0 ? (
+              {people + orgs > 0 ? (
                 <>
-                  Your laptops are helping <span className="tnum">{people}</span> {people === 1 ? "person" : "people"}.
+                  Your laptops are helping <span className="tnum">{people}</span> {people === 1 ? "person" : "people"}
+                  {orgs > 0 ? (
+                    <>
+                      {" "}
+                      and <span className="tnum">{orgs}</span> {orgs === 1 ? "organization" : "organizations"}
+                    </>
+                  ) : null}
+                  .
                 </>
               ) : t.devicesReceived > 0 ? (
                 "Your laptops are on the bench."
@@ -97,7 +106,7 @@ export default async function PartnerDashboard() {
         {batches.length === 0 ? (
           <FlatCard className="mt-4">
             <EmptyState title="No batches yet." tone="apricot" action={<ClayButton href="/partner/batches/new" variant="secondary" size="sm">Start your first batch</ClayButton>}>
-              List your laptops in about two minutes. Each one gets a certified data wipe and a Device Passport that shows who it helps.
+              List your laptops in about two minutes. Each one gets a certified data wipe and its own Device Passport, and you&apos;ll see who it helps right here.
             </EmptyState>
           </FlatCard>
         ) : (
@@ -116,7 +125,7 @@ export default async function PartnerDashboard() {
             <h2 id="passports" className="text-title font-semibold">
               Your laptops&apos; Device Passports
             </h2>
-            <p className="mt-1 text-small text-ink-2">Every laptop you donate gets its own public story. Open one to see its certified data wipe, its volunteer and who it helps.</p>
+            <p className="mt-1 text-small text-ink-2">Every laptop you donate gets its own public story. Open one to see its certified data wipe, its volunteer and where it is now.</p>
           </div>
           {batches.length > 0 ? (
             <ClayButton href="/partner/batches" variant="ghost" size="sm">
@@ -132,7 +141,7 @@ export default async function PartnerDashboard() {
           <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {passports.map((d) => (
               <li key={d.id}>
-                <Link href={`/p/${d.passport_code}`} className="flat lift group flex h-full items-center gap-4 p-4" aria-label={`Open the Device Passport for ${d.make} ${d.model}, ${d.passport_code}`}>
+                <Link href={`/p/${d.passport_code}`} prefetch={false} className="flat lift group flex h-full items-center gap-4 p-4" aria-label={`Open the Device Passport for ${d.make} ${d.model}, ${d.passport_code}`}>
                   <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-[14px] bg-mint text-loop-deep">
                     <QrCode className="size-5" strokeWidth={1.75} />
                   </span>

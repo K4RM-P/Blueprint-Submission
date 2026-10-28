@@ -75,6 +75,22 @@ export async function completeStep(input: unknown): Promise<ActionResult<{ statu
   });
 }
 
+/**
+ * The failure branch of the hardware test (VW-02): a volunteer can't recycle a device, so they tell
+ * staff why it didn't pass. It's a note in the device's append-only chain of custody (RLS: only for
+ * devices assigned to them); staff see it on the Overview and decide whether to recycle.
+ */
+export async function flagForStaff(input: unknown): Promise<ActionResult<null>> {
+  const schema = z.object({ deviceId: z.uuid(), note: z.string().trim().min(5, "Say what went wrong (a few words).").max(300) });
+  return runAction(schema, input, async ({ deviceId, note }) => {
+    const s = await assertRole("volunteer");
+    const { error } = await s.supabase.from("device_events").insert({ device_id: deviceId, actor_id: s.user.id, event_type: "note", note: `Needs staff: ${note}`, metadata: { flag: "needs_staff" } });
+    if (error) return fail("Only devices on your bench can be flagged.");
+    revalidatePath("/volunteer", "layout");
+    return ok(null, "Sent to staff. They'll decide whether it's repaired or recycled.");
+  });
+}
+
 /** Called when the wallet opens: picks up badges earned through staff verification (Data Guardian). */
 export async function syncBadges(): Promise<ActionResult<{ badges: AwardedBadge[] }>> {
   return runAction(z.undefined(), undefined, async () => {

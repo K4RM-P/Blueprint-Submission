@@ -65,7 +65,7 @@ export default async function ImpactPage() {
                 donations).
               </li>
               <li>
-                <span className="font-semibold text-ink">Reused</span> means sold to a new owner. Devices still being refurbished aren&apos;t counted yet.
+                <span className="font-semibold text-ink">Back in use</span> (reused) means sold to a new owner. Devices still being refurbished aren&apos;t counted yet.
               </li>
             </ul>
           </div>

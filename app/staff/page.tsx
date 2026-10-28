@@ -52,6 +52,15 @@ export default async function StaffOverview() {
     // Received partner batches without a certificate yet: candidates for "certificates to issue".
     supabase.from("donation_batches").select("id, organizations(name), certificates(id)").in("status", ["received", "in_refurbishment", "completed"]),
   ]);
+  // Hardware tests that didn't pass: volunteers flag them for staff (VW-02's failure branch).
+  const { data: flagRows } = await supabase
+    .from("device_events")
+    .select("note, created_at, devices!inner(id, passport_code, make, model, status)")
+    .eq("metadata->>flag", "needs_staff")
+    .in("devices.status", ["received", "testing"])
+    .order("created_at", { ascending: false })
+    .limit(5);
+  const flags = flagRows ?? [];
   // The demo passport with a full three-leg story (seeded, fixed code).
   const showcase = SHOWCASE_PASSPORTS[0];
   // DP-06: anonymous story analytics (counts only).
@@ -107,7 +116,7 @@ export default async function StaffOverview() {
     {
       value: program.partnerLaptopsPerMonth.toLocaleString("en-CA"),
       label: "partner laptops received a month",
-      note: `Target ${PROGRAM_TARGETS.partnerLaptopsPerMonth} (250 a year)${program.partnerShare != null ? ` · ${Math.round(program.partnerShare * 100)}% of all intake` : ""}`,
+      note: `Target ${PROGRAM_TARGETS.partnerLaptopsPerMonth} (250 a year)${program.partnerShare != null ? ` · actual: ${Math.round(program.partnerShare * 100)}% of all devices received came from partners` : ""}`,
     },
     {
       value: program.partnerSpeedup == null ? "—" : `${Math.round(program.partnerSpeedup * 100)}% faster`,
@@ -117,7 +126,7 @@ export default async function StaffOverview() {
     {
       value: `${program.repeatPartners.repeat} of ${program.repeatPartners.total}`,
       label: "partners came back with a second batch",
-      note: `Target ${Math.round(PROGRAM_TARGETS.repeatPartnerShare * 100)}% renew`,
+      note: `Target: ${Math.round(PROGRAM_TARGETS.repeatPartnerShare * 100)}% come back`,
     },
     {
       value: money(program.partnerSales.cents),
@@ -186,6 +195,25 @@ export default async function StaffOverview() {
           ))}
         </ul>
       </section>
+
+      {flags.length ? (
+        <section aria-labelledby="flags" className="flat mb-6 p-5">
+          <h2 id="flags" className="font-semibold">
+            Flagged by volunteers
+          </h2>
+          <ul className="mt-2 divide-y divide-line">
+            {flags.map((f) => (
+              <li key={`${f.devices.id}-${f.created_at}`} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2.5 text-small">
+                <Link href={`/staff/devices/${f.devices.id}`} className="font-medium text-ink underline-offset-4 hover:underline">
+                  {f.devices.make} {f.devices.model} · <span className="font-mono">{f.devices.passport_code}</span>
+                </Link>
+                <span className="text-ink-2">{(f.note ?? "").replace(/^Needs staff: /, "")}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-[0.8125rem] text-ink-3">Open a device to repair or recycle it.</p>
+        </section>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <section aria-labelledby="pending" className="flat overflow-hidden !p-0">
@@ -261,7 +289,7 @@ export default async function StaffOverview() {
                 Device Passports
               </h2>
               <p className="mt-1 text-small text-ink-2">
-                Each device gets a QR label at intake. Scanning it shows where the laptop came from, how its data was wiped and who it helps now. Try{" "}
+                Each device gets a QR label at intake. Scanning it shows where the laptop came from, how its data was wiped and who rebuilt it. Try{" "}
                 <span className="font-mono text-ink">{showcase.code}</span>.
               </p>
             </div>
@@ -285,7 +313,7 @@ export default async function StaffOverview() {
             <ClayButton href="/staff/labels" size="sm" icon={<Printer />}>
               Print QR labels
             </ClayButton>
-            <ClayButton href={`/p/${showcase.code}`} variant="ghost" size="sm" icon={<Play />}>
+            <ClayButton href={`/p/${showcase.code}`} prefetch={false} variant="ghost" size="sm" icon={<Play />}>
               Watch a story
             </ClayButton>
           </div>
@@ -295,7 +323,7 @@ export default async function StaffOverview() {
           <h2 className="font-semibold">Impact to date</h2>
           <dl className="grid grid-cols-2 gap-4">
             {[
-              ["devices reused", impact.devicesReused.toLocaleString("en-CA")],
+              ["devices back in use", impact.devicesReused.toLocaleString("en-CA")],
               ["kg kept out of landfill", impact.kgDiverted.toLocaleString("en-CA")],
               ["kg CO₂e avoided", impact.co2eAvoidedKg.toLocaleString("en-CA")],
               ["volunteer hours", impact.volunteerHours.toLocaleString("en-CA")],
@@ -306,7 +334,7 @@ export default async function StaffOverview() {
               </div>
             ))}
           </dl>
-          <p className="text-[0.8125rem] text-ink-3">{labels.deviceStatus.sold} = reused. Factors are estimates marked TO VERIFY.</p>
+          <p className="text-[0.8125rem] text-ink-3">&ldquo;Back in use&rdquo; = {labels.deviceStatus.sold.toLowerCase()}. Factors are estimates marked TO VERIFY.</p>
         </FlatCard>
       </div>
 

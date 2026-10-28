@@ -27,7 +27,7 @@ import { SHOWCASE_PASSPORTS } from "@/lib/showcase-passports";
 export const metadata: Metadata = {
   title: { absolute: "Relay · Pass it on." },
   description:
-    "Toronto businesses: retire your laptops with Free Geek Toronto for free. Every drive gets a certified data wipe, and each laptop's Device Passport shows who it helps.",
+    "Toronto businesses: retire your laptops with Free Geek Toronto for free. Every drive gets a certified data wipe, each laptop gets a Device Passport, and your dashboard shows who it helps.",
 };
 
 const fmt = (n: number) => n.toLocaleString("en-CA");
@@ -37,7 +37,7 @@ const REASONS = [
   { icon: <HandCoins />, title: "Free.", body: "No disposal fee. The Community tier, which includes everything a Reuse Partner needs, is free." },
   { icon: <ShieldCheck />, title: "Certified data wipe.", body: "Staff verify every wipe. You get a numbered certificate with a public verification link." },
   { icon: <CalendarCheck />, title: "Zero hassle.", body: "One two-minute form. Pick a week the bench has room for, then drop off at 180 Sudbury Street." },
-  { icon: <MapPin />, title: "A real local story.", body: "Each laptop's Device Passport and your impact dashboard show who it helps in Toronto." },
+  { icon: <MapPin />, title: "A real local story.", body: "Each laptop's Device Passport shows its journey, and your impact dashboard shows who it helps in Toronto." },
 ];
 
 /** The supply problem in three numbers, all from the case packet. */
@@ -61,7 +61,7 @@ export default async function Landing() {
 
   const impactRow = [
     { value: t.kgDiverted, suffix: "kg", label: "of e-waste kept out of landfill" },
-    { value: t.co2eAvoidedKg, suffix: "kg", label: "CO₂e avoided (estimate; factors TO VERIFY)" },
+    { value: t.co2eAvoidedKg, suffix: "kg", label: "CO₂e avoided if each reused device replaces a new one (estimate; factors TO VERIFY)" },
     { value: t.volunteerHours, label: "volunteer hours on the bench" },
     { value: impact.activePartners, label: "Reuse Partners in the relay" },
   ];
@@ -153,7 +153,7 @@ export default async function Landing() {
                 Every laptop carries its story. <span className="text-white/55">Scan it.</span>
               </h2>
               <p className="mt-4 max-w-md text-white/75">
-                Each refurbished laptop gets a QR label. Its Device Passport shows the business that donated it, its certified data wipe, the volunteer who rebuilt it and who it helps now.
+                Each refurbished laptop gets a QR label. Its Device Passport shows the business that donated it, its certified data wipe, the volunteer who rebuilt it and where it is now.
               </p>
               <p className="mt-8 text-small font-semibold text-white/85">Have a code? Enter it.</p>
               <PassportLookup className="mt-3" tone="dark" />
@@ -162,7 +162,7 @@ export default async function Landing() {
                 {SHOWCASE_PASSPORTS.slice(1).map((sp, i) => (
                   <span key={sp.code}>
                     {i ? " · " : ""}
-                    <Link href={`/p/${sp.code}`} className="font-medium text-white/85 underline decoration-white/30 underline-offset-4 hover:decoration-white">
+                    <Link href={`/p/${sp.code}`} prefetch={false} className="font-medium text-white/85 underline decoration-white/30 underline-offset-4 hover:decoration-white">
                       {sp.label}
                     </Link>
                   </span>

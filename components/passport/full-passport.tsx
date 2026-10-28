@@ -68,7 +68,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
       {printOnly ? null : (
         <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-3">
           <p className="eyebrow">Full passport</p>
-          <Link href={`/p/${p.code}`} className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-[0.9375rem] font-semibold text-white shadow-[0_12px_24px_-14px_rgba(23,32,28,.7)] transition-transform active:scale-[.97]">
+          <Link href={`/p/${p.code}`} prefetch={false} className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-[0.9375rem] font-semibold text-white shadow-[0_12px_24px_-14px_rgba(23,32,28,.7)] transition-transform active:scale-[.97]">
             <Play className="size-4" aria-hidden /> Play its story
           </Link>
         </div>
@@ -195,7 +195,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
             Getting a computer ready for you takes real work: testing every part, wiping and verifying the drive so no one&apos;s data travels with it, and installing fresh software. Free
             Geek Toronto pays fair wages and trains people facing barriers to work, and keeps the lights on in its workshop.
           </p>
-          <p className="mt-3">Free Geek Toronto&apos;s vision is that access to technology reflects ability to pay, and the Pay-It-Forward fund lowers them further for students, newcomers and families who need it.</p>
+          <p className="mt-3">Free Geek Toronto&apos;s vision is that access to technology reflects ability to pay, and the Pay-It-Forward fund lowers prices further for students, newcomers and families who need it.</p>
         </div>
       </section>
         </>

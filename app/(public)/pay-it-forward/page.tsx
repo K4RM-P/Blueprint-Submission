@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { env } from "@/lib/env";
 import Link from "next/link";
 import { CheckCircle2, ShieldCheck } from "lucide-react";
 import { ClayCard, IconTile } from "@/components/clay";
@@ -67,6 +68,7 @@ export default async function PayItForwardPage({ searchParams }: { searchParams:
               <dd className="font-display mt-1 text-2xl tnum">{s.devices_subsidized.toLocaleString("en-CA")}</dd>
             </div>
           </dl>
+          {env.demoMode ? <p className="mt-3 text-[0.8125rem] text-ink-3">Fictional demo data.</p> : null}
         </aside>
       </div>
 

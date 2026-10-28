@@ -106,7 +106,7 @@ export function DashboardPreview() {
           <div className="mb-3 rounded-xl border border-line/80 bg-white/70 px-3 py-2.5">
             <p className="text-[0.8125rem] font-semibold leading-tight">Northwind Legal</p>
             <p className="mt-0.5 flex items-center gap-1 text-[0.6875rem] text-loop-deep">
-              <Award className="size-3" aria-hidden /> Impact Partner
+              <Award className="size-3" aria-hidden /> Community Partner
             </p>
           </div>
           {NAV.map(({ icon: Icon, label, active, badge }) => (
@@ -133,7 +133,7 @@ export function DashboardPreview() {
               <p className="font-display mt-1 text-[1.5rem] font-semibold leading-none tracking-[-0.04em] sm:text-[1.875rem]">Hi Maya.</p>
             </div>
             <div className="hidden items-center gap-2 sm:flex">
-              <span className="rounded-full border border-line bg-white px-3.5 py-2 text-[0.75rem] font-semibold text-ink-2">Download impact report</span>
+              <span className="rounded-full border border-line bg-white px-3.5 py-2 text-[0.75rem] font-semibold text-ink-2">Download certificate</span>
               <span className="inline-flex items-center gap-1 rounded-full bg-ink px-3.5 py-2 text-[0.75rem] font-semibold text-white">
                 <Plus className="size-3.5" aria-hidden /> New batch
               </span>

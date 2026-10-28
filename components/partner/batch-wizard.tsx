@@ -18,7 +18,7 @@ import type { CapacityWeek } from "@/lib/capacity";
 import { DEVICE_CATEGORIES, DEVICE_CONDITIONS, labels, type PartnerTier } from "@/lib/domain";
 import { canRequestPickup } from "@/lib/pricing";
 import { useMotionPrefs } from "@/lib/motion";
-import { batchSchema, type BatchInput } from "@/lib/validation/batch";
+import { batchSchema, lineItemSchema, type BatchInput } from "@/lib/validation/batch";
 import { submitBatch, updateBatch } from "@/server/actions/partner";
 import { cn } from "@/lib/utils";
 
@@ -81,7 +81,8 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
     [lineItems, weights, maxAgeYears],
   );
   // The meter waits for one complete, valid row instead of scoring an empty form.
-  const scoreReady = (lineItems ?? []).some((l) => (l.make ?? "").trim() && (l.model ?? "").trim() && Number.isFinite(l.quantity) && l.quantity >= 1 && l.quantity <= 500);
+  // Scored only when every row passes the same Zod schema the server uses (no "2.5 devices", no 1890).
+  const scoreReady = (lineItems ?? []).length > 0 && (lineItems ?? []).every((l) => lineItemSchema.safeParse({ ...l, approxYear: Number.isFinite(l.approxYear) ? l.approxYear : null }).success);
   const meter = scoreReady ? { value: score.score, verdict: score.label } : { value: 0, verdict: "Add a model" };
   // Week statuses as this batch sees them: its own devices count on top of what's booked (PP-04).
   const batchCalendar = useMemo(() => calendarForBatch(calendar, totalQtyForCalendar(lineItems)), [calendar, lineItems]);
@@ -368,7 +369,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                       </IconTile>
                       <div>
                         <dt className="text-small text-ink-2">Data wipe</dt>
-                        <dd className="font-semibold">Drives left in · Free Geek wipes them</dd>
+                        <dd className="font-semibold">Drives left in · Free Geek Toronto wipes them</dd>
                       </div>
                     </div>
                   </dl>

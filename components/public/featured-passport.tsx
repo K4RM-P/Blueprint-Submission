@@ -14,11 +14,12 @@ export async function FeaturedPassport({ className }: { className?: string }) {
     { icon: <Package />, label: `Donated by ${p.donor}`, sub: "A Reuse Partner" },
     { icon: <ShieldCheck />, label: "Certified data wipe", sub: "Verified by Free Geek Toronto staff" },
     { icon: <Wrench />, label: `Refurbished by ${p.volunteer}`, sub: "A volunteer on the bench" },
-    { icon: <CheckCircle2 />, label: "In its new home", sub: `Now helping ${p.recipient}` },
+    { icon: <CheckCircle2 />, label: "In its new home", sub: "Back in use in Toronto" },
   ];
   return (
     <Link
       href={`/p/${p.code}`}
+      prefetch={false}
       aria-label={`Open the Device Passport for this ${p.device}, code ${p.code}`}
       className={cn("lift group block rounded-[var(--r-xl)] bg-surface p-6 text-ink shadow-[inset_0_1px_0_#fff,0_30px_60px_-30px_rgba(0,0,0,0.65)] sm:p-7", className)}
     >

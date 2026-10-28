@@ -40,7 +40,7 @@ export default async function StaffPartners() {
               <th scope="col">Membership</th>
               <th scope="col" className="text-right">Batches</th>
               <th scope="col" className="text-right">Devices</th>
-              <th scope="col" className="text-right">Reused</th>
+              <th scope="col" className="text-right">Back in use</th>
               <th scope="col">Wall</th>
             </tr>
           </thead>

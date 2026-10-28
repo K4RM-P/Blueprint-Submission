@@ -21,5 +21,4 @@ export const FEATURED_PASSPORT = {
   specs: ["2019", "Intel Core i5", "8 GB RAM", "Linux Mint 22"],
   donor: "Maple Ledger Accounting",
   volunteer: "Aisha",
-  recipient: "a student",
 } as const;

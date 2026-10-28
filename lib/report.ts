@@ -78,7 +78,7 @@ export function suggestedPost(orgName: string, t: ImpactTotals, shareUrl: string
   const whoLine = who ? ` They're now in the hands of ${who} across Toronto.` : "";
   return [
     `This year ${orgName} handed ${n(t.devicesReceived)} retired ${t.devicesReceived === 1 ? "device" : "devices"} to Free Geek Toronto instead of a trade-in or a drawer.`,
-    `${n(t.devicesReused)} ${t.devicesReused === 1 ? "is" : "are"} already back in use after a staff-verified data wipe and a volunteer refurbish.${whoLine}`,
+    `${n(t.devicesReused)} ${t.devicesReused === 1 ? "is" : "are"} already back in use after a staff-verified data wipe and a volunteer's refurbishing.${whoLine}`,
     `That keeps an estimated ${n(t.kgDiverted)} kg of electronics out of landfill.`,
     `Thank you to the Free Geek Toronto volunteers who did the work. Curious how it works? ${shareUrl}`,
   ].join("\n\n");

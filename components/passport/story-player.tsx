@@ -246,7 +246,7 @@ export function StoryPlayer({ story, initialIndex = 0 }: { story: PassportStory;
                   {userPaused ? <Play /> : <Pause />}
                 </button>
               ) : null}
-              <Link ref={closeRef} href={closeHref} className="story-chip-btn" aria-label="Close story and view the full passport">
+              <Link ref={closeRef} href={closeHref} prefetch={false} className="story-chip-btn" aria-label="Close story and view the full passport">
                 <X />
               </Link>
             </span>
