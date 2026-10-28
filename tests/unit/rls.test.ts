@@ -50,7 +50,7 @@ describe.skipIf(!enabled)("RLS & database rules (PRD §12, §17)", () => {
     const json = JSON.stringify(passport);
     expect(json).toContain(code);
     expect(json).not.toContain(rows![0].serial_number!);
-    expect(json).not.toMatch(/wipe_report_ref|BL-\d{6}|recipient|price_cents/);
+    expect(json).not.toMatch(/wipe_report_ref|BL-\d{6}|RPT-\d{6}|recipient|price_cents/);
     const { data: verify } = await anon.rpc("verify_certificate", { p_number: `GL-${new Date().getFullYear()}-0001` });
     expect(verify).toMatchObject({ partner_name: "Maple Ledger Accounting" });
   });
@@ -71,11 +71,24 @@ describe.skipIf(!enabled)("RLS & database rules (PRD §12, §17)", () => {
   });
 
   it("partners cannot change their tier or a batch's status", async () => {
-    const { error } = await partnerA.from("organizations").update({ tier: "champion" }).not("id", "is", null);
+    // Ask for a tier the org doesn't already have, so the update is a real change whatever state earlier runs left.
+    const { data: org } = await partnerA.from("organizations").select("tier").single();
+    const { error } = await partnerA.from("organizations").update({ tier: org!.tier === "champion" ? "impact" : "champion" }).not("id", "is", null);
     expect(error?.message).toMatch(/Membership/);
-    const { data: submitted } = await partnerA.from("donation_batches").select("id").eq("status", "submitted").limit(1);
-    const { error: e2 } = await partnerA.from("donation_batches").update({ status: "approved" }).eq("id", submitted![0].id);
+    // Use the partner's own fresh submitted batch, so the check doesn't depend on what earlier runs left behind.
+    const { data: own } = await partnerA.from("organizations").select("id").single();
+    const { data: me } = await partnerA.auth.getUser();
+    const monday = new Date();
+    monday.setUTCDate(monday.getUTCDate() + 14 - ((monday.getUTCDay() + 6) % 7));
+    const { data: submitted, error: insertError } = await partnerA
+      .from("donation_batches")
+      .insert({ organization_id: own!.id, submitted_by: me.user!.id, preferred_week: monday.toISOString().slice(0, 10), data_handling_ack: true, notes: "rls.test temporary batch" })
+      .select("id")
+      .single();
+    expect(insertError).toBeNull();
+    const { error: e2 } = await partnerA.from("donation_batches").update({ status: "approved" }).eq("id", submitted!.id);
     expect(e2?.message).toMatch(/Only staff/);
+    await partnerA.from("donation_batches").delete().eq("id", submitted!.id);
   });
 
   it("volunteer cannot set wipe_verified", async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeImpact, deviceImpact, isRefurbishedStatus, lastMonths, monthlySeries, outcomeForStatus, type ImpactFactor } from "@/lib/impact";
+import { computeImpact, deviceImpact, isRefurbishedStatus, lastMonths, monthlySeries, outcomeForStatus, runningTotals, type ImpactFactor } from "@/lib/impact";
 
 const factors: ImpactFactor[] = [
   { category: "laptop", avgWeightKg: 2, co2eAvoidedKgPerReuse: 200 },
@@ -50,6 +50,22 @@ describe("impact engine (PRD §9.6)", () => {
       { month: "2026-08", received: 0, reused: 0 },
       { month: "2026-09", received: 2, reused: 0 },
       { month: "2026-10", received: 0, reused: 1 },
+    ]);
+  });
+  it("builds running totals that include devices from before the window (partner dashboard chart)", () => {
+    const months = ["2026-09", "2026-10"];
+    const s = runningTotals(
+      [
+        { receivedAt: "2026-03-10T00:00:00Z", soldAt: "2026-05-01T00:00:00Z" },
+        { receivedAt: "2026-09-02T00:00:00Z", soldAt: "2026-10-01T00:00:00Z" },
+        { receivedAt: "2026-10-20T00:00:00Z", soldAt: null },
+        { receivedAt: null, soldAt: null },
+      ],
+      months,
+    );
+    expect(s).toEqual([
+      { month: "2026-09", received: 2, reused: 1 },
+      { month: "2026-10", received: 3, reused: 2 },
     ]);
   });
 });

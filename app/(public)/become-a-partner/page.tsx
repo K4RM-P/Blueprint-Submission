@@ -9,9 +9,18 @@ export const metadata: Metadata = {
   description: "Retire your business laptops with Free Geek Toronto, free. Every drive gets a certified data wipe, every batch a certificate, and every laptop a Device Passport.",
 };
 
+/** The options an office actually has for retired laptops (direct and indirect alternatives). */
+const OPTIONS = [
+  { option: "Trade-in or buyback", get: "Some credit toward new hardware.", catch: "Proof of the wipe depends on the program, and the laptop's story ends there." },
+  { option: "Reseller", get: "A little cash for newer models.", catch: "Older laptops fetch little, and wiping them is usually your job." },
+  { option: "Paid IT disposal", get: "Drives destroyed, with paperwork.", catch: "You pay per device, and working laptops are often recycled instead of reused." },
+  { option: "Recycling drop-off", get: "Free and responsible.", catch: "Working laptops are broken down for materials, and you get no record of the wipe." },
+  { option: "A drawer or storage room", get: "Nothing to do today.", catch: "Your data sits on old drives while the laptops lose value every month." },
+];
+
 const STEPS = [
-  { icon: <ClipboardList />, title: "Tell us what you have", body: "List your laptops in a 4-step form. It takes about five minutes." },
-  { icon: <CalendarCheck />, title: "Pick a week", body: "Choose a week our bench has room for, then drop off (or we pick up)." },
+  { icon: <ClipboardList />, title: "Tell us what you have", body: "List your laptops in a 4-step form. It takes about two minutes." },
+  { icon: <CalendarCheck />, title: "Pick a week", body: "Choose a week our bench has room for, then drop off at 180 Sudbury Street." },
   { icon: <HardDrive />, title: "Certified data wipe", body: "Staff verify every wipe. Volunteers refurbish each laptop and it gets a Device Passport." },
   { icon: <HeartHandshake />, title: "See who it helps", body: "Get your certificate, then follow each laptop's passport to the student or family it reaches." },
 ];
@@ -52,6 +61,43 @@ export default function BecomeAPartnerPage() {
         </div>
       </section>
 
+      <section aria-labelledby="options" className="mx-auto max-w-[1200px] px-4 pb-20 sm:px-6 md:pb-28">
+        <div className="grid gap-6 md:grid-cols-12 md:items-end">
+          <h2 id="options" className="font-display text-[2rem] leading-tight sm:text-display-m md:col-span-7">
+            Your options for old laptops
+          </h2>
+          <p className="text-ink-2 md:col-span-5">
+            Good business laptops usually go to trade-ins, so they rarely reach Free Geek Toronto. Here is how a Reuse Partnership compares.
+          </p>
+        </div>
+        <div className="flat mt-10 overflow-hidden">
+          <table className="w-full text-left">
+            <caption className="sr-only">How a Reuse Partnership compares with other ways to retire business laptops</caption>
+            <thead className="max-md:sr-only">
+              <tr className="border-b border-line text-small text-ink-2">
+                <th scope="col" className="px-5 py-3 font-medium">Option</th>
+                <th scope="col" className="px-5 py-3 font-medium">What you get</th>
+                <th scope="col" className="px-5 py-3 font-medium">The catch</th>
+              </tr>
+            </thead>
+            <tbody>
+              {OPTIONS.map((o) => (
+                <tr key={o.option} className="border-b border-line max-md:flex max-md:flex-col max-md:gap-1 max-md:px-5 max-md:py-4">
+                  <th scope="row" className="font-semibold md:px-5 md:py-4">{o.option}</th>
+                  <td className="text-ink-2 md:px-5 md:py-4">{o.get}</td>
+                  <td className="text-ink-2 md:px-5 md:py-4">{o.catch}</td>
+                </tr>
+              ))}
+              <tr className="bg-mint/50 max-md:flex max-md:flex-col max-md:gap-1 max-md:px-5 max-md:py-4">
+                <th scope="row" className="font-semibold text-loop-deep md:px-5 md:py-4">Reuse Partnership</th>
+                <td className="md:px-5 md:py-4">Free. A certified data wipe for every drive and a numbered certificate for every batch.</td>
+                <td className="md:px-5 md:py-4">None for you. Each laptop&apos;s Device Passport shows who it helps in Toronto.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <section aria-labelledby="how" className="border-y border-line bg-surface-flat/60 py-20">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
           <h2 id="how" className="font-display text-[2rem] leading-tight sm:text-display-m">
@@ -85,7 +131,7 @@ export default function BecomeAPartnerPage() {
           </div>
           <ul className="flex flex-col gap-4 md:col-span-7">
             {[
-              "Leave the drives in. Free Geek Toronto wipes every drive with its own sanitization software, which produces a report for each device.",
+              "Leave the drives in. Free Geek Toronto wipes every drive with the data-sanitization software it already uses, and the result is recorded for each device.",
               "A staff member — never a volunteer — verifies every wipe before a device can be refurbished or sold.",
               "Every step is logged in an append-only chain of custody that no one can edit afterwards.",
               "You get a numbered certificate listing each device, its serial number, wipe method and verification date, with a public verification link.",
@@ -126,10 +172,10 @@ export default function BecomeAPartnerPage() {
               },
               {
                 q: "How do we know our data is destroyed?",
-                a: "Free Geek Toronto's sanitization software wipes every drive and produces a report. A staff member verifies each one, and your numbered certificate lists every device with a public verification link.",
+                a: "Free Geek Toronto wipes every drive with its data-sanitization software and records the result for each device. A staff member verifies each one, and your numbered certificate lists every device with a public verification link.",
               },
               { q: "What does it cost?", a: "Nothing. The Community tier is free, for good. Paid memberships are optional extras for more reporting and recognition." },
-              { q: "Is the membership a donation?", a: "No. Memberships are a business service, reporting and recognition, so they don't come with a tax receipt. Free Geek Toronto is a non-profit, not a registered charity." },
+              { q: "Is the membership a donation?", a: "No. Memberships are a business service, reporting and recognition, so they don't come with a tax receipt." },
               { q: "Do I need to remove or destroy the drives?", a: "Please don't. Intact drives make a laptop reusable. Free Geek Toronto wipes and verifies every drive and lists each one on your certificate." },
               { q: "What do you accept?", a: "Laptops, desktops, flat-screen monitors, tablets and accessories. Batches of 5+ identical laptops under 5 years old help the most, but every batch is welcome." },
               { q: "Does paying get my devices processed first?", a: "No. Every partner's batch is scheduled by bench capacity. Tiers buy reporting and recognition, never priority or influence over prices." },

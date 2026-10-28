@@ -58,7 +58,7 @@ export function ContributionForm({ initialCents }: { initialCents?: number }) {
       <ClayButton type="submit" variant="primary" size="lg" loading={busy} icon={<HandCoins />} className="self-start">
         {Number.isFinite(cents) && cents > 0 ? `Contribute ${formatCents(cents)}` : "Contribute"}
       </ClayButton>
-      <p className="text-small text-ink-3">Not a donation for tax purposes — Free Geek Toronto doesn&apos;t issue tax receipts for contributions.</p>
+      <p className="text-small text-ink-3">Contributions through Relay don&apos;t come with a tax receipt.</p>
     </form>
   );
 }

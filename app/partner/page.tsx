@@ -9,8 +9,8 @@ import { getPartnerContext, listBatches } from "@/lib/queries/partner";
 import { getPartnerImpact } from "@/lib/queries/impact";
 import { labels, recipientNoun, type DeviceStatus, type RecipientCategory } from "@/lib/domain";
 import { hasFullDashboard } from "@/lib/pricing";
-import { DevicesAreaChart } from "@/components/charts/area";
-import { lastMonths, monthlySeries } from "@/lib/impact";
+import { DevicesAreaChart } from "@/components/charts/lazy";
+import { lastMonths, runningTotals } from "@/lib/impact";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -158,8 +158,8 @@ export default async function PartnerDashboard() {
           </div>
           <div className="mt-4">
             <DevicesAreaChart
-              label="Devices received and reused per month"
-              data={monthlySeries(
+              label="Running total of devices received and back in use, by month"
+              data={runningTotals(
                 impact.devices.map((d) => ({ receivedAt: d.received_at ?? d.created_at, soldAt: d.sold_at })),
                 lastMonths(new Date(), 6),
               )}
@@ -176,7 +176,7 @@ export default async function PartnerDashboard() {
 
       {!full ? (
         <p className="mt-10 border-t border-line pt-5 text-small text-ink-2">
-          Your batches, certificates and Device Passports are free on the Community tier. Want a live ESG dashboard, an annual report and a LinkedIn card for your board?{" "}
+          Your batches, certificates and Device Passports are free on the Community tier. Want a detailed impact dashboard, an annual report and a LinkedIn card for your board?{" "}
           <Link href="/partner/membership" className="font-semibold text-loop-deep underline-offset-4 hover:underline">
             Compare optional memberships
           </Link>

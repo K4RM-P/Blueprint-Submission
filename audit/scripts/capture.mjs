@@ -32,7 +32,7 @@ async function login(ctx, role) {
   return page;
 }
 
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {});
 const errors = [];
 
 async function shoot(ctxPage, name, url) {
@@ -43,7 +43,7 @@ async function shoot(ctxPage, name, url) {
       await ctxPage.goto(BASE + url, { waitUntil: "load", timeout: 60000 });
       await ctxPage.waitForTimeout(700);
       await scrollThrough(ctxPage);
-      await ctxPage.screenshot({ path: path.join(OUT, `${name}@${w}.png`), fullPage: true });
+      await ctxPage.screenshot({ path: path.join(OUT, `${name}@${w}.${process.env.JPEG ? 'jpg' : 'png'}`), fullPage: true, ...(process.env.JPEG ? { type: 'jpeg', quality: 78 } : {}) });
       const overflow = await ctxPage.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       if (overflow > 1) errors.push(`${name}@${w}: horizontal overflow ${overflow}px`);
     } catch (e) {

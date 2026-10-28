@@ -1,6 +1,30 @@
 import type { NextConfig } from "next";
 
+const supabaseOrigin = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").origin;
+  } catch {
+    return "";
+  }
+})();
+
+// Next's bootstrap scripts are inline, so scripts allow 'unsafe-inline'; everything else is locked to
+// this site and the Supabase project. Production only: the dev server needs eval for fast refresh.
+const csp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  `img-src 'self' data: blob: ${supabaseOrigin}`,
+  "font-src 'self'",
+  `connect-src 'self' ${supabaseOrigin} ${supabaseOrigin.replace(/^https/, "wss")}`,
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self' https://checkout.stripe.com",
+].join("; ");
+
 const securityHeaders = [
+  ...(process.env.NODE_ENV === "production" ? [{ key: "Content-Security-Policy", value: csp }] : []),
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

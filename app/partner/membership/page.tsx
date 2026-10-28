@@ -54,8 +54,8 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
               {tier === "community"
                 ? "Free, no expiry"
                 : active
-                  ? `Renews by ${longDate(org.membership_expires_at)} · ${days} days left`
-                  : `Lapsed on ${longDate(org.membership_expires_at)}`}
+                  ? `Renews by ${longDate(org.membership_expires_at?.slice(0, 10))} · ${days} days left`
+                  : `Lapsed on ${longDate(org.membership_expires_at?.slice(0, 10))}`}
             </p>
           </div>
           <p className="font-display text-[2.5rem] leading-none tnum">
@@ -107,7 +107,7 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
           {options.length === 1 && options[0] === tier ? (
             <p className="flat p-6 text-ink-2">You&apos;re on our top tier. Thank you for putting your people — and your laptops — to work for Toronto.</p>
           ) : null}
-          <p className="text-small text-ink-3">Memberships aren&apos;t charitable donations and don&apos;t come with tax receipts. Prices are placeholders until Free Geek Toronto confirms them.</p>
+          <p className="text-small text-ink-3">Memberships are a business service, so they don&apos;t come with a tax receipt. Prices are placeholders until Free Geek Toronto confirms them.</p>
         </div>
       </div>
 

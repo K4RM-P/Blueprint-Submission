@@ -13,7 +13,7 @@ test("F3 — volunteer claims a device and completes the checklist on a phone (V
   await expect(page.getByRole("dialog")).toContainText("Diagnostician");
   await page.getByRole("button", { name: "Keep going" }).click();
 
-  await page.getByLabel("Sanitization report ID").fill("BL-990001");
+  await page.getByLabel("Sanitization report ID").fill("RPT-990001");
   const hold = page.getByRole("button", { name: /Hold to confirm wipe/ });
   await hold.focus();
   await page.keyboard.press("Enter");

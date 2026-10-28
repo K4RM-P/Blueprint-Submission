@@ -851,17 +851,13 @@ html[data-reduced-motion="true"] :is(.laptop-lid, .laptop-lane-fill, .laptop-bat
   display: inline-block;
   animation: hero-hand 1s var(--ease-spring) var(--d, 0ms) both;
 }
-/* words are handed in from the left, one after another, like a baton */
+/* words are handed in from the left, one after another, like a baton. Motion only, no fade:
+   the headline is readable (and counts as painted) from the very first frame. */
 @keyframes hero-hand {
   from {
-    opacity: 0;
     transform: translate(-0.18em, 0.28em) rotate(-2deg);
   }
-  40% {
-    opacity: 1;
-  }
   to {
-    opacity: 1;
     transform: none;
   }
 }
@@ -915,6 +911,35 @@ html[data-reduced-motion="true"] :is(.laptop-lid, .laptop-lane-fill, .laptop-bat
 }
 html[data-reduced-motion="true"] :is(.hero-in, .hero-word, .hero-drop, .live-dot) {
   animation: none !important;
+}
+
+/* Landing entrance (components/landing/reveal.tsx): settles up on the soft spring curve, once. */
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-y, 40px)) scale(0.965);
+  transition:
+    opacity 0.45s cubic-bezier(0.2, 0, 0, 1) var(--reveal-delay, 0s),
+    transform 0.9s var(--ease-spring) var(--reveal-delay, 0s);
+}
+.reveal[data-in] {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    transform: none;
+    transition: opacity 0.15s linear;
+  }
+}
+html[data-reduced-motion="true"] .reveal {
+  transform: none;
+  transition: opacity 0.15s linear;
+}
+@media print {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* Landing cards: a soft light follows the pointer over the clay; the card sinks a touch when pressed. */
@@ -1116,29 +1141,12 @@ html[data-reduced-motion="true"] :is(.hero-in, .hero-word, .hero-drop, .live-dot
     radial-gradient(ellipse 40% 42% at 50% 40%, var(--canvas) 35%, transparent 100%),
     linear-gradient(to bottom, transparent 60%, var(--canvas) 100%);
 }
-/* Floating paths: each hairline grows from 30% and slides along itself, like a current. */
+/* Floating paths: each hairline shows 30% of its length at its own offset, like a current caught mid-flow. */
 .float-path {
   stroke-dasharray: 0.3 1;
-  animation: float-path var(--dur, 24s) linear var(--delay, 0s) infinite;
+  stroke-dashoffset: var(--offset, 0);
 }
 /* No opacity keyframes here: 72 per-path opacity animations make Chrome stop painting the type above them. */
-@keyframes float-path {
-  0% {
-    stroke-dasharray: 0.3 1;
-    stroke-dashoffset: 0;
-  }
-  50% {
-    stroke-dasharray: 1 1;
-    stroke-dashoffset: -1;
-  }
-  100% {
-    stroke-dasharray: 0.3 1;
-    stroke-dashoffset: 0;
-  }
-}
-.floating-paths[data-live="false"] .float-path {
-  animation-play-state: paused;
-}
 @media (prefers-reduced-motion: reduce) {
   .float-path {
     animation: none;

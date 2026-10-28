@@ -48,6 +48,16 @@ export type ChecklistStep = (typeof CHECKLIST_STEPS)[number];
 
 export const EMPLOYEE_RANGES = ["1-10", "11-50", "51-200", "201-500", "500+"] as const;
 
+/**
+ * What Relay records as the wipe method until staff type FGT's own: it names the tool FGT already
+ * uses and says the standard is unconfirmed. Relay never defaults to a named standard (PRD §19).
+ */
+export const DEFAULT_WIPE_METHOD = "FGT data-sanitization software (standard to be confirmed)";
+
+/** What staff record about the drive when a device is recycled before its wipe was verified. */
+export const DRIVE_HANDLING = ["Drive physically destroyed", "Drive wiped with FGT's sanitization software", "No storage drive in this device"] as const;
+export type DriveHandling = (typeof DRIVE_HANDLING)[number];
+
 export const labels = {
   tier: { community: "Community Partner", impact: "Impact Partner", champion: "Champion Partner" } satisfies Record<PartnerTier, string>,
   batchStatus: {

@@ -38,8 +38,11 @@ describe("device status machine (PRD §9.1)", () => {
   });
 
   it("recycles from any pre-sale state with a reason", () => {
-    expect(canTransitionDevice("testing", "recycled", { actor: "staff", recycledReason: "Cracked board" }).ok).toBe(true);
+    expect(canTransitionDevice("testing", "recycled", { actor: "staff", recycledReason: "Cracked board", driveHandling: "Drive physically destroyed" }).ok).toBe(true);
+    expect(canTransitionDevice("wipe_verified", "recycled", { actor: "staff", recycledReason: "Cracked board", wipeVerifiedAt: "2026-10-01" }).ok).toBe(true);
     expect(canTransitionDevice("testing", "recycled", { actor: "staff" }).ok).toBe(false);
+    // An unverified drive can't leave without a recorded handling (certificate accounts for every drive).
+    expect(canTransitionDevice("testing", "recycled", { actor: "staff", recycledReason: "Cracked board" })).toEqual({ ok: false, reason: "Record what happened to the drive before recycling." });
     expect(canTransitionDevice("sold", "recycled", { actor: "staff", recycledReason: "x" }).ok).toBe(false);
     expect(canTransitionDevice("recycled", "recycled", { actor: "staff", recycledReason: "x" }).ok).toBe(false);
   });

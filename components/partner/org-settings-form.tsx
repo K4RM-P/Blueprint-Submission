@@ -125,9 +125,9 @@ function LogoUploader({ logoUrl }: { logoUrl: string | null }) {
       </div>
       <div className="min-w-0 flex-1">
         <h2 className="font-semibold">Logo</h2>
-        <p className="text-small text-ink-2">PNG, JPG, WebP or SVG, up to 1 MB. Used on your Partner Wall tile, reports and LinkedIn card.</p>
+        <p className="text-small text-ink-2">PNG, JPG or WebP, up to 1 MB. Used on your Partner Wall tile, reports and LinkedIn card.</p>
       </div>
-      <input ref={input} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="sr-only" aria-label="Upload a logo" onChange={(ev) => onChange(ev.target.files?.[0])} />
+      <input ref={input} type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" aria-label="Upload a logo" onChange={(ev) => onChange(ev.target.files?.[0])} />
       <ClayButton type="button" variant="secondary" size="sm" loading={busy} icon={<ImageUp />} onClick={() => input.current?.click()}>
         {preview ? "Replace logo" : "Upload logo"}
       </ClayButton>

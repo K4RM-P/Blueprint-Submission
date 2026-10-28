@@ -16,7 +16,7 @@ test("PP-10 / PP-11 — partner downloads the report and sees the LinkedIn card"
   const src = await img.getAttribute("src");
   const png = await page.request.get(src!);
   expect(png.headers()["content-type"]).toContain("image/png");
-  await expect(page.getByLabel("Suggested post")).toHaveValue(/Maple Ledger Accounting gave \d+ retired/);
+  await expect(page.getByLabel("Suggested post")).toHaveValue(/Maple Ledger Accounting handed \d+ retired devices to Free Geek Toronto/);
 });
 
 test("PP-11 — the card is private to its own organization", async ({ request }) => {

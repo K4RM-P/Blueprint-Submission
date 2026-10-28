@@ -25,7 +25,7 @@ export default function AboutPage() {
           </IconTile>
           <h2 className="text-title font-semibold">One name, independent organizations</h2>
           <p className="text-ink-2">
-            Free Geek Toronto is independent. Free Geek locations in other cities — like Vancouver or Portland — are separate organizations, so their products, prices and services differ
+            Free Geek Toronto is independent. Free Geek locations in other cities are separate organizations, so their products, prices and services differ
             from ours.
           </p>
         </ClayCard>
@@ -48,7 +48,7 @@ export default function AboutPage() {
           <ol className="mt-4 flex flex-col gap-4">
             {[
               [HardDrive, "Drives arrive intact. Donors don't need to remove or destroy them."],
-              [Wrench, "A volunteer wipes each drive with Free Geek Toronto's sanitization software, which produces a report."],
+              [Wrench, "A volunteer wipes each drive with the data-sanitization software Free Geek Toronto already uses, and records the result."],
               [ShieldCheck, "A staff member — never a volunteer — checks the report and verifies the wipe before the device can move on."],
               [ShieldCheck, "Every step is logged in an append-only record. Reuse Partners receive a numbered certificate for this certified data wipe, which anyone can verify."],
             ].map(([Icon, text], i) => {

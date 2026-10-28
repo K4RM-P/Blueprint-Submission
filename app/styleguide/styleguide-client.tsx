@@ -364,7 +364,7 @@ export function StyleguideClient() {
 
       <Section title="Feedback">
         <div className="flex flex-wrap gap-4">
-          <ClayButton variant="secondary" onClick={() => toast.success("Batch sent. We'll confirm your drop-off week within 2 business days.")}>
+          <ClayButton variant="secondary" onClick={() => toast.success("Batch sent. Free Geek Toronto staff will confirm your drop-off week.")}>
             Show success toast
           </ClayButton>
           <ClayButton variant="secondary" onClick={() => toast.error("That week is full — the next open week is Nov 30.")}>
@@ -502,7 +502,7 @@ function WrappedKit() {
           <div className="relative h-56 overflow-hidden rounded-[20px] [container-type:size]" style={{ background: "#F4F0E9" }}>
             <LiquidTransition dir={run === 0 ? 0 : 1} tint={tint} reduced={false}>
               <div className="story-slide !p-6" data-tint={tint}>
-                <p className="font-display text-[1.75rem] leading-none">Every byte erased.</p>
+                <p className="font-display text-[1.75rem] leading-none">Its old data, wiped.</p>
               </div>
             </LiquidTransition>
           </div>

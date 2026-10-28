@@ -61,6 +61,11 @@ export function isRefurbishedStatus(status: DeviceStatus): boolean {
 
 const round = (n: number, d = 1) => Math.round(n * 10 ** d) / 10 ** d;
 
+/** Estimated bench hours: refurbished devices × refurb minutes (uniform vs mixed) ÷ 60, one decimal. */
+export function estimateHours(uniform: number, mixed: number, minutes: RefurbMinutes): number {
+  return round((uniform * minutes.uniform + mixed * minutes.mixed) / 60);
+}
+
 export function computeImpact(rows: ImpactRow[], factors: ImpactFactor[], minutes: RefurbMinutes = DEFAULT_REFURB_MINUTES): ImpactTotals {
   const byCat = new Map(factors.map((f) => [f.category, f]));
   let received = 0,
@@ -69,7 +74,8 @@ export function computeImpact(rows: ImpactRow[], factors: ImpactFactor[], minute
     inProgress = 0,
     kg = 0,
     co2 = 0,
-    mins = 0;
+    uniformRefurbished = 0,
+    mixedRefurbished = 0;
   const recipients: Partial<Record<RecipientCategory, number>> = {};
 
   for (const r of rows) {
@@ -89,7 +95,10 @@ export function computeImpact(rows: ImpactRow[], factors: ImpactFactor[], minute
     } else {
       inProgress += n;
     }
-    if (r.refurbished) mins += (r.uniform ? minutes.uniform : minutes.mixed) * n;
+    if (r.refurbished) {
+      if (r.uniform) uniformRefurbished += n;
+      else mixedRefurbished += n;
+    }
   }
 
   return {
@@ -99,7 +108,7 @@ export function computeImpact(rows: ImpactRow[], factors: ImpactFactor[], minute
     devicesInProgress: inProgress,
     kgDiverted: round(kg),
     co2eAvoidedKg: round(co2),
-    volunteerHours: round(mins / 60),
+    volunteerHours: estimateHours(uniformRefurbished, mixedRefurbished, minutes),
     recipients,
   };
 }
@@ -126,6 +135,18 @@ export function monthlySeries(
     month: m,
     received: events.filter((e) => e.receivedAt?.slice(0, 7) === m).length,
     reused: events.filter((e) => e.soldAt?.slice(0, 7) === m).length,
+  }));
+}
+
+/** Running totals at the end of each month (everything up to and including it), for "devices over time" charts. */
+export function runningTotals(
+  events: { receivedAt: string | null; soldAt: string | null }[],
+  months: string[],
+): { month: string; received: number; reused: number }[] {
+  return months.map((m) => ({
+    month: m,
+    received: events.filter((e) => e.receivedAt != null && e.receivedAt.slice(0, 7) <= m).length,
+    reused: events.filter((e) => e.soldAt != null && e.soldAt.slice(0, 7) <= m).length,
   }));
 }
 

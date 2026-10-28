@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
+import { env } from "@/lib/env";
 import { ClayButton, EmptyState } from "@/components/clay";
 import { PartnerTile } from "@/components/public/partner-tile";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { logoUrl } from "@/lib/queries/common";
 import { labels, type PartnerTier } from "@/lib/domain";
 
 export const metadata: Metadata = { title: "Partner Wall", description: "Toronto businesses whose retired laptops now help students, newcomers and families." };
 
 /** DP-07: opted-in partners by tier, with logos and devices-reused counts. */
+// Public numbers only: cached and refreshed every minute (ISR), so visitors never wait on the database.
+export const revalidate = 60;
+
 export default async function PartnersPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase.rpc("partner_wall");
   const partners = data ?? [];
   const tiers: PartnerTier[] = ["champion", "impact", "community"];
@@ -23,7 +27,7 @@ export default async function PartnersPage() {
         </div>
         <p className="text-ink-2 md:col-span-4">
           <span className="font-display block text-[3.5rem] leading-none text-ink tnum">{total}</span>
-          devices from these partners are back in use. Partners choose whether to appear here.
+          devices from these partners are back in use. Partners choose whether to appear here.{env.demoMode ? " These are fictional demo partners." : ""}
         </p>
       </div>
       {partners.length === 0 ? (

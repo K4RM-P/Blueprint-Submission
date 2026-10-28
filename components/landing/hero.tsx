@@ -2,13 +2,11 @@
 
 import { motion, useInView, useScroll, useSpring, useTransform } from "motion/react";
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 import { ClayButton } from "@/components/clay";
-import { FloatingPathsBackground } from "@/components/ui/floating-paths";
 import { useMotionPrefs } from "@/lib/motion";
 import { CountUp } from "./count-up";
-import { DashboardPreview, type PreviewTotals } from "./dashboard-preview";
 
 /**
  * Landing hero, "Pass it on.". Centered, Apple/Vercel-style: a live pill, one
@@ -18,7 +16,8 @@ import { DashboardPreview, type PreviewTotals } from "./dashboard-preview";
  * a mint glow. Entrance is CSS (runs
  * before hydration). Reduced motion: everything rests in place.
  */
-export function Hero({ devicesReused, totals }: { devicesReused: number; totals: PreviewTotals }) {
+/** `backdrop` and `shot` are server-rendered (static art and the illustrative mock), so they cost nothing to hydrate. */
+export function Hero({ devicesReused, backdrop, shot }: { devicesReused: number; backdrop: ReactNode; shot: ReactNode }) {
   const ref = useRef<HTMLElement>(null);
   const shotRef = useRef<HTMLDivElement>(null);
   const { reduced } = useMotionPrefs();
@@ -36,8 +35,7 @@ export function Hero({ devicesReused, totals }: { devicesReused: number; totals:
       <span aria-hidden className="hero-aura absolute inset-x-0 top-0 -z-10 h-[1100px]" />
       {/* a current of hairlines sweeping behind the headline, in the relay's green */}
       <div aria-hidden className="hero-paths pointer-events-none absolute left-1/2 top-0 -z-10 h-[760px] w-[max(100%,1440px)] -translate-x-1/2 text-loop-deep md:h-[900px]">
-        <FloatingPathsBackground position={1} className="absolute inset-0" />
-        <FloatingPathsBackground position={-1} className="absolute inset-0" />
+        {backdrop}
       </div>
       <div className="mx-auto max-w-[1200px] px-4 pt-12 text-center sm:px-6 md:pt-20 lg:pt-24">
         <Link href="/impact" className="hero-in group inline-flex items-center gap-3 text-small text-ink-2 [--d:0ms]">
@@ -46,14 +44,15 @@ export function Hero({ devicesReused, totals }: { devicesReused: number; totals:
           </span>
           <span aria-hidden className="h-3.5 w-px bg-line" />
           <span>
-            <CountUp value={devicesReused} className="font-semibold text-ink" /> devices back in use
+            <CountUp value={devicesReused} className="font-semibold text-ink" /> devices back in use <span className="text-ink-3">(demo data)</span>
           </span>
           <span className="hidden items-center gap-1 font-medium text-ink underline decoration-line sm:inline-flex underline-offset-4 transition-colors group-hover:decoration-ink">
             See the impact <ArrowRight aria-hidden className="size-3.5 transition-transform group-hover:translate-x-0.5" />
           </span>
         </Link>
 
-        <h1 id="hero-title" className="hero-title font-display mx-auto mt-8 text-[clamp(4.75rem,19vw,10.5rem)] leading-[0.86] md:mt-10">
+        <p className="hero-in mt-8 font-mono text-[0.75rem] uppercase tracking-[0.14em] text-loop-deep md:mt-10 [--d:30ms]">Free laptop retirement for Toronto businesses</p>
+        <h1 id="hero-title" className="hero-title font-display mx-auto mt-4 text-[clamp(4.75rem,19vw,10.5rem)] leading-[0.86]">
           <span className="hero-word [--d:60ms]">Pass</span> <span className="hero-word [--d:140ms]">it</span>{" "}
           <span className="hero-word hero-ink relative [--d:220ms]">
             on
@@ -82,11 +81,12 @@ export function Hero({ devicesReused, totals }: { devicesReused: number; totals:
           <span aria-hidden className="shot-glow absolute inset-x-[6%] top-[8%] -z-10 h-[80%]" />
           <motion.div style={live ? { rotateX, scale, y, transformOrigin: "50% 0%" } : undefined} role="img" aria-label="Example Partner Portal dashboard: devices received, verified and back in use, a chart over time, who the laptops help, and recent batches.">
             <div aria-hidden>
-              <DashboardPreview totals={totals} />
+              {shot}
             </div>
           </motion.div>
           <span aria-hidden className="shot-floor pointer-events-none absolute inset-x-0 -bottom-px h-40" />
         </div>
+        <p className="relative mt-4 text-[0.8125rem] text-ink-3">Example Partner Portal with illustrative numbers. The live demo counts are further down this page.</p>
 
       </div>
     </section>

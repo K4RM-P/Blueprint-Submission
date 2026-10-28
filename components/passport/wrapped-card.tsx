@@ -5,7 +5,7 @@ import type { PointerEvent } from "react";
 import { LoopMark } from "@/components/shell/logo";
 import { cardFacts, legLabel, type PassportStory } from "@/lib/passport-story";
 import { cn } from "@/lib/utils";
-import { PERSONA_ICON } from "./slides";
+import { PERSONA_ICON } from "./persona-icons";
 import { useStoryMotion } from "./story-context";
 
 /**

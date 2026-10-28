@@ -1,5 +1,6 @@
 import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import type { ImpactTotals } from "@/lib/impact";
+import { impactSummary } from "@/lib/report";
 
 /**
  * Annual impact report (PP-10). Same document language as the certificate (UI §9.8):
@@ -131,7 +132,7 @@ export function ReportDocument({ data }: { data: ReportData }) {
         <Text style={s.period}>{data.periodLabel}</Text>
         <Text style={s.lead}>
           {people > 0
-            ? `${n(t.devicesReceived)} devices donated by ${data.orgName} were wiped, verified and refurbished in Toronto. ${n(people)} are now back in use with people who need them.`
+            ? impactSummary(data.orgName, t)
             : `${n(t.devicesReceived)} devices donated by ${data.orgName} are moving through Free Geek Toronto's refurbishment process.`}
         </Text>
 
@@ -215,7 +216,7 @@ export function ReportDocument({ data }: { data: ReportData }) {
               <Text style={{ width: "44%", paddingLeft: 12, color: INK2 }}>{f.source}</Text>
             </View>
           ))}
-          <Text style={s.note}>Factors marked TO VERIFY are placeholders pending review by Free Geek Toronto. Memberships are not charitable donations; no tax receipt is implied.</Text>
+          <Text style={s.note}>Factors marked TO VERIFY are placeholders pending review by Free Geek Toronto. Memberships are a business service; no tax receipt is implied.</Text>
         </View>
 
         <View style={s.footer} fixed>

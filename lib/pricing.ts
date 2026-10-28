@@ -44,7 +44,7 @@ export const TIER_BENEFITS: Record<PartnerTier, string[]> = {
     "A Device Passport for every laptop",
     "Impact summary on your dashboard",
   ],
-  impact: ["Everything in Community", "Pickup requests", "Live ESG impact dashboard", "Downloadable annual impact report", "Shareable LinkedIn impact card", "Logo on the public Partner Wall"],
+  impact: ["Everything in Community", "Pickup requests (to be confirmed by Free Geek Toronto)", "Detailed impact dashboard", "Downloadable annual impact report", "Shareable LinkedIn impact card", "Logo on the public Partner Wall"],
   champion: [
     "Everything in Impact",
     "One hosted employee volunteer day at the FGT Community Hub each year",

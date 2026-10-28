@@ -43,7 +43,7 @@ export function BarsChart({ data, unit = "devices", height = 240, label }: { dat
     <figure aria-label={label} className="w-full">
       <div style={{ height }} aria-hidden>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: -18 }}>
+          <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: -18 }} accessibilityLayer={false}>
             <defs>
               {/* liquid two-stop green (§3.3), lighter at the meniscus */}
               <linearGradient id="bar-liquid" x1="0" x2="0" y1="0" y2="1">

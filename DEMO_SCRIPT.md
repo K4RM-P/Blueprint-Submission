@@ -37,19 +37,19 @@ How the time splits: about **75%** on the core (the Reuse Partner pipeline and t
 ### 1:45 – 2:30 · F5: the Device Passport (Staff → phone)
 15. Staff → **Devices** → filter **Ready** → open one → **Set price** → **Record sale** → recipient **Student**.
 16. On the phone (signed out), scan the passport `/p/FGT-WRAPPED2`. It opens **Relay Wrapped**: the booklet opens → *"This laptop has a story."* → **Tap to begin**.
-17. Let it play (or tap right): **Leg 1 · Donated by a Reuse Partner**: *Its first job was at Maple Ledger Accounting* → the handoff → **Certified data wipe: Every byte erased** (sky seal) → *Aisha brought it back to life* → Linux Mint → kg kept out of landfill → **Where your money goes** (*Illustrative*) → **Why isn't it free?** → the collectible card → **Share my laptop's story**.
+17. Let it play (or tap right): **Leg 1 · Donated by a Reuse Partner**: *Its first job was at Maple Ledger Accounting* → the handoff → **Certified data wipe: Its old data, wiped** (sky seal) → *Aisha brought it back to life* → Linux Mint → kg kept out of landfill → **Where your money goes** (*Illustrative*) → **Why isn't it free?** → the collectible card → **Share my laptop's story**.
 18. Tap ✕ for the full passport: **Donated by Maple Ledger Accounting · A Reuse Partner** and **Certified data wipe · Verified** sit right on the cover. Say: *"This is what makes the impact visible to buyers and to the business. No serial numbers, no report IDs, no price paid, no buyer."*
 
 **Showcase passports** (fixed codes from `pnpm seed`; also listed on `/demo` under "Scan a Device Passport", and `FGT-WRAPPED2` is the featured passport on the landing page):
 
 | Code | Story |
 |---|---|
-| `FGT-WRAPPED2` | The full relay: Maple Ledger → Aisha → sold, with a Pay-It-Forward subsidy. 12 slides. **Use this one for the video.** |
+| `FGT-WRAPPED2` | The full relay: Maple Ledger → Aisha → sold, with a Pay-It-Forward subsidy. 13 slides. **Use this one for the video.** |
 | `FGT-QUEEN7WD` | Anonymous: the donor and volunteer opted out, so it says "a Toronto business" / "an FGT volunteer". |
 | `FGT-BENCH24Z` | Still on the bench with Jordan: ends on "Its next leg is coming soon." |
 | `FGT-PARTS4RC` | Recycled after its hardware test: "Its parts live on through responsible recycling." |
 
-Deep link any slide with `?s=N` (e.g. `/p/FGT-WRAPPED2?s=12` is the card). On a phone over Wi-Fi: run `pnpm dev -H 0.0.0.0`, then open `http://<your-laptop-LAN-IP>:3000/p/FGT-WRAPPED2`. For the printed QR codes to point at your laptop, set `NEXT_PUBLIC_SITE_URL=http://<LAN-IP>:3000` in `.env.local` first.
+Deep link any slide with `?s=N` (e.g. `/p/FGT-WRAPPED2?s=13` is the collectible card). On a phone over Wi-Fi: run `pnpm dev -H 0.0.0.0`, then open `http://<your-laptop-LAN-IP>:3000/p/FGT-WRAPPED2`. For the printed QR codes to point at your laptop, set `NEXT_PUBLIC_SITE_URL=http://<LAN-IP>:3000` in `.env.local` first.
 
 ### 2:30 – 2:50 · F6: why partners come back (Partner)
 19. Partner dashboard: "Your laptops are helping **N people**", certificates issued, then **Your laptops' Device Passports**: open one to show the partner can follow its own laptops.

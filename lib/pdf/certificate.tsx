@@ -96,7 +96,7 @@ export function CertificateDocument({ data }: { data: CertificateData }) {
           <Text style={s.c1}>#</Text>
           <Text style={s.c2}>Device</Text>
           <Text style={s.c3}>Serial</Text>
-          <Text style={s.c4}>Sanitization method</Text>
+          <Text style={s.c4}>Wipe method or drive handling</Text>
           <Text style={s.c5}>Verified</Text>
           <Text style={s.c6}>Outcome</Text>
         </View>
@@ -107,17 +107,17 @@ export function CertificateDocument({ data }: { data: CertificateData }) {
               {d.makeModel} ({d.category})
             </Text>
             <Text style={s.c3}>{d.serial ?? "not recorded"}</Text>
-            <Text style={s.c4}>{d.method ?? (d.outcome === "Recycled" ? "Physically recycled" : "—")}</Text>
+            <Text style={s.c4}>{d.method ?? "Not recorded"}</Text>
             <Text style={s.c5}>{d.verifiedAt ? fmt(d.verifiedAt) : "—"}</Text>
             <Text style={s.c6}>{d.outcome}</Text>
           </View>
         ))}
 
         <Text style={s.statement}>
-          Statement of process: each storage device listed above was received with its drive intact and sanitized by Free Geek Toronto using its data-sanitization software, which
-          produces a report for every device. A Free Geek Toronto staff member verified each sanitization report before the device could be refurbished, sold or recycled. Devices
-          that could not be reused were recycled responsibly. Every step is recorded in an append-only chain of custody. Relay records sanitization; Free Geek Toronto&apos;s
-          sanitization software remains the system of record. [Process wording to be confirmed by Free Geek Toronto.]
+          Statement of process: each device listed above was received with its drive intact. Drives of devices that were refurbished were sanitized by Free Geek Toronto using
+          its data-sanitization software, the result was recorded for each one, and a Free Geek Toronto staff member verified it before the device could be refurbished or sold.
+          For devices that could not be reused and were recycled, the table shows the wipe or the drive handling staff recorded. Every step is recorded in an append-only chain of
+          custody. Relay records sanitization; Free Geek Toronto&apos;s sanitization software remains the system of record. [Process wording to be confirmed by Free Geek Toronto.]
         </Text>
 
         <View style={s.footer} fixed>

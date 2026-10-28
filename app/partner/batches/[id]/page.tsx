@@ -63,7 +63,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
             ) : null}
             {batch.status === "submitted" ? (
               <div className="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
-                <p className="text-small text-ink-2">Our team reviews new batches within 2 business days. You can edit until then.</p>
+                <p className="text-small text-ink-2">Free Geek Toronto staff review new batches by bench capacity. You can edit until then.</p>
                 <BatchActions id={batch.id} />
               </div>
             ) : null}

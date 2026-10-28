@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Award, Cpu, HardDrive, Lock, ShieldCheck, Sparkle, Stethoscope, Terminal, Trophy, Users, Wrench } from "lucide-react";
+import { Award, Cpu, HardDrive, Lock, ShieldCheck, Stethoscope, Terminal, Trophy, Users, Wrench } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMotionPrefs } from "@/lib/motion";
 
@@ -32,7 +32,7 @@ interface BadgeCoinProps {
 
 /** Butter coin; locked = flat outline + progress ring, unlocked = full clay (§8). */
 export function BadgeCoin({ slug, name, unlocked, progress = 0, threshold = 1, size = 88, celebrate, className }: BadgeCoinProps) {
-  const Icon = icons[slug as BadgeIcon] ?? (slug === "sparkle" ? Sparkle : Award);
+  const Icon = icons[slug as BadgeIcon] ?? Award;
   const { reduced, t } = useMotionPrefs();
   const pct = Math.max(0, Math.min(1, threshold > 0 ? progress / threshold : 0));
   const live = Boolean(celebrate) && !reduced;

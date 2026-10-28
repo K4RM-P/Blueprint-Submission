@@ -23,7 +23,7 @@ interface AppShellProps {
   children: ReactNode;
 }
 
-function UserMenu({ userName, orgName, compact }: { userName: string; orgName?: string | null; compact?: boolean }) {
+function UserMenu({ userName, orgName, compact, more = [] }: { userName: string; orgName?: string | null; compact?: boolean; more?: NavItem[] }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -45,6 +45,15 @@ function UserMenu({ userName, orgName, compact }: { userName: string; orgName?: 
           Signed in as <span className="font-semibold text-ink">{userName}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {/* On phones, the pages that don't fit in the dock live here */}
+        {more.map((item) => (
+          <DropdownMenuItem key={item.href} asChild>
+            <Link href={item.href}>
+              <item.icon className="size-4" aria-hidden /> {item.label}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+        {more.length ? <DropdownMenuSeparator /> : null}
         <DropdownMenuItem asChild>
           <Link href="/">Public site</Link>
         </DropdownMenuItem>
@@ -104,7 +113,7 @@ export function AppShell({ role, userName, orgName, children }: AppShellProps) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="no-print glass sticky top-2 z-30 mx-2 mt-2 flex h-16 items-center justify-between rounded-[22px] px-3 lg:hidden">
           <Logo href={items[0].href} sub={meta.title} />
-          <UserMenu userName={userName} orgName={orgName} compact />
+          <UserMenu userName={userName} orgName={orgName} compact more={items.filter((i) => !i.dock)} />
         </header>
         <main id="main" className={cn("mx-auto w-full flex-1 px-4 pb-32 pt-6 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10", role === "staff" ? "max-w-[1320px]" : "max-w-[1200px]")}>
           {children}

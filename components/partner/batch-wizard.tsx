@@ -77,6 +77,9 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
       ),
     [lineItems, weights, maxAgeYears],
   );
+  // The meter waits for one complete, valid row instead of scoring an empty form.
+  const scoreReady = (lineItems ?? []).some((l) => (l.make ?? "").trim() && (l.model ?? "").trim() && Number.isFinite(l.quantity) && l.quantity >= 1 && l.quantity <= 500);
+  const meter = scoreReady ? { value: score.score, verdict: score.label } : { value: 0, verdict: "Add a model" };
   const pickupAllowed = canRequestPickup(tier);
   const totalQty = score.totalQuantity;
 
@@ -130,7 +133,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
       className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
       {/* Mobile: the meter collapses into a sticky top pill (§9.4). */}
       <div className="sticky top-[72px] z-20 -mx-1 lg:hidden">
-        <LiquidMeter compact title="Batch Value Score" value={score.score} verdict={score.label} />
+        <LiquidMeter compact title="Batch Value Score" value={meter.value} verdict={meter.verdict} />
       </div>
 
       <ClayCard size="lg" className="min-w-0">
@@ -175,17 +178,17 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                               )}
                             </Field>
                             <Field label="Make" className="sm:col-span-2" error={le?.make?.message}>
-                              {({ id, describedBy, invalid }) => <Input id={id} placeholder="Dell" aria-describedby={describedBy} aria-invalid={invalid} {...register(`lineItems.${i}.make`)} />}
+                              {({ id, describedBy, invalid }) => <Input id={id} placeholder="e.g. Dell" aria-describedby={describedBy} aria-invalid={invalid} {...register(`lineItems.${i}.make`)} />}
                             </Field>
                             <Field label="Model" className="sm:col-span-2" error={le?.model?.message}>
-                              {({ id, describedBy, invalid }) => <Input id={id} placeholder="Latitude 5420" aria-describedby={describedBy} aria-invalid={invalid} {...register(`lineItems.${i}.model`)} />}
+                              {({ id, describedBy, invalid }) => <Input id={id} placeholder="e.g. Latitude 5420" aria-describedby={describedBy} aria-invalid={invalid} {...register(`lineItems.${i}.model`)} />}
                             </Field>
                             <Field label="Approx. year" className="sm:col-span-2" error={le?.approxYear?.message}>
                               {({ id, describedBy, invalid }) => (
                                 <Input
                                   id={id}
                                   inputMode="numeric"
-                                  placeholder="2021"
+                                  placeholder="e.g. 2021"
                                   aria-describedby={describedBy}
                                   aria-invalid={invalid}
                                   {...register(`lineItems.${i}.approxYear`, { setValueAs: (v) => (v === "" || v === null ? null : Number(v)) })}
@@ -281,7 +284,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                       <ShieldCheck />
                     </IconTile>
                     <p className="measure text-ink-2">
-                      Free Geek Toronto wipes every drive with its own sanitization software and records a report for each device. Staff verify every wipe before a device can be sold, and
+                      Free Geek Toronto wipes every drive with its own sanitization software and records the result for each device. Staff verify every wipe before a device can be sold, and
                       you get a numbered certificate listing every device.
                     </p>
                   </div>
@@ -387,9 +390,9 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
       </ClayCard>
 
       <aside className="sticky top-8 hidden flex-col gap-4 lg:flex" aria-label="Batch Value Score">
-        <LiquidMeter title="Batch Value Score" value={score.score} verdict={score.label}>
+        <LiquidMeter title="Batch Value Score" value={meter.value} verdict={meter.verdict}>
           <p className="mt-3 text-small text-ink-2" aria-live="polite">
-            {scoreTip(score)}
+            {scoreReady ? scoreTip(score) : "Add the make, model and quantity to see how quickly this batch can be refurbished."}
           </p>
         </LiquidMeter>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 px-2 text-small">
@@ -480,8 +483,8 @@ function SubmittedCelebration({ id, score, label }: { id: string; score: number;
       {phase === "fly" && flight ? <BatonFlight from={flight.from} to={flight.to} href="/partner/batches" onDone={() => setPhase("done")} /> : null}
       <div role="status">
         <p className="eyebrow !text-loop-deep">Batch Value Score · {score} · {label}</p>
-        <h2 className="font-display mt-2 text-[2.25rem] leading-tight">Batch sent. The baton&apos;s with us now.</h2>
-        <p className="mt-2 text-body-l text-ink-2">We&apos;ll confirm your drop-off week within 2 business days.</p>
+        <h2 className="font-display mt-2 text-[2.25rem] leading-tight">Batch sent. Thank you.</h2>
+        <p className="mt-2 text-body-l text-ink-2">Free Geek Toronto staff will confirm your drop-off week.</p>
       </div>
       <div className={cn("flex flex-wrap justify-center gap-3")}>
         <ClayButton href={`/partner/batches/${id}`} variant="secondary">

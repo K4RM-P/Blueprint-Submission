@@ -17,11 +17,13 @@ export interface ImpactCardProps {
 /** The card itself — flat porcelain, one mint pebble, real numbers (UI §3, §12). */
 export function renderImpactCard({ orgName, tierLabel, periodLabel, totals: t }: ImpactCardProps): ImageResponse {
   const who = recipientPhrase(t);
-  const line = `gave ${n(t.devicesReceived)} retired ${t.devicesReceived === 1 ? "device" : "devices"} a second life${who ? ` — now helping ${who}` : ""}.`;
+  const line = `handed ${n(t.devicesReceived)} retired ${t.devicesReceived === 1 ? "device" : "devices"} to Free Geek Toronto${who ? `, now helping ${who}` : ""}.`;
+  // Share surfaces carry only counted numbers plus the weight estimate; CO₂e stays on the
+  // dashboard and methodology page, next to its TO VERIFY factors, until FGT confirms them.
   const stats = [
     [n(t.devicesReused), "devices back in use"],
-    [`${n(t.kgDiverted)} kg`, "kept out of landfill"],
-    [`${n(t.co2eAvoidedKg)} kg`, "CO₂e avoided (est.)"],
+    [n(t.devicesInProgress), "being refurbished now"],
+    [`${n(t.kgDiverted)} kg`, "kept out of landfill (est.)"],
   ];
 
   return new ImageResponse(

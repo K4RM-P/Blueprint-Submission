@@ -84,7 +84,7 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
                         </p>
                         <p className="text-small text-ink-2">{HINT[step]}</p>
                       </div>
-                      <Field label="Sanitization report ID" error={errors.reportRef} hint="Printed by the wipe software, e.g. BL-482913.">
+                      <Field label="Sanitization report ID" error={errors.reportRef} hint="The reference for this drive in the wipe software, e.g. RPT-482913.">
                         {({ id, describedBy, invalid }) => <Input id={id} className="font-mono" value={reportRef} onChange={(e) => setReportRef(e.target.value)} aria-describedby={describedBy} aria-invalid={invalid} />}
                       </Field>
                       <HoldToConfirm label="Hold to confirm wipe" hint={reportRef.trim() ? "Press and hold for about a second" : "Enter the report ID first"} disabled={!reportRef.trim() || busy !== null} icon={<HardDrive />} onConfirm={() => run(step)} />

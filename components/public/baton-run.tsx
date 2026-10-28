@@ -53,7 +53,7 @@ export function BatonRun({ stations }: { stations: RelayStation[] }) {
             label="The relay"
             title="One laptop, five handoffs."
             muted="Every one on the record."
-            aside={<p className="text-ink-2">Follow one laptop from an office desk to its next owner, and the story back to the business that gave it. Real counts from Free Geek Toronto&apos;s bench.</p>}
+            aside={<p className="text-ink-2">Follow one laptop from an office desk to its next owner, and the story back to the business that gave it. Live counts from Relay&apos;s records (fictional demo data here).</p>}
           />
 
           {/* Desktop: horizontal relay lane over one station column per handoff */}
@@ -180,7 +180,7 @@ function StationCard({ station, index, lit, receiving }: { station: RelayStation
     >
       <div className="flex items-baseline justify-between gap-3">
         <p className={cn("font-display text-[2.5rem] font-semibold leading-none tracking-[-0.05em] tnum transition-colors md:text-[3rem]", lit ? "text-ink" : "text-ink-3")}>{station.stat}</p>
-        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-ink-3">Leg {index + 1}</p>
+        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-ink-3">Handoff {index + 1}</p>
       </div>
       <p className="mt-1 text-small text-ink-2">{station.statLabel}</p>
       <h3 className={cn("mt-6 text-lg font-semibold leading-snug transition-colors", lit ? "text-ink" : "text-ink-2")}>{station.title}</h3>

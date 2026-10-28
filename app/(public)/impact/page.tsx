@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { StatPebble } from "@/components/clay";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { getPublicImpact } from "@/lib/queries/impact";
 import { getSettings } from "@/lib/queries/common";
 import { labels, recipientNoun, type RecipientCategory } from "@/lib/domain";
@@ -9,23 +9,26 @@ import { longDate } from "@/lib/dates";
 export const metadata: Metadata = { title: "Impact & methodology", description: "Live impact numbers from Free Geek Toronto, and exactly how they're calculated." };
 
 /** DP-09 + CI-04: aggregate stats and the methodology with citations. */
+// Public numbers only: cached and refreshed every minute (ISR), so visitors never wait on the database.
+export const revalidate = 60;
+
 export default async function ImpactPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const [impact, settings] = await Promise.all([getPublicImpact(supabase), getSettings(supabase)]);
   const t = impact.totals;
   const recipients = (Object.entries(t.recipients) as [RecipientCategory, number][]).filter(([k]) => k !== "undisclosed").sort((a, b) => b[1] - a[1]);
   return (
     <main className="mx-auto w-full max-w-[1200px] px-4 py-14 sm:px-6 md:py-24">
       <p className="eyebrow">Impact</p>
-      <h1 className="font-display mt-3 max-w-3xl text-[2.75rem] leading-[0.98] sm:text-display-l">Real numbers, honest math.</h1>
-      <p className="measure mt-5 text-body-l text-ink-2">These update live from Free Geek Toronto&apos;s refurbishment records. Every formula and factor is below.</p>
+      <h1 className="font-display mt-3 max-w-3xl text-[2.75rem] leading-[0.98] sm:text-display-l">Counted numbers, honest math.</h1>
+      <p className="measure mt-5 text-body-l text-ink-2">These update live from every handoff recorded in Relay (fictional demo data in this demo). Every formula and factor is below.</p>
 
       <div className="mt-12 grid gap-5 md:grid-cols-4">
         <StatPebble className="md:col-span-2 md:row-span-2" size="lg" tint="mint" label="Devices back in use" value={t.devicesReused} caption={`${t.devicesReceived} received · ${t.devicesRecycled} recycled responsibly`} />
         <StatPebble label="kg kept out of landfill" value={t.kgDiverted} suffix="kg" />
         <StatPebble label="kg CO₂e avoided (est.)" value={t.co2eAvoidedKg} />
         <StatPebble label="Volunteer hours" value={t.volunteerHours} />
-        <StatPebble label="Passport scans" value={impact.passportViews} />
+        <StatPebble label="Passport views" value={impact.passportViews} />
       </div>
 
       {recipients.length ? (
@@ -66,8 +69,9 @@ export default async function ImpactPage() {
               </li>
             </ul>
           </div>
-          <div className="flat overflow-x-auto !p-0">
-            <table className="data-table">
+          {/* focusable so keyboard users can scroll it on a phone (axe scrollable-region-focusable) */}
+          <div className="flat overflow-x-auto !p-0" tabIndex={0} role="region" aria-label="Impact factors table (scrolls sideways on small screens)">
+            <table className="data-table min-w-[560px]">
               <caption className="px-5 pt-4 text-left text-small text-ink-2">Impact factors — placeholders marked TO VERIFY must be replaced with cited sources.</caption>
               <thead>
                 <tr>

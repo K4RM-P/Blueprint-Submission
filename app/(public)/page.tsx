@@ -8,6 +8,8 @@ import { PartnerTile } from "@/components/public/partner-tile";
 import { BatonRun } from "@/components/public/baton-run";
 import { CountUp } from "@/components/landing/count-up";
 import { Hero } from "@/components/landing/hero";
+import { DashboardPreview } from "@/components/landing/dashboard-preview";
+import { FloatingPathsBackground } from "@/components/ui/floating-paths";
 import { Pour } from "@/components/landing/pour";
 import { Reveal } from "@/components/landing/reveal";
 import { Rule, SectionHead } from "@/components/landing/section-head";
@@ -15,7 +17,8 @@ import { OutcomeBreakdown } from "@/components/landing/outcome-breakdown";
 import { CertificatePreview } from "@/components/landing/certificate-preview";
 import { StickyCta } from "@/components/landing/sticky-cta";
 import { Tactile } from "@/components/landing/tactile";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
+import { env } from "@/lib/env";
 import { getPublicImpact } from "@/lib/queries/impact";
 import { logoUrl } from "@/lib/queries/common";
 import type { PartnerTier } from "@/lib/domain";
@@ -33,12 +36,22 @@ const fmt = (n: number) => n.toLocaleString("en-CA");
 const REASONS = [
   { icon: <HandCoins />, title: "Free.", body: "No disposal fee and no contract. The Community tier costs nothing, for good." },
   { icon: <ShieldCheck />, title: "Certified data wipe.", body: "Staff verify every wipe. You get a numbered certificate with a public verification link." },
-  { icon: <CalendarCheck />, title: "Zero hassle.", body: "One five-minute form. Pick a week the bench has room for, then drop off, or we pick up." },
+  { icon: <CalendarCheck />, title: "Zero hassle.", body: "One two-minute form. Pick a week the bench has room for, then drop off at 180 Sudbury Street." },
   { icon: <MapPin />, title: "A real local story.", body: "Each laptop's Device Passport and your impact dashboard show who it helps in Toronto." },
 ];
 
+/** The supply problem in three numbers, all from the case packet. */
+const WHY = [
+  { value: "0", label: "corporate partners or sponsors today" },
+  { value: "77%", label: "of Free Geek Toronto's 2025 revenue came from sales" },
+  { value: "63%", label: "of Canadians bought refurbished, open-box or traded-in tech last year" },
+];
+
+// Public numbers only: cached and refreshed every minute (ISR), so visitors never wait on the database.
+export const revalidate = 60;
+
 export default async function Landing() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const [impact, { data: wall }] = await Promise.all([getPublicImpact(supabase), supabase.rpc("partner_wall")]);
   const t = impact.totals;
   // Lead with partners whose devices are already back in use; newcomers fill the rest.
@@ -61,7 +74,13 @@ export default async function Landing() {
       {/* 1 · Hero: the Reuse Partner promise, aimed at the business retiring laptops */}
       <Hero
         devicesReused={t.devicesReused}
-        totals={{ received: t.devicesReceived, verified: impact.stages.verified, reused: t.devicesReused, kgDiverted: t.kgDiverted }}
+        backdrop={
+          <>
+            <FloatingPathsBackground position={1} className="absolute inset-0" />
+            <FloatingPathsBackground position={-1} className="absolute inset-0" />
+          </>
+        }
+        shot={<DashboardPreview />}
       />
 
       {/* Reuse Partner strip directly under the hero: who's already running */}
@@ -69,7 +88,7 @@ export default async function Landing() {
         <section aria-label="Reuse Partners in the relay" className="mt-16 md:mt-24">
           <Rule />
           <div className="mx-auto grid max-w-[1200px] grid-cols-2 sm:grid-cols-3 lg:grid-cols-[auto_repeat(6,minmax(0,1fr))]">
-            <p className="col-span-2 flex items-center px-4 py-5 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3 sm:col-span-3 sm:px-6 lg:col-span-1 lg:pr-8">Reuse Partners</p>
+            <p className="col-span-2 flex items-center px-4 py-5 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3 sm:col-span-3 sm:px-6 lg:col-span-1 lg:pr-8">{env.demoMode ? "Demo Reuse Partners" : "Reuse Partners"}</p>
             {ranked.slice(0, 6).map((p) => (
               <p key={p.slug} className="flex min-h-[72px] items-center border-line/70 px-4 py-4 font-display text-[1.0625rem] leading-tight tracking-[-0.02em] text-ink-2 max-lg:border-t sm:px-6 lg:border-l lg:px-5">
                 {p.name}
@@ -82,6 +101,36 @@ export default async function Landing() {
 
       <Pour className="mt-10" />
 
+      {/* 1b · Why Relay exists: the supply problem, in the case's own numbers */}
+      <section aria-labelledby="why-title" className="mx-auto max-w-[1200px] px-4 pb-8 pt-16 sm:px-6 md:pb-12 md:pt-24">
+        <Reveal>
+          <SectionHead
+            id="why-title"
+            label="Why Relay exists"
+            title="Good business laptops rarely reach Free Geek Toronto."
+            muted="Relay changes that."
+            aside={
+              <p className="text-ink-2">
+                Trade-in and buyback programs catch most of them first. Free Geek Toronto has no corporate partners yet, and selling refurbished computers is most of how it pays for
+                its mission. A steady supply of uniform business laptops is the one change that helps most: they are the fastest to refurbish and the easiest to sell, without raising
+                prices.
+              </p>
+            }
+          />
+        </Reveal>
+        <Reveal>
+          <ul className="mt-12 grid grid-cols-1 border-y border-line sm:grid-cols-3">
+            {WHY.map((w, i) => (
+              <li key={w.label} className={i ? "border-line py-6 max-sm:border-t sm:border-l sm:pl-6" : "py-6 sm:pr-6"}>
+                <p className="font-display text-[2.75rem] font-semibold leading-none tracking-[-0.05em] tnum">{w.value}</p>
+                <p className="mt-2 text-small text-ink-2">{w.label}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-[0.8125rem] text-ink-3">Source: Free Geek Toronto case, FUSE Blueprint 2026 (Best Buy Canada / Angus Reid 2026 survey for the 63%).</p>
+        </Reveal>
+      </section>
+
       {/* 2 · The relay (pinned, scroll-linked): business → certified wipe → bench → passport → impact back */}
       <BatonRun
         stations={[
@@ -89,7 +138,7 @@ export default async function Landing() {
           { hand: "Free Geek staff", title: "Certified data wipe", body: "Every drive is wiped, then a staff member verifies the report.", stat: fmt(impact.stages.verified), statLabel: "wipes verified" },
           { hand: "A volunteer", title: "Rebuilt on the bench", body: "Tested, refurbished and set up with open-source software.", stat: fmt(impact.stages.refurbished), statLabel: "refurbished" },
           { hand: "Its QR label", title: "Device Passport", body: "Scan the sticker: who gave it, when it was wiped, who rebuilt it.", stat: fmt(impact.passportViews), statLabel: "passport views" },
-          { hand: "Back to the business", title: "Impact, reported back", body: "Sold at prices tied to ability to pay. The business sees who it helps.", stat: fmt(t.devicesReused), statLabel: "people reached" },
+          { hand: "Back to the business", title: "Impact, reported back", body: "Sold at prices tied to ability to pay. The business sees who it helps.", stat: fmt(t.devicesReused), statLabel: "in new homes" },
         ]}
       />
 
@@ -161,7 +210,7 @@ export default async function Landing() {
               <h3 className="font-display relative mt-4 max-w-md text-[2rem] font-semibold leading-[1.02] tracking-[-0.045em] sm:text-[2.5rem]">A certificate for every batch. A dashboard of who it helps.</h3>
               <ul className="relative mt-5 flex flex-col gap-2 text-ink-2">
                 <li className="flex gap-2.5">
-                  <BadgeCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-loop-deep" /> Numbered data-destruction certificate, listing every device
+                  <BadgeCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-loop-deep" /> Numbered certificate of data sanitization, listing every device
                 </li>
                 <li className="flex gap-2.5">
                   <PackageCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-loop-deep" /> Every device tracked from drop-off to its next owner
@@ -189,9 +238,12 @@ export default async function Landing() {
               title="Toronto businesses"
               muted="already in the relay."
               aside={
-                <Link href="/partners" className="group inline-flex items-center gap-1.5 text-small font-semibold text-loop-deep">
-                  Full Partner Wall <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
+                <div className="flex flex-col items-start gap-2">
+                  {env.demoMode ? <p className="text-small text-ink-2">Fictional demo partners, so you can see how the wall works.</p> : null}
+                  <Link href="/partners" className="group inline-flex items-center gap-1.5 text-small font-semibold text-loop-deep">
+                    Full Partner Wall <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                </div>
               }
             />
           </Reveal>
@@ -221,7 +273,7 @@ export default async function Landing() {
             muted="has moved so far."
             aside={
               <Link href="/impact#methodology" className="group inline-flex flex-wrap items-center gap-1.5 text-small font-semibold text-loop-deep">
-                <span className="w-full font-normal text-ink-2">Counted from every recorded handoff.</span> How we calculate this <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
+                <span className="w-full font-normal text-ink-2">Counted from every recorded handoff (fictional demo data here).</span> How we calculate this <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             }
           />
@@ -311,7 +363,7 @@ export default async function Landing() {
           <p className="mx-auto mt-6 max-w-xl text-body-l text-ink-2">Free for your business. A certified data wipe for every drive, and a Device Passport for every laptop.</p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 min-[420px]:flex-row">
             <ClayButton href="/login?mode=signup" variant="primary" size="lg" iconRight={<ArrowRight />}>
-              Become a Reuse Partner
+              Create a free partner account
             </ClayButton>
             <ClayButton href="#passport" variant="secondary" size="lg">
               See a Device Passport

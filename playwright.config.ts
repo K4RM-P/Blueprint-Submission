@@ -15,7 +15,14 @@ export default defineConfig({
   reporter: [["list"]],
   use: { baseURL, trace: "retain-on-failure" },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"] } },
+    {
+      name: "desktop",
+      use: {
+        ...devices["Desktop Chrome"],
+        // Sandboxes with a preinstalled Chromium (e.g. cloud sessions) can point at it instead of downloading one.
+        launchOptions: process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {},
+      },
+    },
   ],
   webServer: process.env.E2E_BASE_URL
     ? undefined

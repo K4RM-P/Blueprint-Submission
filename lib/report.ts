@@ -1,7 +1,7 @@
 /** Annual impact report and LinkedIn card helpers (PP-10, PP-11). Pure. */
 import type { ImpactTotals } from "./impact";
 import { lastMonths } from "./impact";
-import { labels, type RecipientCategory } from "./domain";
+import { labels, recipientNoun, type RecipientCategory } from "./domain";
 
 export interface ReportPeriod {
   /** Inclusive start (first day of the first month, UTC). */
@@ -55,8 +55,21 @@ export function recipientPhrase(t: ImpactTotals, max = 3): string {
   return joinList(
     topRecipients(t)
       .slice(0, max)
-      .map((r) => `${r.label.toLowerCase()}${r.count === 1 ? "" : "s"}`),
+      .map((r) => recipientNoun(r.category, r.count)),
   );
+}
+
+const devices = (x: number) => `${n(x)} ${x === 1 ? "device" : "devices"}`;
+
+/**
+ * Where a partner's devices are, in one honest sentence: handed over is not the same as
+ * refurbished, so devices still on the bench or recycled are named as such (report lead, card).
+ */
+export function impactSummary(orgName: string, t: ImpactTotals): string {
+  const parts = [`${n(t.devicesReused)} ${t.devicesReused === 1 ? "is" : "are"} back in use`];
+  if (t.devicesInProgress > 0) parts.push(`${n(t.devicesInProgress)} ${t.devicesInProgress === 1 ? "is" : "are"} being refurbished`);
+  if (t.devicesRecycled > 0) parts.push(`${n(t.devicesRecycled)} ${t.devicesRecycled === 1 ? "was" : "were"} recycled responsibly`);
+  return `${orgName} handed ${devices(t.devicesReceived)} to Free Geek Toronto. ${joinList(parts)}.`;
 }
 
 /** Suggested LinkedIn post (PP-11): specific, warm, no hype words (UI §10). */
@@ -64,9 +77,9 @@ export function suggestedPost(orgName: string, t: ImpactTotals, shareUrl: string
   const who = recipientPhrase(t);
   const whoLine = who ? ` They're now in the hands of ${who} across Toronto.` : "";
   return [
-    `This year ${orgName} gave ${n(t.devicesReceived)} retired ${t.devicesReceived === 1 ? "device" : "devices"} a second life with Free Geek Toronto.`,
-    `${n(t.devicesReused)} ${t.devicesReused === 1 ? "is" : "are"} back in use after a verified data wipe and a volunteer refurbish.${whoLine}`,
-    `That kept about ${n(t.kgDiverted)} kg of electronics out of landfill (est. ${n(t.co2eAvoidedKg)} kg CO₂e avoided).`,
+    `This year ${orgName} handed ${n(t.devicesReceived)} retired ${t.devicesReceived === 1 ? "device" : "devices"} to Free Geek Toronto instead of a trade-in or a drawer.`,
+    `${n(t.devicesReused)} ${t.devicesReused === 1 ? "is" : "are"} already back in use after a staff-verified data wipe and a volunteer refurbish.${whoLine}`,
+    `That keeps an estimated ${n(t.kgDiverted)} kg of electronics out of landfill.`,
     `Thank you to the Free Geek Toronto volunteers who did the work. Curious how it works? ${shareUrl}`,
   ].join("\n\n");
 }

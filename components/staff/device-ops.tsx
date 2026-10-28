@@ -6,8 +6,9 @@ import { BadgeDollarSign, MessageSquarePlus, Recycle, ShieldCheck, Tag } from "l
 import { toast } from "sonner";
 import { ClayButton, Field, Input, Select, Textarea } from "@/components/clay";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { PIF_ELIGIBLE_RECIPIENTS, RECIPIENT_CATEGORIES, SALE_CHANNELS, labels, type DeviceStatus, type RecipientCategory, type SaleChannel } from "@/lib/domain";
+import { DRIVE_HANDLING, PIF_ELIGIBLE_RECIPIENTS, RECIPIENT_CATEGORIES, SALE_CHANNELS, labels, type DeviceStatus, type RecipientCategory, type SaleChannel } from "@/lib/domain";
 import { nextDeviceStatuses } from "@/lib/status-machine";
+import type { DriveHandling } from "@/lib/domain";
 import { formatCents } from "@/lib/ledger";
 import { addNote, assignVolunteer, changeStatus, recordSale, setPrice } from "@/server/actions/staff";
 import { VerifyDialog } from "./verify-dialog";
@@ -32,6 +33,9 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
   const [price, setPriceVal] = useState(priceCents ? String(priceCents / 100) : "");
   const [sale, setSale] = useState({ soldAt: new Date().toISOString().slice(0, 10), channel: "in_store" as SaleChannel, recipient: "student" as RecipientCategory | "", subsidy: "" });
   const [reason, setReason] = useState("");
+  const [drive, setDrive] = useState<DriveHandling | "">("");
+  // Before staff verify the wipe, recycling must record what happened to the drive.
+  const wipeVerified = ["wipe_verified", "refurbishing", "ready", "listed"].includes(status);
   const [note, setNote] = useState("");
   const nexts = nextDeviceStatuses(status).filter((s) => s !== "wipe_verified" && s !== "sold" && s !== "recycled");
 
@@ -202,14 +206,28 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
           <Field label="Reason" required>
             {({ id: fid }) => <Textarea id={fid} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Cracked motherboard — recycled for parts" />}
           </Field>
+          {wipeVerified ? null : (
+            <Field label="What happened to the drive?" hint="Its wipe was never verified, so the partner's certificate shows this instead." required>
+              {({ id: fid }) => (
+                <Select id={fid} value={drive} onChange={(e) => setDrive(e.target.value as DriveHandling | "")}>
+                  <option value="">Choose one</option>
+                  {DRIVE_HANDLING.map((h) => (
+                    <option key={h} value={h}>
+                      {h}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+          )}
           <DialogFooter>
             <ClayButton
               variant="danger"
               loading={busy}
-              disabled={reason.trim().length < 3}
+              disabled={reason.trim().length < 3 || (!wipeVerified && !drive)}
               onClick={async () => {
                 setBusy(true);
-                done(await changeStatus({ ids: [id], to: "recycled", reason }));
+                done(await changeStatus({ ids: [id], to: "recycled", reason, driveHandling: drive || undefined }));
               }}
             >
               Recycle device

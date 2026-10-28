@@ -5,7 +5,8 @@ test("F2 — staff approves, schedules and receives the demo batch (OPS-02..04, 
   await signInAs(page, "staff");
   await page.goto("/staff/batches?status=submitted");
   await page.getByRole("link", { name: "Maple Ledger Accounting" }).first().click();
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("20 devices");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Maple Ledger Accounting");
+  await expect(page.getByRole("main")).toContainText("20 devices");
 
   await page.getByRole("button", { name: "Approve & schedule" }).click();
   await page.getByRole("radio", { name: /Open,/ }).first().click();

@@ -37,7 +37,8 @@ export function DonationChecker({ categories }: { categories: { category: Device
   const [age, setAge] = useState<AgeBucket | null>(null);
   const [working, setWorking] = useState<Working | null>(null);
   const [isBusiness, setIsBusiness] = useState<boolean | null>(null);
-  const [quantity, setQuantity] = useState("1");
+  // Blank until answered, so a business never slips through as "1 device" by default.
+  const [quantity, setQuantity] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<(CheckerResult & { category: DeviceCategory }) | null>(null);
 

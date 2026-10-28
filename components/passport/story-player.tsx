@@ -42,19 +42,21 @@ export function StoryPlayer({ story, initialIndex = 0 }: { story: PassportStory;
   const paused = userPaused || holding || hidden;
   const autoAdvance = !reduced && slide.durationMs !== null;
 
-  // ---- analytics: start (left the cover), complete (reached the card), drop (left mid-story)
-  const seen = useRef({ started: initialIndex > 0, completed: false, slide: slide.key });
+  // ---- analytics: start (left the cover), complete (reached the card), drop (left mid-story).
+  // Only visits that began on the cover are counted, so completions can never outnumber starts;
+  // a deep link (?s=N) is a shared slide, not a watched story.
+  const seen = useRef({ started: false, completed: initialIndex > 0, slide: slide.key });
   useEffect(() => {
     seen.current.slide = slide.key;
-    if (index > 0 && !seen.current.started) {
+    if (index > 0 && !seen.current.started && initialIndex === 0) {
       seen.current.started = true;
       logStoryEvent("start", slides[0].key);
     }
-    if (index === last && !seen.current.completed) {
+    if (index === last && seen.current.started && !seen.current.completed) {
       seen.current.completed = true;
       logStoryEvent("complete", slide.key);
     }
-  }, [index, last, slide.key, slides]);
+  }, [index, last, slide.key, slides, initialIndex]);
   useEffect(() => {
     const onHide = () => {
       if (seen.current.started && !seen.current.completed) {

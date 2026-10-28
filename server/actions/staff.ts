@@ -6,7 +6,7 @@ import { assertRole } from "@/lib/auth";
 import { ActionError, fail, ok, runAction, type ActionResult } from "@/lib/action";
 import { generateUniqueCodes } from "@/lib/passport-code";
 import { canTransitionBatch, canTransitionDevice, devicePath } from "@/lib/status-machine";
-import { DEVICE_CATEGORIES, DEVICE_STATUSES, PARTNER_TIERS, RECIPIENT_CATEGORIES, SALE_CHANNELS, type DeviceStatus } from "@/lib/domain";
+import { DEVICE_CATEGORIES, DEVICE_STATUSES, DRIVE_HANDLING, PARTNER_TIERS, RECIPIENT_CATEGORIES, SALE_CHANNELS, type DeviceStatus } from "@/lib/domain";
 import { getCalendar, getSettings } from "@/lib/queries/common";
 import { isMonday } from "@/lib/dates";
 import { nextOpenWeek, wouldExceed } from "@/lib/capacity";
@@ -194,7 +194,8 @@ export async function verifyWipes(input: unknown): Promise<ActionResult<{ verifi
 }
 
 export async function changeStatus(input: unknown): Promise<ActionResult<{ changed: number }>> {
-  return runAction(z.object({ ids: z.array(uuid).min(1).max(500), to: z.enum(DEVICE_STATUSES), reason: z.string().trim().max(300).optional() }), input, async ({ ids, to, reason }) => {
+  const schema = z.object({ ids: z.array(uuid).min(1).max(500), to: z.enum(DEVICE_STATUSES), reason: z.string().trim().max(300).optional(), driveHandling: z.enum(DRIVE_HANDLING).optional() });
+  return runAction(schema, input, async ({ ids, to, reason, driveHandling }) => {
     const s = await staff();
     if (to === "wipe_verified") return fail("Use “Verify wipe” so the method and report ID are recorded.");
     if (to === "sold") return fail("Use “Record sale” so the sale details are recorded.");
@@ -202,12 +203,17 @@ export async function changeStatus(input: unknown): Promise<ActionResult<{ chang
     const errors: string[] = [];
     for (const id of ids) {
       const d = await loadDevice(s.supabase, id);
-      const check = canTransitionDevice(d.status, to, { actor: "staff", wipeVerifiedAt: d.wipe_verified_at, recycledReason: reason });
+      const check = canTransitionDevice(d.status, to, { actor: "staff", wipeVerifiedAt: d.wipe_verified_at, recycledReason: reason, driveHandling });
       if (!check.ok) {
         errors.push(check.reason);
         continue;
       }
-      const { error } = await s.supabase.from("devices").update({ status: to, recycled_reason: to === "recycled" ? reason : undefined, assigned_volunteer_id: to === "recycled" ? null : undefined }).eq("id", id);
+      const recycling = to === "recycled";
+      // An unverified drive's recorded handling goes in the method column, so the certificate accounts for every drive.
+      const { error } = await s.supabase
+        .from("devices")
+        .update({ status: to, recycled_reason: recycling ? reason : undefined, assigned_volunteer_id: recycling ? null : undefined, wipe_method: recycling && !d.wipe_verified_at ? driveHandling : undefined })
+        .eq("id", id);
       if (error) errors.push(error.message);
       else changed++;
     }

@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = { title: "Pay-It-Forward fund" };
 
 const TYPE_LABEL: Record<FundTxType, string> = { contribution: "Contribution", subsidy: "Subsidy", sponsorship: "Sponsorship" };
+const TYPE_PLURAL: Record<FundTxType, string> = { contribution: "Contributions", subsidy: "Subsidies", sponsorship: "Sponsorships" };
+const PROVIDER_LABEL: Record<string, string> = { mock: "Test payment", stripe: "Stripe (test mode)", manual: "Recorded by staff" };
 const FILTERS = ["all", "contribution", "sponsorship", "subsidy"] as const;
 type Filter = (typeof FILTERS)[number];
 
@@ -48,7 +50,7 @@ export default async function StaffFund({ searchParams }: { searchParams: Promis
             aria-current={filter === f ? "page" : undefined}
             className={cn("chip h-9 border border-line px-4", filter === f ? "bg-ink text-white" : "bg-surface-flat text-ink-2 hover:bg-canvas")}
           >
-            {f === "all" ? "All" : `${TYPE_LABEL[f]}s`}
+            {f === "all" ? "All" : TYPE_PLURAL[f]}
           </Link>
         ))}
       </nav>
@@ -89,7 +91,7 @@ export default async function StaffFund({ searchParams }: { searchParams: Promis
                         </Link>
                       ) : null}
                     </td>
-                    <td className="text-small capitalize text-ink-2">{t.provider}</td>
+                    <td className="text-small text-ink-2">{PROVIDER_LABEL[t.provider] ?? t.provider}</td>
                     <td className={cn("text-right font-semibold tnum", t.amount_cents < 0 ? "text-ink-2" : "text-loop-deep")}>
                       {t.amount_cents > 0 ? "+" : "−"}
                       {formatCents(Math.abs(t.amount_cents))}

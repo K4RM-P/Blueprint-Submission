@@ -20,7 +20,10 @@ export default async function StaffBatches({ searchParams }: { searchParams: Pro
     .select("id, status, value_score, preferred_week, scheduled_week, logistics, created_at, organizations!inner(name, tier), batch_line_items(quantity, make, model)")
     .order("value_score", { ascending: false })
     .order("created_at", { ascending: true });
-  if (sp.status && (BATCH_STATUSES as readonly string[]).includes(sp.status)) q = q.eq("status", sp.status as (typeof BATCH_STATUSES)[number]);
+  // Default view is the work still open; "all" includes completed and declined batches.
+  const status = sp.status ?? "active";
+  if (status === "active") q = q.not("status", "in", "(completed,declined)");
+  else if ((BATCH_STATUSES as readonly string[]).includes(status)) q = q.eq("status", status as (typeof BATCH_STATUSES)[number]);
   if (sp.tier && (PARTNER_TIERS as readonly string[]).includes(sp.tier)) q = q.eq("organizations.tier", sp.tier as (typeof PARTNER_TIERS)[number]);
   if (sp.week && /^\d{4}-\d{2}-\d{2}$/.test(sp.week)) q = q.or(`scheduled_week.eq.${sp.week},and(scheduled_week.is.null,preferred_week.eq.${sp.week})`);
   const { data } = await q;
@@ -29,11 +32,11 @@ export default async function StaffBatches({ searchParams }: { searchParams: Pro
 
   return (
     <>
-      <PageHeader eyebrow="Staff Console" title="Batch queue" description="Sorted by Batch Value Score — the batches with the best unit economics come first." />
+      <PageHeader eyebrow="Staff Console" title="Batch queue" description="Sorted by Batch Value Score: uniform batches of newer laptops, the quickest to refurbish and sell, come first." />
       <FilterBar
         action="/staff/batches"
         filters={[
-          { name: "status", label: "Status", value: sp.status ?? "", options: [{ value: "", label: "All statuses" }, ...BATCH_STATUSES.map((s) => ({ value: s, label: labels.batchStatus[s] }))] },
+          { name: "status", label: "Status", value: status, options: [{ value: "active", label: "Open batches" }, { value: "all", label: "All statuses" }, ...BATCH_STATUSES.map((s) => ({ value: s, label: labels.batchStatus[s] }))] },
           { name: "tier", label: "Partner tier", value: sp.tier ?? "", options: [{ value: "", label: "All tiers" }, ...PARTNER_TIERS.map((t) => ({ value: t, label: labels.tier[t] }))] },
           { name: "week", label: "Week", value: sp.week ?? "", options: [{ value: "", label: "Any week" }, ...weeks.map((w) => ({ value: w, label: `Week of ${shortDate(w)}` }))] },
         ]}

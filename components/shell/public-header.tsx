@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSyncExternalStore } from "react";
 import { Menu } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -22,8 +23,15 @@ const LINKS = [
 
 const isCurrent = (pathname: string, match: string[]) => match.some((m) => pathname.startsWith(m));
 
-export function PublicHeader({ dashboardHref }: { dashboardHref: string | null }) {
+// The public pages are cached for everyone, so whether you're signed in is read in the browser:
+// @supabase/ssr keeps the session in an "sb-<project>-auth-token" cookie.
+const subscribe = () => () => {};
+const hasAuthCookie = () => /(?:^|;\s*)sb-[^=]+-auth-token(?:\.0)?=/.test(document.cookie);
+
+export function PublicHeader() {
   const pathname = usePathname();
+  const signedIn = useSyncExternalStore(subscribe, hasAuthCookie, () => false);
+  const dashboardHref = signedIn ? "/dashboard" : null;
   return (
     <header className="no-print sticky top-3 z-40 px-3 sm:px-4">
       <div className="glass mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 rounded-full pl-4 pr-2.5 sm:pl-5">

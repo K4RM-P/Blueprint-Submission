@@ -6,10 +6,11 @@ import { toast } from "sonner";
 import { ClayButton, Field, Input } from "@/components/clay";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { verifyWipes } from "@/server/actions/staff";
+import { DEFAULT_WIPE_METHOD } from "@/lib/domain";
 
 /** OPS-07: staff enter the sanitization method and the report/reference ID from FGT's software. */
 export function VerifyDialog({ ids, open, onOpenChange, onDone, defaultReference }: { ids: string[]; open: boolean; onOpenChange: (o: boolean) => void; onDone: () => void; defaultReference?: string | null }) {
-  const [method, setMethod] = useState("NIST 800-88 Purge (software overwrite)");
+  const [method, setMethod] = useState(DEFAULT_WIPE_METHOD);
   const [reference, setReference] = useState(defaultReference ?? "");
   const [busy, setBusy] = useState(false);
   const bulk = ids.length > 1;
@@ -31,7 +32,7 @@ export function VerifyDialog({ ids, open, onOpenChange, onDone, defaultReference
             Check {bulk ? "each report" : "the report"} in Free Geek Toronto&apos;s sanitization software first. Relay records the result; it doesn&apos;t perform the wipe.
           </DialogDescription>
         </DialogHeader>
-        <Field label="Sanitization method" required>
+        <Field label="Sanitization method" hint="As named in Free Geek Toronto’s sanitization report." required>
           {({ id }) => <Input id={id} value={method} onChange={(e) => setMethod(e.target.value)} />}
         </Field>
         {bulk ? (

@@ -12,6 +12,7 @@ import { formatCertificateNumber } from "../lib/certificate-number";
 import { DEFAULT_ACCEPTED_ITEMS } from "../lib/checker";
 import { addDays, mondayOf, toISODate } from "../lib/dates";
 import type { DeviceCategory, DeviceCondition, DeviceStatus, PartnerTier, RecipientCategory, SaleChannel } from "../lib/domain";
+import { DEFAULT_WIPE_METHOD, DRIVE_HANDLING } from "../lib/domain";
 import { generateUniqueCodes } from "../lib/passport-code";
 import { SHOWCASE_PASSPORTS } from "../lib/showcase-passports";
 import { devicePath } from "../lib/status-machine";
@@ -297,7 +298,7 @@ const SHOWCASE: Record<string, Showcase> = {
 async function reset() {
   console.log("Resetting demo data…");
   const all = (t: string) => db.from(t).delete().gte("created_at", "1970-01-01");
-  for (const t of ["fund_transactions", "membership_payments", "certificates", "volunteer_badges", "checker_logs", "devices", "batch_line_items", "donation_batches", "account_invites", "badges", "impact_factors"]) {
+  for (const t of ["fund_transactions", "membership_payments", "certificates", "volunteer_badges", "checker_logs", "passport_story_events", "devices", "batch_line_items", "donation_batches", "account_invites", "badges", "impact_factors"]) {
     await must(`reset ${t}`, all(t));
   }
   // Demo users (cascades their profiles), then seeded organizations.
@@ -312,6 +313,12 @@ async function reset() {
     page++;
   }
   await must("reset orgs", db.from("organizations").delete().in("slug", ORGS.map((o) => o.slug)));
+  // Organizations left with no members (e.g. created by e2e sign-ups on the demo domain) would
+  // otherwise linger on the public Partner Wall after a reset. Real sign-ups keep their members.
+  const [{ data: orgs }, { data: members }] = await Promise.all([db.from("organizations").select("id"), db.from("profiles").select("organization_id").not("organization_id", "is", null)]);
+  const staffed = new Set((members ?? []).map((m) => m.organization_id));
+  const orphans = (orgs ?? []).map((o) => o.id).filter((id) => !staffed.has(id));
+  if (orphans.length) await must("reset orphan orgs", db.from("organizations").delete().in("id", orphans));
   const { data: files } = await db.storage.from("certificates").list("", { limit: 1000 });
   for (const f of files ?? []) {
     const { data: inner } = await db.storage.from("certificates").list(f.name, { limit: 1000 });
@@ -517,7 +524,9 @@ async function main() {
     let stepNo = 0;
     // Keep every timeline in the past.
     const step = () => {
-      const h = sc ? (sc.stepHours[stepNo++] ?? 24) : between(6, 60);
+      // Demo data mirrors the case's point that mixed household donations take longer to refurbish
+      // than uniform partner laptops (PRD §6.3 placeholders: 120 vs 60 minutes, [ASSUMPTION]).
+      const h = sc ? (sc.stepHours[stepNo++] ?? 24) : d.source === "household" ? between(12, 110) : between(6, 60);
       t = Math.min(t + hours(h), NOW.getTime() - hours(2));
       return new Date(t).toISOString();
     };
@@ -554,7 +563,7 @@ async function main() {
         ev({ actor_id: d.volunteer, event_type: "status_change", from_status: prev, to_status: next, created_at: at });
         ev({ actor_id: d.volunteer, event_type: "step_completed", step: "hardware_test", created_at: at });
       } else if (next === "wipe_pending_verification") {
-        Object.assign(row, { wipe_report_ref: `BL-${between(100000, 999999)}`, wipe_method: "NIST 800-88 Purge (software overwrite)", wipe_performed_by: d.volunteer, wipe_performed_at: at });
+        Object.assign(row, { wipe_report_ref: `RPT-${between(100000, 999999)}`, wipe_method: DEFAULT_WIPE_METHOD, wipe_performed_by: d.volunteer, wipe_performed_at: at });
         ev({ actor_id: d.volunteer, event_type: "status_change", from_status: prev, to_status: next, created_at: at });
         ev({ actor_id: d.volunteer, event_type: "step_completed", step: "wipe_performed", metadata: { report_recorded: true }, created_at: at });
       } else if (next === "wipe_verified") {
@@ -589,7 +598,8 @@ async function main() {
     if (d.status === "recycled") {
       const at = step();
       const reason = sc ? "Failed hardware test (no display)" : pick(["Cracked motherboard — recycled for parts", "Swollen battery, unsafe to refurbish", "Failed hardware test (no display)"]);
-      Object.assign(row, { recycled_reason: reason, assigned_volunteer_id: null });
+      // Same rule as the staff Recycle dialog: an unverified drive gets a recorded handling.
+      Object.assign(row, { recycled_reason: reason, assigned_volunteer_id: null, ...(row.wipe_verified_at ? {} : { wipe_method: DRIVE_HANDLING[0] }) });
       ev({ actor_id: staffId, event_type: "status_change", from_status: prev, to_status: "recycled", note: reason, created_at: at });
     }
     row.updated_at = new Date(t).toISOString();
@@ -675,6 +685,19 @@ async function main() {
       return { category: outcome === "not_accepted" ? "other" : pick(cats), outcome, is_business: outcome === "partner_redirect", created_at: daysAgo(between(0, 60)).toISOString() };
     }),
   );
+
+  // Anonymous story analytics (DP-06): every completion and drop belongs to a visit that started.
+  console.log("Passport story analytics…");
+  const story: { kind: string; slide: string | null; created_at: string }[] = [];
+  const dropSlides = ["origin", "origin", "handoff", "erased", "bench", "money"];
+  for (let i = 0; i < 46; i++) {
+    const at = daysAgo(between(0, 45)).toISOString();
+    story.push({ kind: "start", slide: "cover", created_at: at });
+    if (i % 5 < 2) story.push({ kind: "complete", slide: "finale", created_at: at });
+    else story.push({ kind: "drop", slide: pick(dropSlides), created_at: at });
+    if (i % 9 === 0) story.push({ kind: "share", slide: "finale", created_at: at });
+  }
+  await chunked("story events", "passport_story_events", story);
 
   const counts: Record<string, number> = {};
   for (const t of ["organizations", "profiles", "donation_batches", "batch_line_items", "devices", "device_events", "certificates", "badges", "volunteer_badges", "fund_transactions", "membership_payments", "impact_factors", "checker_logs"]) {

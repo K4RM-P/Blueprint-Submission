@@ -28,6 +28,8 @@ export interface TransitionContext {
   actor: Actor;
   wipeVerifiedAt?: string | Date | null;
   recycledReason?: string | null;
+  /** How staff handled the drive when recycling a device whose wipe was never verified. */
+  driveHandling?: string | null;
 }
 
 export type TransitionResult = { ok: true } | { ok: false; reason: string };
@@ -44,6 +46,8 @@ export function canTransitionDevice(from: DeviceStatus, to: DeviceStatus, ctx: T
     if (!PRE_SALE.includes(from)) return { ok: false, reason: "Sold or recycled devices can't be recycled." };
     if (!ctx.recycledReason?.trim()) return { ok: false, reason: "Recycling needs a reason." };
     if (ctx.actor !== "staff" && ctx.actor !== "system") return { ok: false, reason: "Only staff can recycle a device." };
+    // Every drive is accounted for on the certificate: unverified ones need a recorded handling.
+    if (ctx.actor === "staff" && !ctx.wipeVerifiedAt && !ctx.driveHandling?.trim()) return { ok: false, reason: "Record what happened to the drive before recycling." };
     return { ok: true };
   }
   if (!DEVICE_NEXT[from].includes(to)) {

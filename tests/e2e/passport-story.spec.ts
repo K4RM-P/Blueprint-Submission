@@ -64,7 +64,7 @@ test("slides auto-advance, and the pause button and holding both stop them", asy
 test("deep links open a slide, and the finale offers sharing", async ({ page }) => {
   await page.goto(`/p/${FULL}?s=4`);
   await expectSlide(page, "erased");
-  await expect(current(page)).toContainText(/Every byte erased/);
+  await expect(current(page)).toContainText(/Its old data, wiped/);
 
   await page.goto(`/p/${FULL}?s=99`);
   await expectSlide(page, "finale");
@@ -170,7 +170,7 @@ test("DP-05: private fields never appear in any passport HTML", async ({ request
   for (const code of [FULL, ANON, BENCH, RECYCLED]) {
     for (const path of [`/p/${code}`, `/p/${code}?view=full`, `/p/${code}?s=99`]) {
       const html = await (await request.get(path)).text();
-      expect(html).not.toMatch(/\bBL-\d{6}\b/); // sanitization report IDs
+      expect(html).not.toMatch(/\b(BL|RPT)-\d{6}\b/); // sanitization report IDs
       expect(html).not.toMatch(/\b(LE|HP|DE|AP)\d{7}\b/); // seeded serial numbers
       expect(html).not.toMatch(/serial_number|wipe_report_ref|recipient_category|price_cents|sale_channel/);
       expect(html).not.toMatch(/\$\d+\.\d{2}/); // no prices

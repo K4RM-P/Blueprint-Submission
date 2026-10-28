@@ -15,13 +15,13 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <AuthLayout
       eyebrow={invited ? "You're invited" : "Sign in or join"}
-      title={invited ? "Join the Relay team." : "Pick up the baton."}
+      title={invited ? "Join the Relay team." : "Sign in to Relay."}
       lead={
         invited ? (
           <p>Someone at Free Geek Toronto or your organization invited you. Sign up with the email they used.</p>
         ) : (
           <p>
-            Partners see their batches and impact. Staff run intake. Volunteers pick up where they left off at the bench. New businesses join free as Community Partners — your first batch is free.
+            Partners see their batches and impact. Staff run intake. Volunteers pick up where they left off at the bench. New businesses join free as Community Partners, and every batch is free.
           </p>
         )
       }

@@ -57,7 +57,5 @@ export function badgeProgress(stats: VolunteerStats, def: BadgeDef): { value: nu
   return { value: statFor(stats, def.criterionType), threshold: def.threshold };
 }
 
-/** Estimated hours at the bench: completed devices × refurb minutes. */
-export function estimateHours(completedUniform: number, completedMixed: number, minutes: { uniform: number; mixed: number }): number {
-  return Math.round(((completedUniform * minutes.uniform + completedMixed * minutes.mixed) / 60) * 10) / 10;
-}
+// The Skills Wallet uses the impact engine's hours formula (CI-03: one formula, everywhere).
+export { estimateHours } from "./impact";

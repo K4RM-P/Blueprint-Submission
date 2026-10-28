@@ -1,14 +1,6 @@
-import { Award, BarChart3, FileCheck2, LayoutGrid, Lock, Package, Plus, Settings, ShieldCheck, Sparkles } from "lucide-react";
+import { Award, BarChart3, FileCheck2, LayoutGrid, Lock, Package, Plus, Settings, ShieldCheck } from "lucide-react";
 import { LoopMark } from "@/components/shell/logo";
 import { cn } from "@/lib/utils";
-import { CountUp } from "./count-up";
-
-export interface PreviewTotals {
-  received: number;
-  verified: number;
-  reused: number;
-  kgDiverted: number;
-}
 
 const NAV = [
   { icon: LayoutGrid, label: "Overview", active: true },
@@ -30,12 +22,14 @@ const BATCHES = [
   { id: "FGT-B-0131", what: "30 × Dell Latitude", stage: "Certified", tone: "mint", pct: 100 },
 ] as const;
 
+// "Who your laptops help" adds up to the "Back in use" tile, as on the real dashboard.
 const HELPS = [
   { label: "Students", n: 46 },
   { label: "Newcomers", n: 31 },
-  { label: "Families", n: 22 },
+  { label: "Low-income households", n: 22 },
   { label: "Seniors", n: 12 },
 ];
+const BACK_IN_USE = HELPS.reduce((s, h) => s + h.n, 0);
 
 const chip: Record<(typeof BATCHES)[number]["tone"], string> = {
   butter: "bg-butter text-[#6b4e00]",
@@ -69,19 +63,20 @@ function Spark({ series, className }: { series: number[]; className?: string }) 
 /**
  * A believable, illustrative Partner Portal: window chrome, sidebar, KPI tiles,
  * a chart, recipient bars and recent batches. Presented on the landing page the
- * way Apple/Vercel show their product. Static and decorative; the KPI numbers
- * are the live public totals, everything else is example data.
+ * way Apple/Vercel show their product. Static and decorative, and every number
+ * is example data (the hero captions it as illustrative), kept internally
+ * consistent so nothing on it contradicts itself.
  */
-export function DashboardPreview({ totals }: { totals: PreviewTotals }) {
+export function DashboardPreview() {
   const W = 560;
   const H = 190;
   const max = Math.max(...RECEIVED) * 1.1;
   const reusedLine = path(REUSED, W, H, max);
   const kpis = [
-    { label: "Devices received", value: totals.received, delta: "+24 this month", series: RECEIVED },
-    { label: "Wiped & verified", value: totals.verified, delta: "100% certified", series: [3, 7, 10, 15, 18, 24, 27, 33] },
-    { label: "Back in use", value: totals.reused, delta: "+11 this month", series: REUSED, accent: true },
-    { label: "Kept out of landfill", value: totals.kgDiverted, suffix: "kg", delta: "est. 2.3 kg / device", series: [4, 9, 12, 20, 24, 33, 38, 46] },
+    { label: "Devices received", value: 128, delta: "+24 this month", series: RECEIVED },
+    { label: "Wiped & verified", value: 120, delta: "Every wipe staff-verified", series: [3, 7, 10, 15, 18, 24, 27, 33] },
+    { label: "Back in use", value: BACK_IN_USE, delta: "+11 this month", series: REUSED, accent: true },
+    { label: "Kept out of landfill", value: 276, suffix: "kg", delta: "est. 2.3 kg / device", series: [4, 9, 12, 20, 24, 33, 38, 46] },
   ];
   const helpsMax = Math.max(...HELPS.map((h) => h.n));
 
@@ -111,7 +106,7 @@ export function DashboardPreview({ totals }: { totals: PreviewTotals }) {
           <div className="mb-3 rounded-xl border border-line/80 bg-white/70 px-3 py-2.5">
             <p className="text-[0.8125rem] font-semibold leading-tight">Northwind Legal</p>
             <p className="mt-0.5 flex items-center gap-1 text-[0.6875rem] text-loop-deep">
-              <Sparkles className="size-3" aria-hidden /> Impact Partner
+              <Award className="size-3" aria-hidden /> Impact Partner
             </p>
           </div>
           {NAV.map(({ icon: Icon, label, active, badge }) => (
@@ -138,7 +133,7 @@ export function DashboardPreview({ totals }: { totals: PreviewTotals }) {
               <p className="font-display mt-1 text-[1.5rem] font-semibold leading-none tracking-[-0.04em] sm:text-[1.875rem]">Hi Maya.</p>
             </div>
             <div className="hidden items-center gap-2 sm:flex">
-              <span className="rounded-full border border-line bg-white px-3.5 py-2 text-[0.75rem] font-semibold text-ink-2">Export ESG report</span>
+              <span className="rounded-full border border-line bg-white px-3.5 py-2 text-[0.75rem] font-semibold text-ink-2">Download impact report</span>
               <span className="inline-flex items-center gap-1 rounded-full bg-ink px-3.5 py-2 text-[0.75rem] font-semibold text-white">
                 <Plus className="size-3.5" aria-hidden /> New batch
               </span>
@@ -152,7 +147,7 @@ export function DashboardPreview({ totals }: { totals: PreviewTotals }) {
                 <p className="text-[0.6875rem] font-medium text-ink-3 sm:text-[0.75rem]">{k.label}</p>
                 <div className="mt-2 flex items-end justify-between gap-2">
                   <p className="font-display text-[1.5rem] font-semibold leading-none tracking-[-0.04em] sm:text-[1.875rem]">
-                    <CountUp value={k.value} />
+                    {k.value.toLocaleString("en-CA")}
                     {k.suffix ? <span className="ml-0.5 font-sans text-[0.45em] font-medium tracking-normal text-ink-3">{k.suffix}</span> : null}
                   </p>
                   <Spark series={k.series} className={cn("hidden sm:block", k.accent ? "text-loop" : "text-[#9fb5aa]")} />

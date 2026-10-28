@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Building2, CheckCircle2, HandCoins, Sparkles, HardDrive, Leaf, Package, Play, Recycle, ShieldCheck, Terminal, Wrench } from "lucide-react";
+import { Building2, CheckCircle2, HandCoins, HardDrive, Leaf, Package, Play, Recycle, ShieldCheck, Terminal, Wrench } from "lucide-react";
 import { ClayButton, ClayCard, IconTile, StatPebble } from "@/components/clay";
 import { LiquidBlob } from "@/components/liquid";
 import { ClayLaptop } from "@/components/illustrations/clay-laptop";
@@ -23,6 +23,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
   const impact = { kg: story.impact.kg, co2eKg: story.impact.co2eKg ?? 0 };
   const specs = [p.approx_year ? String(p.approx_year) : null, p.cpu, p.ram_gb ? `${p.ram_gb} GB RAM` : null, p.storage_gb ? `${p.storage_gb} GB storage` : null, labels.category[p.category]].filter(Boolean) as string[];
   const ready = Boolean(p.timeline.ready_at) || ["ready", "listed", "sold"].includes(p.status);
+  const recycled = p.status === "recycled";
 
   const steps = [
     { key: "donated", label: `Donated by ${donor}`, date: longDate(p.timeline.donated_at), done: true, icon: <Package />, tint: "apricot" as const },
@@ -78,9 +79,6 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
             </div>
             <span className="flex flex-col items-end gap-2">
               <span className="chip bg-white/75 text-loop-deep">{p.status === "sold" ? "In a new home" : p.status === "recycled" ? "Recycled" : ready ? "Ready" : "Being refurbished"}</span>
-              <span className="chip gap-1.5 bg-[#0A3D2B] text-[#8FF5C4]" title={story.persona.tagline}>
-                <Sparkles className="size-3.5" aria-hidden /> {story.persona.name}
-              </span>
             </span>
           </div>
           <div className="mt-8 grid items-end gap-6 sm:grid-cols-[1.4fr_1fr]">
@@ -113,13 +111,15 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
                 <ShieldCheck aria-hidden className="size-5 shrink-0 text-loop-deep" strokeWidth={1.75} /> Certified data wipe
               </dt>
               <dd className="pl-7 font-semibold text-ink">
-                {p.timeline.wipe_verified_at ? `Verified ${longDate(p.timeline.wipe_verified_at)}` : "Wipe in progress"}
-                <span className="block text-small font-normal text-ink-2">Checked by Free Geek Toronto staff</span>
+                {p.timeline.wipe_verified_at ? `Verified ${longDate(p.timeline.wipe_verified_at)}` : recycled ? "Drive handled before recycling" : "Wipe in progress"}
+                <span className="block text-small font-normal text-ink-2">
+                  {p.timeline.wipe_verified_at ? "Checked by Free Geek Toronto staff" : recycled ? "Recorded by Free Geek Toronto staff" : "Staff verify every wipe before a laptop can be sold"}
+                </span>
               </dd>
             </div>
           </dl>
           <p className="mt-4 text-small text-ink-2">
-            Refurbished by <span className="font-semibold text-ink">Free Geek Toronto</span>, an independent non-profit.
+            {recycled ? "Recycled responsibly" : "Refurbished"} by <span className="font-semibold text-ink">Free Geek Toronto</span>, an independent non-profit.
           </p>
         </div>
         </PassportBooklet>
@@ -147,12 +147,12 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
         </h2>
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           <StatPebble tint="mint" label="kept out of landfill" value={impact.kg} decimals={1} suffix="kg" />
-          {impact.co2eKg > 0 ? <StatPebble label="CO₂e avoided (est.)" value={impact.co2eKg} suffix="kg" /> : null}
+          {impact.co2eKg > 0 ? <StatPebble label={p.status === "sold" ? "CO₂e avoided (est.)" : "CO₂e avoided once reused (est.)"} value={impact.co2eKg} suffix="kg" /> : null}
           <div data-tint="butter" className="clay-glass hairline-top col-span-2 flex flex-col justify-between gap-3 p-6 sm:col-span-1">
             <p className="eyebrow !text-ink-2">Software</p>
             <p className="flex items-center gap-2 text-lg font-semibold">
               <Terminal className="size-5 text-loop-deep" aria-hidden />
-              {p.os_installed ? `Running ${p.is_open_source_os ? "open-source " : ""}${p.os_installed}` : "Fresh software goes on at the bench"}
+              {p.os_installed ? `${ready ? "Running" : "Installed:"} ${p.is_open_source_os ? "open-source " : ""}${p.os_installed}` : "Fresh software goes on at the bench"}
             </p>
           </div>
         </div>
@@ -161,7 +161,9 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
         </p>
       </section>
 
-      {/* 4 · Where your money goes */}
+      {/* 4 · Where your money goes (and why it isn't free): only for laptops that are sold, not recycled ones */}
+      {recycled ? null : (
+        <>
       <section aria-labelledby="money" className="mt-14">
         <div className="flex flex-wrap items-center gap-3">
           <h2 id="money" className="font-display text-[2rem] leading-tight">
@@ -187,6 +189,8 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
           <p className="mt-3">Prices stay as low as possible and are tied to ability to pay — and the Pay-It-Forward fund lowers them further for students, newcomers and families who need it.</p>
         </div>
       </section>
+        </>
+      )}
 
       {/* PIF-06: a quiet note, below the core story */}
       {p.pif_subsidized ? (
@@ -204,7 +208,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
           <HardDrive />
         </IconTile>
         <p>
-          Refurbished by <span className="font-semibold">Free Geek Toronto</span>, an independent non-profit. Free Geek locations operate independently — products, prices and services vary by
+          {recycled ? "Handled" : "Refurbished"} by <span className="font-semibold">Free Geek Toronto</span>, an independent non-profit. Free Geek locations operate independently — products, prices and services vary by
           city.
         </p>
       </ClayCard>

@@ -152,7 +152,7 @@ const BASE: Record<SlideKey, Omit<StorySlide, "key">> = {
   cover: { tint: "porcelain", durationMs: null, title: "This laptop has a story" },
   origin: { tint: "apricot", durationMs: 6000, title: "Its first job" },
   handoff: { tint: "porcelain", durationMs: 6000, title: "The handoff" },
-  erased: { tint: "sky", durationMs: 6500, title: "Every byte erased" },
+  erased: { tint: "sky", durationMs: 6500, title: "Data wiped" },
   bench: { tint: "butter", durationMs: 7500, title: "Back to life" },
   speed: { tint: "mint", durationMs: 5500, title: "Ready, fast" },
   software: { tint: "porcelain", durationMs: 5500, title: "Open source" },

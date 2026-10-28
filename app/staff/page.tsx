@@ -4,7 +4,7 @@ import { ArrowRight, ClipboardCheck, Play, Printer } from "lucide-react";
 import { ClayButton, ClayCard, FlatCard, StatGroup } from "@/components/clay";
 import { PassportQrImage } from "@/components/journey/passport-qr";
 import { CapacityGlasses } from "@/components/liquid";
-import { BarsChart } from "@/components/charts/bars";
+import { BarsChart } from "@/components/charts/lazy";
 import { PipelineTrack } from "@/components/staff/pipeline-track";
 import { PageHeader } from "@/components/shell/page-header";
 import { requireRole } from "@/lib/auth";
@@ -17,6 +17,7 @@ import { daysAgo, longDate, shortDate } from "@/lib/dates";
 import { scoreLabel } from "@/lib/batch-score";
 import { batchCanIssueCertificate } from "@/lib/status-machine";
 import { fundBalance } from "@/lib/ledger";
+import { PROGRAM_TARGETS, programMetrics } from "@/lib/program-metrics";
 import { SHOWCASE_PASSPORTS } from "@/lib/showcase-passports";
 
 export const metadata: Metadata = { title: "Overview" };
@@ -41,7 +42,7 @@ export default async function StaffOverview() {
   const [calendar, factors, devicesRes, pendingRes, membershipsRes, fundRes, orgsRes, activeVolRes, checkerRes, certBatchesRes] = await Promise.all([
     getCalendar(supabase, settings.weeklyCapacity, 4),
     getFactors(supabase),
-    supabase.from("devices").select("status, source, batch_id, category, weight_kg, recipient_category, refurbished_at, sold_at, price_cents, batch_line_items(quantity)"),
+    supabase.from("devices").select("status, source, batch_id, category, weight_kg, recipient_category, created_at, refurbished_at, sold_at, price_cents, passport_views, batch_line_items(quantity)"),
     supabase.from("donation_batches").select("id, created_at, value_score, preferred_week, organizations(name, tier), batch_line_items(quantity, make, model)").eq("status", "submitted").order("value_score", { ascending: false }),
     supabase.from("membership_payments").select("amount_cents").gte("created_at", since),
     supabase.from("fund_transactions").select("amount_cents, type, created_at"),
@@ -91,6 +92,41 @@ export default async function StaffOverview() {
     ] as const
   ).map(([k, label]) => ({ label, value: checker.filter((c) => c.outcome === k).length, highlight: k === "accepted" || k === "partner_redirect" }));
 
+  // PRD §3.3: is the Reuse Partnership working? Last 90 days against the year-one targets.
+  const program = programMetrics(
+    devices.map((d) => ({ source: d.source, category: d.category, receivedAt: d.created_at, readyAt: d.refurbished_at, soldAt: d.sold_at, priceCents: d.price_cents, passportViews: d.passport_views })),
+    (orgsRes.data ?? []).flatMap((o) => o.donation_batches.map((b) => ({ organizationId: o.id, status: b.status }))),
+    new Date(),
+  );
+  const days = (n: number | null) => (n == null ? "—" : `${n.toFixed(1)} days`);
+  const programRows = [
+    {
+      value: program.partnerLaptopsPerMonth.toLocaleString("en-CA"),
+      label: "partner laptops received a month",
+      note: `Target ${PROGRAM_TARGETS.partnerLaptopsPerMonth} (250 a year)${program.partnerShare != null ? ` · ${Math.round(program.partnerShare * 100)}% of all intake` : ""}`,
+    },
+    {
+      value: program.partnerSpeedup == null ? "—" : `${Math.round(program.partnerSpeedup * 100)}% faster`,
+      label: "partner laptops reach Ready vs household devices",
+      note: `Median intake to Ready: ${days(program.medianDaysToReady.partner)} vs ${days(program.medianDaysToReady.household)} · target ${Math.round(PROGRAM_TARGETS.partnerSpeedup * 100)}% faster`,
+    },
+    {
+      value: `${program.repeatPartners.repeat} of ${program.repeatPartners.total}`,
+      label: "partners came back with a second batch",
+      note: `Target ${Math.round(PROGRAM_TARGETS.repeatPartnerShare * 100)}% renew`,
+    },
+    {
+      value: money(program.partnerSales.cents),
+      label: `from ${program.partnerSales.count} partner laptops sold`,
+      note: "Prices set by Free Geek Toronto, never raised by Relay",
+    },
+    {
+      value: program.passportViewsPerSold == null ? "—" : program.passportViewsPerSold.toFixed(1),
+      label: "passport views per sold device",
+      note: `Target ${PROGRAM_TARGETS.passportViewsPerSold}`,
+    },
+  ];
+
   const kpis = [
     { label: "devices sold this month", value: soldThisMonth.length },
     { label: "revenue this month", note: `Sales ${money(salesCents)} · memberships ${money(membershipCents)} · fund ${money(pifCents)}`, value: `$${Math.round((salesCents + membershipCents + pifCents) / 100).toLocaleString("en-CA")}` },
@@ -126,7 +162,9 @@ export default async function StaffOverview() {
               href: certsToIssue.length === 1 ? `/staff/batches/${certsToIssue[0].id}` : "/staff/batches?status=in_refurbishment",
               value: certsToIssue.length,
               label: "certificates to issue",
-              note: certsToIssue.length ? certsToIssue.map((b) => b.organizations?.name).filter(Boolean).slice(0, 2).join(", ") : "Every verified batch has one",
+              note: certsToIssue.length
+                ? `${certsToIssue.slice(0, 2).map((b) => b.organizations?.name ?? "A partner").join(", ")}${certsToIssue.length > 2 ? ` +${certsToIssue.length - 2} more` : ""}`
+                : "Every verified batch has one",
             },
           ].map((tile) => (
             <li key={tile.label} className="bg-surface-flat">
@@ -266,6 +304,25 @@ export default async function StaffOverview() {
           <p className="text-[0.8125rem] text-ink-3">{labels.deviceStatus.sold} = reused. Factors are estimates marked TO VERIFY.</p>
         </FlatCard>
       </div>
+
+      {/* PRD §3.3 success metrics: the numbers that show whether the one change is working */}
+      <section aria-labelledby="program" className="mt-12">
+        <h2 id="program" className="text-title font-semibold">
+          Is the Reuse Partnership working?
+        </h2>
+        <p className="mt-1 text-small text-ink-2">
+          Last {program.windowDays} days of demo data. Targets are year-one assumptions to confirm with Free Geek Toronto.
+        </p>
+        <ul className="flat mt-4 grid grid-cols-1 gap-px overflow-hidden bg-line !p-0 sm:grid-cols-2 xl:grid-cols-5">
+          {programRows.map((r) => (
+            <li key={r.label} className="flex flex-col gap-1 bg-surface-flat p-5">
+              <span className="font-display tnum text-[1.75rem] leading-none text-ink">{r.value}</span>
+              <span className="mt-1 text-small font-medium text-ink">{r.label}</span>
+              <span className="text-[0.8125rem] text-ink-3">{r.note}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {/* Also running: quieter numbers that support the pipeline */}
       <section aria-labelledby="month" className="mt-12">

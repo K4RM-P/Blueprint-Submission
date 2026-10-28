@@ -6,9 +6,10 @@
 
 **Who it's for.** The office manager or IT lead at a Toronto small or medium business retiring 10–50 laptops.
 
-- **Live demo:** _add the Vercel URL here after deploying_ → open **`/demo`** for one-click sign-in
+- **Live demo:** https://freegeek-relay.vercel.app → open **`/demo`** for one-click sign-in
 - **Demo accounts:** `demo-partner@geekloop.test`, `demo-staff@geekloop.test`, `demo-volunteer@geekloop.test`. The shared password is shown on `/demo` in demo mode. Every organization and person in the data is fictional.
 - **Payments:** test mode only. With `PAYMENT_PROVIDER=mock` (the default) nothing is charged anywhere.
+- **More docs:** `HOW_IT_WORKS.md` (the loop, formulas, metrics, cost and launch timeline) · `ADMIN_GUIDE.md` (the staff routine, for a non-technical reader) · `DEMO_SCRIPT.md` (the video click path).
 
 ---
 
@@ -21,7 +22,7 @@
 ### Supporting (how the core works)
 3. **Partner impact dashboard and certificates:** why partners stay. People helped, recipient categories, every device linked to its Device Passport, an annual report and a LinkedIn card.
 4. **Volunteer Bench and Skills Wallet:** how FGT handles the extra volume. Volunteers claim the best-scoring partner devices first, their work is stamped on each Device Passport, and they earn verifiable skill badges.
-5. **Staff Console:** how a tiny team runs it all in minutes. The overview leads with incoming partner batches, capacity, wipes awaiting verification and certificates to issue.
+5. **Staff Console:** how a tiny team runs it all in minutes. The overview leads with incoming partner batches, capacity, wipes awaiting verification and certificates to issue, and shows whether the Reuse Partnership is working (partner laptops a month, partner vs household intake-to-ready time, repeat partners, partner-laptop sales and passport views per sold device, against labelled year-one targets).
 
 ### Also included (fully working, quieter)
 6. **Pay-It-Forward fund:** optional contributions that lower prices for digital-inclusion buyers.

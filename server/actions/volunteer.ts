@@ -5,7 +5,7 @@ import { z } from "zod";
 import { assertRole } from "@/lib/auth";
 import { fail, ok, runAction, type ActionResult } from "@/lib/action";
 import { BADGES, newBadges, type VolunteerStats } from "@/lib/badges";
-import { CHECKLIST_STEPS } from "@/lib/domain";
+import { CHECKLIST_STEPS, DEFAULT_WIPE_METHOD } from "@/lib/domain";
 
 export interface AwardedBadge {
   slug: string;
@@ -63,6 +63,7 @@ export async function completeStep(input: unknown): Promise<ActionResult<{ statu
       p_device: d.deviceId,
       p_step: d.step,
       p_report_ref: d.reportRef ?? undefined,
+      p_wipe_method: d.step === "wipe_performed" ? DEFAULT_WIPE_METHOD : undefined,
       p_os: d.os ?? undefined,
       p_open_source: d.openSource ?? true,
       p_note: d.note ?? undefined,

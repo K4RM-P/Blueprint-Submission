@@ -1,12 +1,13 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowRight, BadgeCheck, Cpu, Flame, Gift, HandCoins, HardDrive, Hourglass, Recycle, ShieldCheck, Sparkles, Terminal, Users, Wrench, Zap } from "lucide-react";
+import { ArrowRight, BadgeCheck, Cpu, HandCoins, HardDrive, Recycle, ShieldCheck, Terminal, Users, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { Seal } from "@/components/clay/seal";
 import { ClayLaptop } from "@/components/illustrations/clay-laptop";
 import { PassportBooklet } from "@/components/journey/passport-booklet";
-import { storyDate, type BenchStep, type PassportStory, type Persona, type SlideKey } from "@/lib/passport-story";
+import { PERSONA_ICON } from "./persona-icons";
+import { storyDate, type BenchStep, type PassportStory, type SlideKey } from "@/lib/passport-story";
 import { cn } from "@/lib/utils";
 import { BatonSprite } from "./baton-sprite";
 import { OdometerDigits } from "./odometer-digits";
@@ -180,12 +181,12 @@ function Erased({ story }: SlideProps) {
   return (
     <>
       <Eyebrow>Certified data wipe</Eyebrow>
-      <KineticLine text="Every byte *erased.*" className="mt-3" />
+      <KineticLine text="Its old data, *wiped.*" className="mt-3" />
       <Hero>
         <Seal rim="DATA WIPED · VERIFIED · TORONTO · " icon={<ShieldCheck />} size={200} tilt={-8} />
       </Hero>
       <MonoChip className="self-start">VERIFIED · {storyDate(story.dates.wipeVerified).toUpperCase()}</MonoChip>
-      <Sub delay={0.9}>The drive was wiped, then verified by Free Geek Toronto staff before anyone else touched it. Nothing from its first job came along{story.donor.household ? "" : ", and the business gets a certificate that lists it"}.</Sub>
+      <Sub delay={0.9}>The drive was wiped at the bench, then verified by Free Geek Toronto staff before the laptop could be refurbished or sold. Nothing from its first job came along{story.donor.household ? "" : ", and the business gets a certificate that lists it"}.</Sub>
     </>
   );
 }
@@ -463,14 +464,6 @@ function Recycled({ story }: SlideProps) {
   );
 }
 
-export const PERSONA_ICON: Record<Persona["key"], ReactNode> = {
-  phoenix: <Flame />,
-  sprinter: <Zap />,
-  veteran: <Hourglass />,
-  free_spirit: <Terminal />,
-  gift: <Gift />,
-  comeback: <Sparkles />,
-};
 
 /* Persona: Wrapped's "personality" reveal. A holographic plate flips in, then its traits stamp down. */
 function PersonaSlide({ story }: SlideProps) {
