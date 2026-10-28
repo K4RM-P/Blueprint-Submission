@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "motion/react";
 import { forwardRef, useState, type ComponentPropsWithoutRef, type PointerEvent, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,7 +10,7 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "relative isolate inline-flex select-none items-center justify-center gap-2 overflow-hidden rounded-full font-semibold whitespace-nowrap transition-[filter,transform] duration-200 disabled:pointer-events-none disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:opacity-55 [&_svg]:size-[18px] [&_svg]:shrink-0 [&_svg]:stroke-[1.75]";
+  "relative isolate inline-flex select-none items-center justify-center gap-2 overflow-hidden rounded-full font-semibold whitespace-nowrap transition-[filter,translate,scale] duration-200 ease-[var(--ease-spring)] disabled:pointer-events-none disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:opacity-55 [&_svg]:size-[18px] [&_svg]:shrink-0 [&_svg]:stroke-[1.75]";
 
 const variants: Record<Variant, string> = {
   primary: "clay-sm clay-press text-white",
@@ -52,15 +51,14 @@ type CommonProps = {
 type ButtonProps = CommonProps & Omit<ComponentPropsWithoutRef<"button">, keyof CommonProps> & { href?: undefined };
 type LinkProps = CommonProps & { href: string; prefetch?: boolean; target?: string; rel?: string; "aria-label"?: string; onClick?: () => void };
 
-const MotionLink = motion.create(Link);
-
 /**
- * Pill button with clay depth and a liquid-press ripple (§7.2.5, §8).
+ * Pill button with clay depth and a liquid-press ripple (§7.2.5, §8). The press is CSS
+ * (scale .97 on the spring curve), so the many buttons on a page cost nothing to hydrate.
  * Max one `primary` per view.
  */
 export const ClayButton = forwardRef<HTMLButtonElement, ButtonProps | LinkProps>(function ClayButton(props, ref) {
   const { variant = "secondary", size = "md", loading, icon, iconRight, className, children, ...rest } = props;
-  const { reduced, t } = useMotionPrefs();
+  const { reduced } = useMotionPrefs();
   const [ripples, setRipples] = useState<Ripple[]>([]);
 
   const onPointerDown = (e: PointerEvent<HTMLElement>) => {
@@ -87,33 +85,29 @@ export const ClayButton = forwardRef<HTMLButtonElement, ButtonProps | LinkProps>
     </>
   );
 
-  const classes = cn(base, variants[variant], sizes[size], variant !== "ghost" && "hover:-translate-y-0.5", className);
-  const motionProps = variant === "ghost" ? {} : { whileTap: reduced ? undefined : { scale: 0.97 }, transition: t("press") };
+  const classes = cn(base, variants[variant], sizes[size], variant !== "ghost" && "hover:-translate-y-0.5", variant !== "ghost" && !reduced && "active:scale-[0.97]", className);
 
   if ("href" in rest && rest.href !== undefined) {
     const { href, ...linkRest } = rest as LinkProps;
     return (
-      <MotionLink href={href} data-tint={tints[variant]} className={classes} onPointerDown={onPointerDown} {...motionProps} {...linkRest}>
+      <Link href={href} data-tint={tints[variant]} className={classes} onPointerDown={onPointerDown} {...linkRest}>
         {content}
-      </MotionLink>
+      </Link>
     );
   }
 
   const buttonRest = rest as Omit<ButtonProps, keyof CommonProps>;
-  const { onDrag: _d, onDragStart: _ds, onDragEnd: _de, onAnimationStart: _as, ...safeRest } = buttonRest;
-  void _d; void _ds; void _de; void _as;
   return (
-    <motion.button
+    <button
       ref={ref}
       data-tint={tints[variant]}
       className={classes}
       onPointerDown={onPointerDown}
       aria-busy={loading || undefined}
       disabled={buttonRest.disabled || loading}
-      {...motionProps}
-      {...safeRest}
+      {...buttonRest}
     >
       {content}
-    </motion.button>
+    </button>
   );
 });

@@ -3,7 +3,7 @@ import { LoopMark } from "@/components/shell/logo";
 import { cn } from "@/lib/utils";
 
 const ROWS = [
-  ["Batch", "FGT-B-0131"],
+  ["Received", "Sep 9, 2026"],
   ["Devices", "30 × Dell Latitude 5420"],
   ["Drives wiped", "30 of 30"],
   ["Verified by", "Free Geek Toronto staff"],

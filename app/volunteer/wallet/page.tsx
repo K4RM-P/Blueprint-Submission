@@ -97,7 +97,7 @@ export default async function WalletPage() {
                       {p.make} {p.model}
                     </p>
                     <p className="text-[0.8125rem] text-ink-2">
-                      {p.status === "sold" ? "In someone's hands" : labels.deviceStatus[p.status]} · {longDate(p.refurbished_at)}
+                      {p.status === "sold" ? "In a new home" : labels.deviceStatus[p.status]} · {longDate(p.refurbished_at)}
                     </p>
                   </div>
                 </ClayCard>

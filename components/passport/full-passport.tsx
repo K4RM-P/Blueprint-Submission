@@ -24,11 +24,17 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
   const specs = [p.approx_year ? String(p.approx_year) : null, p.cpu, p.ram_gb ? `${p.ram_gb} GB RAM` : null, p.storage_gb ? `${p.storage_gb} GB storage` : null, labels.category[p.category]].filter(Boolean) as string[];
   const ready = Boolean(p.timeline.ready_at) || ["ready", "listed", "sold"].includes(p.status);
   const recycled = p.status === "recycled";
+  // A device recycled before its wipe was verified had its drive handled at recycling instead.
+  const drivePath = recycled && !p.timeline.wipe_verified_at;
 
   const steps = [
     { key: "donated", label: `Donated by ${donor}`, date: longDate(p.timeline.donated_at), done: true, icon: <Package />, tint: "apricot" as const },
-    { key: "wiped", label: "Certified data wipe, verified by staff", date: p.timeline.wipe_verified_at ? longDate(p.timeline.wipe_verified_at) : null, done: Boolean(p.timeline.wipe_verified_at), icon: <ShieldCheck />, tint: "sky" as const, current: !p.timeline.wipe_verified_at },
-    { key: "refurb", label: `Refurbished by ${volunteer}`, date: p.timeline.refurbished_at ? longDate(p.timeline.refurbished_at) : null, done: Boolean(p.timeline.refurbished_at) && Boolean(p.timeline.wipe_verified_at), icon: <Wrench />, tint: "butter" as const },
+    drivePath
+      ? { key: "wiped", label: "Drive handled before recycling, recorded by staff", date: null, done: true, icon: <ShieldCheck />, tint: "sky" as const }
+      : { key: "wiped", label: "Certified data wipe, verified by staff", date: p.timeline.wipe_verified_at ? longDate(p.timeline.wipe_verified_at) : null, done: Boolean(p.timeline.wipe_verified_at), icon: <ShieldCheck />, tint: "sky" as const, current: !p.timeline.wipe_verified_at },
+    ...(recycled && !p.timeline.refurbished_at
+      ? []
+      : [{ key: "refurb", label: `Refurbished by ${volunteer}`, date: p.timeline.refurbished_at ? longDate(p.timeline.refurbished_at) : null, done: Boolean(p.timeline.refurbished_at) && Boolean(p.timeline.wipe_verified_at), icon: <Wrench />, tint: "butter" as const }]),
     {
       key: "ready",
       label: p.timeline.in_new_home ? "In its new home" : p.status === "recycled" ? "Recycled responsibly" : "Ready for its next owner",
@@ -39,11 +45,12 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
     },
   ];
 
+  const byKey = (k: string) => steps.find((s) => s.key === k);
   // The relay in three legs: business → Free Geek, the bench, the next owner.
   const legs = [
     { label: "Handed over", done: true },
-    { label: "On the bench", done: steps[1].done && steps[2].done },
-    { label: "Next owner", done: steps[3].done },
+    { label: "On the bench", done: Boolean(byKey("wiped")?.done) && (byKey("refurb")?.done ?? recycled) },
+    { label: "Next owner", done: Boolean(byKey("ready")?.done) },
   ];
   const legStatus = p.timeline.in_new_home
     ? "Now with its next owner"
@@ -51,7 +58,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
       ? "Recycled responsibly"
       : ready
         ? "Waiting for its next owner"
-        : steps[1].done
+        : byKey("wiped")?.done
           ? "On the volunteer bench"
           : "Arrived at Free Geek Toronto";
 
@@ -108,7 +115,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
             </div>
             <div>
               <dt className="flex items-center gap-2 text-small text-ink-2">
-                <ShieldCheck aria-hidden className="size-5 shrink-0 text-loop-deep" strokeWidth={1.75} /> Certified data wipe
+                <ShieldCheck aria-hidden className="size-5 shrink-0 text-loop-deep" strokeWidth={1.75} /> {drivePath ? "Its drive" : "Certified data wipe"}
               </dt>
               <dd className="pl-7 font-semibold text-ink">
                 {p.timeline.wipe_verified_at ? `Verified ${longDate(p.timeline.wipe_verified_at)}` : recycled ? "Drive handled before recycling" : "Wipe in progress"}
@@ -148,6 +155,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           <StatPebble tint="mint" label="kept out of landfill" value={impact.kg} decimals={1} suffix="kg" />
           {impact.co2eKg > 0 ? <StatPebble label={p.status === "sold" ? "CO₂e avoided (est.)" : "CO₂e avoided once reused (est.)"} value={impact.co2eKg} suffix="kg" /> : null}
+          {recycled ? null : (
           <div data-tint="butter" className="clay-glass hairline-top col-span-2 flex flex-col justify-between gap-3 p-6 sm:col-span-1">
             <p className="eyebrow !text-ink-2">Software</p>
             <p className="flex items-center gap-2 text-lg font-semibold">
@@ -155,6 +163,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
               {p.os_installed ? `${ready ? "Running" : "Installed:"} ${p.is_open_source_os ? "open-source " : ""}${p.os_installed}` : "Fresh software goes on at the bench"}
             </p>
           </div>
+          )}
         </div>
         <p className="mt-3 text-[0.8125rem] text-ink-3">
           Estimates use placeholder factors {p.factor?.source_title === "TO VERIFY" ? "(TO VERIFY)" : `from ${p.factor?.source_title}`}. <Link href="/impact#methodology" className="underline">Methodology</Link>

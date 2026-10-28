@@ -1,12 +1,12 @@
-import { Award, BarChart3, FileCheck2, LayoutGrid, Lock, Package, Plus, Settings, ShieldCheck } from "lucide-react";
+import { Award, FileCheck2, LayoutGrid, Lock, Package, Plus, Settings, ShieldCheck } from "lucide-react";
 import { LoopMark } from "@/components/shell/logo";
 import { cn } from "@/lib/utils";
 
+// The real Partner Portal's navigation (components/shell/nav-config.ts).
 const NAV = [
-  { icon: LayoutGrid, label: "Overview", active: true },
+  { icon: LayoutGrid, label: "Dashboard", active: true },
   { icon: Package, label: "Batches", badge: "3" },
-  { icon: FileCheck2, label: "Certificates" },
-  { icon: BarChart3, label: "Impact report" },
+  { icon: FileCheck2, label: "Impact report" },
   { icon: Award, label: "Membership" },
   { icon: Settings, label: "Settings" },
 ];
@@ -17,9 +17,9 @@ const REUSED = [2, 5, 9, 11, 16, 18, 24, 29];
 const MONTHS = ["Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"];
 
 const BATCHES = [
-  { id: "FGT-B-0142", what: "24 × ThinkPad T14", stage: "Wiping", tone: "butter", pct: 34 },
-  { id: "FGT-B-0139", what: "18 × MacBook Air", stage: "On the bench", tone: "sky", pct: 68 },
-  { id: "FGT-B-0131", what: "30 × Dell Latitude", stage: "Certified", tone: "mint", pct: 100 },
+  { id: "Oct 21", what: "24 × ThinkPad T14", stage: "Wiping", tone: "butter", pct: 34 },
+  { id: "Sep 30", what: "18 × MacBook Air", stage: "On the bench", tone: "sky", pct: 68 },
+  { id: "Sep 9", what: "30 × Dell Latitude", stage: "Certified", tone: "mint", pct: 100 },
 ] as const;
 
 // "Who your laptops help" adds up to the "Back in use" tile, as on the real dashboard.
@@ -129,7 +129,7 @@ export function DashboardPreview() {
         <div className="min-w-0 flex-1 p-4 sm:p-6 lg:p-7">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-ink-3">Overview · Oct 2026</p>
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-ink-3">Dashboard · Oct 2026</p>
               <p className="font-display mt-1 text-[1.5rem] font-semibold leading-none tracking-[-0.04em] sm:text-[1.875rem]">Hi Maya.</p>
             </div>
             <div className="hidden items-center gap-2 sm:flex">

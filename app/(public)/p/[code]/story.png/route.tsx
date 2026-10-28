@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getPassportStory } from "@/lib/queries/passport";
+import { getPassportStoryForImage } from "@/lib/queries/passport";
 import { buildPassportStory } from "@/lib/passport-story";
 import { renderStoryImage } from "@/lib/og/passport-card";
 
@@ -12,7 +12,7 @@ const Params = z.object({ code: z.string().min(4).max(32) });
 export async function GET(req: Request, { params }: { params: Promise<{ code: string }> }) {
   const parsed = Params.safeParse(await params);
   if (!parsed.success) return NextResponse.json({ error: "Invalid passport code" }, { status: 400 });
-  const data = await getPassportStory(parsed.data.code);
+  const data = await getPassportStoryForImage(parsed.data.code);
   if (!data) return NextResponse.json({ error: "Passport not found" }, { status: 404 });
   const story = buildPassportStory(data);
   const image = await renderStoryImage(story);

@@ -322,9 +322,10 @@
   bottom: auto;
   top: 48%;
 }
+/* One slow pass per visit, never a looping marquee (UI §12.9); a slide is gone long before it ends. */
 .story-ticker-track {
   display: inline-block;
-  animation: story-marquee 28s linear infinite;
+  animation: story-marquee 28s linear 1 both;
 }
 .story-ticker[data-reverse="true"] .story-ticker-track {
   animation-direction: reverse;
