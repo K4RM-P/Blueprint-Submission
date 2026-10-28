@@ -1,5 +1,8 @@
-import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
+import { Document, Font, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import { batchReference } from "@/lib/certificate-number";
+
+// Never hyphenate: model names like "MacBook Pro 13 (2017)" must not break mid-word.
+Font.registerHyphenationCallback((word) => [word]);
 
 /**
  * Data-sanitization certificate (CI-01). Flat, formal, print-professional:

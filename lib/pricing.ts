@@ -41,7 +41,7 @@ export const TIER_PRICE_CENTS: Record<PartnerTier, number> = { community: 0, imp
 export const TIER_PITCH: Record<PartnerTier, string> = {
   community: "Everything the core needs: certified data wipe, a certificate for every batch, a Device Passport for every laptop and your impact summary.",
   impact: "Optional: a detailed impact dashboard, annual report and LinkedIn card for your team, clients and board, plus pickup requests (to be confirmed by Free Geek Toronto).",
-  champion: "Optional: everything in Impact, plus a hosted employee volunteer day at the FGT Community Hub and 10 laptops sponsored through the Pay-It-Forward fund.",
+  champion: "Optional: everything in Impact, plus a hosted employee volunteer day at the FGT Community Hub (to be confirmed by Free Geek Toronto) and 10 laptops sponsored through the Pay-It-Forward fund.",
 };
 
 export const TIER_BENEFITS: Record<PartnerTier, string[]> = {
@@ -54,7 +54,7 @@ export const TIER_BENEFITS: Record<PartnerTier, string[]> = {
   impact: ["Everything in Community", "Pickup requests (to be confirmed by Free Geek Toronto)", "Detailed impact dashboard", "Downloadable annual impact report", "Shareable LinkedIn impact card", "Logo on the public Partner Wall"],
   champion: [
     "Everything in Impact",
-    "One hosted employee volunteer day at the FGT Community Hub each year",
+    "One hosted employee volunteer day at the FGT Community Hub each year (to be confirmed by Free Geek Toronto)",
     "Featured placement on the Partner Wall",
     "10 sponsored laptops credited to the Pay-It-Forward fund in your name",
   ],

@@ -13,7 +13,7 @@ import { upcomingWeeks } from "@/lib/capacity";
 
 export const metadata: Metadata = { title: "Batch queue" };
 
-export default async function StaffBatches({ searchParams }: { searchParams: Promise<{ status?: string; tier?: string; week?: string }> }) {
+export default async function StaffBatches({ searchParams }: { searchParams: Promise<{ status?: string; tier?: string; week?: string; org?: string }> }) {
   const sp = await searchParams;
   const { supabase } = await requireRole("staff");
   let q = supabase
@@ -27,6 +27,8 @@ export default async function StaffBatches({ searchParams }: { searchParams: Pro
   else if ((BATCH_STATUSES as readonly string[]).includes(status)) q = q.eq("status", status as (typeof BATCH_STATUSES)[number]);
   if (sp.tier && (PARTNER_TIERS as readonly string[]).includes(sp.tier)) q = q.eq("organizations.tier", sp.tier as (typeof PARTNER_TIERS)[number]);
   if (sp.week && /^\d{4}-\d{2}-\d{2}$/.test(sp.week)) q = q.or(`scheduled_week.eq.${sp.week},and(scheduled_week.is.null,preferred_week.eq.${sp.week})`);
+  const org = sp.org && /^[0-9a-f-]{36}$/i.test(sp.org) ? sp.org : null;
+  if (org) q = q.eq("organization_id", org);
   const [{ data }, settings] = await Promise.all([q, getSettings(supabase)]);
   // Rank by the score recomputed from the line items, never the stored value alone.
   const batches = (data ?? [])
@@ -44,7 +46,17 @@ export default async function StaffBatches({ searchParams }: { searchParams: Pro
           { name: "tier", label: "Partner tier", value: sp.tier ?? "", options: [{ value: "", label: "All tiers" }, ...PARTNER_TIERS.map((t) => ({ value: t, label: labels.tier[t] }))] },
           { name: "week", label: "Week", value: sp.week ?? "", options: [{ value: "", label: "Any week" }, ...weeks.map((w) => ({ value: w, label: `Week of ${shortDate(w)}` }))] },
         ]}
-      />
+      >
+        {org ? <input type="hidden" name="org" value={org} /> : null}
+      </FilterBar>
+      {org && batches[0] ? (
+        <p className="-mt-2 mb-4 text-small text-ink-2">
+          Showing batches from <span className="font-semibold text-ink">{batches[0].organizations.name}</span> ·{" "}
+          <Link href="/staff/batches" className="text-loop-deep underline underline-offset-4">
+            All partners
+          </Link>
+        </p>
+      ) : null}
       <div className="flat overflow-x-auto !p-0">
         {batches.length === 0 ? (
           <div className="px-6">
@@ -68,13 +80,13 @@ export default async function StaffBatches({ searchParams }: { searchParams: Pro
                 const qty = b.batch_line_items.reduce((s, l) => s + l.quantity, 0);
                 const top = [...b.batch_line_items].sort((a, z) => z.quantity - a.quantity)[0];
                 return (
-                  <tr key={b.id}>
+                  <tr key={b.id} className="relative cursor-pointer">
                     <td className="text-right">
                       <span className="font-display text-xl">{b.value_score}</span>
                       <span className="block text-[0.75rem] text-ink-2">{scoreLabel(b.value_score)}</span>
                     </td>
                     <td>
-                      <Link href={`/staff/batches/${b.id}`} className="font-semibold underline-offset-4 hover:underline">
+                      <Link href={`/staff/batches/${b.id}`} className="font-semibold underline-offset-4 after:absolute after:inset-0 hover:underline">
                         {b.organizations.name}
                       </Link>
                       <span className="block text-[0.8125rem] text-ink-2">{labels.tier[b.organizations.tier]}</span>

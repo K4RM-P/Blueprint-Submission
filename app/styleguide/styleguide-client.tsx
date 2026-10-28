@@ -318,7 +318,7 @@ export function StyleguideClient() {
             <p className="text-small text-ink-2">Odometer for the hero counter. Rolls once on view; reduced motion shows the final number.</p>
           </ClayCard>
           <ClayCard className="flex items-center gap-6 md:col-span-5">
-            <Seal rim="DATA WIPED · RELAY · DATA WIPED · " icon={<ShieldCheck />} size={104} inView />
+            <Seal rim="DATA WIPED · FREE GEEK TORONTO · " icon={<ShieldCheck />} size={104} inView />
             <p className="text-small text-ink-2">Ink seal: wipes, certificates, verification. Presses in once with a slight hand-stamped tilt.</p>
           </ClayCard>
           <ClayCard tint="mint" className="flex flex-col gap-4 md:col-span-7">
@@ -516,7 +516,7 @@ function WrappedKit() {
           <p className="eyebrow self-start">BatonSprite</p>
           <BatonSprite glow className="w-48" />
         </FlatCard>
-        <FlatCard className="flex flex-col gap-4">
+        <FlatCard className="flex flex-col gap-4 overflow-hidden">
           <p className="eyebrow">StampSequence</p>
           <StampSequence
             stamps={story.benchSteps.map((b) => ({ key: b.kind, label: b.label, date: b.at ? new Date(b.at).toLocaleDateString("en-CA", { month: "short", day: "numeric" }) : "Coming up", icon: <Cpu />, done: Boolean(b.at) }))}

@@ -17,7 +17,7 @@ const CARDS: { role: Role; tint: "apricot" | "sky" | "butter"; title: string; ap
     title: "Partner",
     app: "Partner Portal",
     who: "Priya · Maple Ledger Accounting",
-    does: "Start here. Donate a batch of laptops, follow every device to its Device Passport and get a certificate for its certified data wipe.",
+    does: "Start here. Donate a batch of laptops, follow every device to its Device Passport and get a certificate of data sanitization for the batch.",
     icon: <Building2 />,
   },
   {

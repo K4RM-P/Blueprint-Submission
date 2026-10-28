@@ -1,6 +1,9 @@
-import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
+import { Document, Font, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import type { ImpactTotals } from "@/lib/impact";
 import { impactSummary } from "@/lib/report";
+
+// Never hyphenate: model names like "MacBook Pro 13 (2017)" must not break mid-word.
+Font.registerHyphenationCallback((word) => [word]);
 
 /**
  * Annual impact report (PP-10). Same document language as the certificate (UI §9.8):

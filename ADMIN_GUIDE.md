@@ -38,7 +38,7 @@ The partner sees every change on their dashboard straight away.
 
 1. Open the batch and press **Receive & add N devices**. Relay creates one device record per laptop, each with its own **Device Passport** code (`FGT-XXXXXXXX`).
 2. Optional: type serial numbers into the grid. Serials are private; only staff and the owning partner ever see them, and they appear on the partner's certificate.
-3. Go to **QR labels**, choose the devices and print the sheet (Avery 5160, 30 labels per page). Stick one label on each laptop.
+3. On the batch page, under the serials, click **Print QR labels for these N** and print the sheet (Avery 5160, 30 labels per page). Stick one label on each laptop. (**QR labels** in the menu prints the 30 most recently received devices; on **Devices** you can also select rows and choose **Labels**.)
 
 **Household donations** (not from a partner): **Devices** → **Household intake**. They follow the same steps, without a partner or certificate.
 
@@ -98,7 +98,7 @@ The device's Device Passport now tells its story to the buyer, and the partner's
 
 ## 9. Reports for funders
 
-- **Devices** and **Partners** each have a CSV export for grant reports.
+- **Devices** has a Devices CSV and **Partners** has a Batches CSV, for grant reports.
 - The Overview's **Impact to date** uses the same formula as every other page in Relay (`lib/impact.ts`), so the numbers always agree.
 
 ---

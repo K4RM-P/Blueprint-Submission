@@ -138,7 +138,7 @@ export function Checklist({ deviceId, initialDone, status }: { deviceId: string;
                         <Lock className="size-5 shrink-0" aria-hidden />
                       ) : isDone && step === "wipe_performed" ? (
                         // Hold-to-confirm wipe (Signature Moment 10): the liquid becomes a sky seal stamped onto the card.
-                        <Seal rim="DATA WIPED · RELAY · DATA WIPED · " icon={<ShieldCheck />} size={68} tilt={-9} stamp={fresh.has(step)} className="-my-3" />
+                        <Seal rim="DATA WIPED · FREE GEEK TORONTO · " icon={<ShieldCheck />} size={68} tilt={-9} stamp={fresh.has(step)} className="-my-3" />
                       ) : isDone ? (
                         <Check className="size-6 shrink-0 text-loop-deep" aria-hidden />
                       ) : (

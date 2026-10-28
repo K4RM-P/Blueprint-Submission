@@ -12,9 +12,12 @@ export default async function NewBatchPage() {
   const settings = await getSettings(supabase);
   const calendar = await getCalendar(supabase, settings.weeklyCapacity);
   return (
-    <>
-      <PageHeader title="Donate a batch" description="Tell us what you’re sending and when. It takes about two minutes." />
-      <BatchWizard tier={org.tier as PartnerTier} calendar={calendar} weights={settings.weights} maxAgeYears={settings.maxAgeYears} />
-    </>
+    <BatchWizard
+      header={<PageHeader title="Donate a batch" description="Tell us what you’re sending and when. It takes about two minutes." />}
+      tier={org.tier as PartnerTier}
+      calendar={calendar}
+      weights={settings.weights}
+      maxAgeYears={settings.maxAgeYears}
+    />
   );
 }

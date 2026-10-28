@@ -126,7 +126,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
             </div>
           </dl>
           <p className="mt-4 text-small text-ink-2">
-            {recycled ? "Recycled responsibly" : "Refurbished"} by <span className="font-semibold text-ink">Free Geek Toronto</span>, an independent non-profit.
+            {recycled ? "Recycled responsibly" : ready ? "Refurbished" : "Being refurbished"} by <span className="font-semibold text-ink">Free Geek Toronto</span>, an independent non-profit.
           </p>
         </div>
         </PassportBooklet>
@@ -139,7 +139,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
         </h2>
         <p className="mt-2 text-ink-2">Every handoff in this laptop&apos;s relay, stamped as it happened.</p>
         <div className="mt-6">
-          <LegCounter legs={legs} status={legStatus}>
+          <LegCounter legs={legs} status={legStatus} current={story.leg}>
             <div className="flat p-6 sm:p-8">
               <JourneyTimeline steps={steps} label="Device journey" />
             </div>
@@ -217,7 +217,7 @@ export function FullPassport({ p, story, printOnly = false }: { p: PassportStory
           <HardDrive />
         </IconTile>
         <p>
-          {recycled ? "Handled" : "Refurbished"} by <span className="font-semibold">Free Geek Toronto</span>, an independent non-profit. Free Geek locations operate independently — products, prices and services vary by
+          {recycled ? "Handled" : ready ? "Refurbished" : "Being refurbished"} by <span className="font-semibold">Free Geek Toronto</span>, an independent non-profit. Free Geek locations operate independently — products, prices and services vary by
           city.
         </p>
       </ClayCard>

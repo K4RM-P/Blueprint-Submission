@@ -53,3 +53,11 @@ describe("batch reference on certificates (CI-01)", () => {
     expect(batchReference("e4c78be7-1a2b-4c3d-8e9f-001122334455")).toBe(batchReference("e4c78be7-1a2b-4c3d-8e9f-001122334455"));
   });
 });
+
+describe("sanitization report IDs (OPS-07, VW-02)", () => {
+  it("accept what wipe software prints, reject markup", async () => {
+    const { REPORT_ID } = await import("@/lib/domain");
+    for (const ok of ["RPT-482913", "BL 2026/10/28 #44", "a1b2:c3_d4.e5"]) expect(REPORT_ID.test(ok)).toBe(true);
+    for (const bad of ["<script>alert(1)</script>", "-starts-with-dash", "", "x".repeat(121)]) expect(REPORT_ID.test(bad)).toBe(false);
+  });
+});

@@ -633,14 +633,19 @@ async function main() {
   }
 
   console.log("Pay-It-Forward fund and memberships…");
-  const contributions = Array.from({ length: 34 }, (_, i) => ({
-    type: "contribution",
-    amount_cents: pick([500, 500, 1000, 1000, 1000, 2500, 2500, 5000]),
-    provider: "mock",
-    provider_ref: `seed_contrib_${i}`,
-    note: pick(["Round-up at checkout", "One-time gift", "Round-up at checkout"]),
-    created_at: daysAgo(between(5, 170)).toISOString(),
-  }));
+  const contributions = Array.from({ length: 34 }, (_, i) => {
+    // Same random draws as before (seeded data stays stable); a round-up adds at most $5 (lib/ledger roundUpCents).
+    const amount = pick([500, 500, 1000, 1000, 1000, 2500, 2500, 5000]);
+    const kind = pick(["Round-up at checkout", "One-time gift", "Round-up at checkout"]);
+    return {
+      type: "contribution",
+      amount_cents: kind === "Round-up at checkout" ? between(100, 500) : amount,
+      provider: "mock",
+      provider_ref: `seed_contrib_${i}`,
+      note: kind,
+      created_at: daysAgo(between(5, 170)).toISOString(),
+    };
+  });
   const sponsorship = { type: "sponsorship", amount_cents: 75000, organization_id: orgId.get("brightpath-logistics"), provider: "mock", provider_ref: "seed_champion_brightpath", note: "Champion Partner: 10 sponsored laptops", created_at: daysAgo(165).toISOString() };
   // Insert money in first, subsidies after, so the balance never dips below zero.
   await chunked("fund in", "fund_transactions", [sponsorship, ...contributions.map((c) => ({ organization_id: null, ...c }))]);

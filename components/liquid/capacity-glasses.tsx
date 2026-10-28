@@ -22,14 +22,17 @@ interface CapacityGlassesProps {
   /** Allow choosing full weeks (staff override). */
   allowFull?: boolean;
   label: string;
+  /** Word for a full week; the partner wizard says "No room" when the week can't take this batch. */
+  fullText?: string;
   className?: string;
 }
 
-const statusText = { open: "Open", limited: "Limited", full: "Full" } as const;
+const STATUS_TEXT: Record<GlassWeek["status"], string> = { open: "Open", limited: "Limited", full: "Full" };
 
 /** One small clay glass per week, filled to that week's load; full weeks get a lid (§8). */
-export function CapacityGlasses({ weeks, value, onSelect, allowFull, label, className }: CapacityGlassesProps) {
+export function CapacityGlasses({ weeks, value, onSelect, allowFull, label, fullText, className }: CapacityGlassesProps) {
   const { t } = useMotionPrefs();
+  const statusText = fullText ? { ...STATUS_TEXT, full: fullText } : STATUS_TEXT;
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const interactive = Boolean(onSelect);
 

@@ -28,7 +28,7 @@ export function IssueCertificateButton({ batchId, disabled }: { batchId: string;
     return (
       <div role="status" className="flex items-center gap-3 self-start">
         {/* Certificate seal (Signature Moment 14): one crisp press, nothing more. */}
-        <Seal rim="CERTIFIED · RELAY · CERTIFIED · " icon={<ShieldCheck />} size={72} tilt={-8} />
+        <Seal rim="CERTIFIED · FREE GEEK TORONTO · " icon={<ShieldCheck />} size={72} tilt={-8} />
         <span className="font-mono text-[#1d4f9a]">{stamped}</span>
       </div>
     );

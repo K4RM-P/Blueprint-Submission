@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Save } from "lucide-react";
+import { Save, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { ClayButton } from "@/components/clay";
 import { DeviceStatusChip } from "@/components/journey/status";
@@ -25,7 +25,7 @@ interface Row {
 const cell = "h-10 w-full rounded-[10px] border border-transparent bg-[#f7f4ee] px-2.5 text-[0.875rem] shadow-[inset_2px_2px_5px_rgba(90,75,55,.1)] focus-visible:border-loop";
 
 /** OPS-04: edit serials/specs for many devices at once after bulk-add. */
-export function SerialGrid({ devices }: { devices: Row[] }) {
+export function SerialGrid({ devices, labelsHref }: { devices: Row[]; labelsHref?: string }) {
   const router = useRouter();
   const [rows, setRows] = useState(devices);
   const [dirty, setDirty] = useState<Set<string>>(new Set());
@@ -53,9 +53,16 @@ export function SerialGrid({ devices }: { devices: Row[] }) {
           <h2 className="font-semibold">Devices ({rows.length})</h2>
           <p className="text-small text-ink-2">Serials are optional at intake. They appear on the certificate, never on public passports.</p>
         </div>
-        <ClayButton variant="secondary" size="sm" icon={<Save />} disabled={dirty.size === 0} loading={busy} onClick={save}>
-          Save {dirty.size || ""} change{dirty.size === 1 ? "" : "s"}
-        </ClayButton>
+        <div className="flex flex-wrap gap-2.5">
+          {labelsHref ? (
+            <ClayButton href={labelsHref} variant="ghost" size="sm" icon={<QrCode />}>
+              Print QR labels for these {rows.length}
+            </ClayButton>
+          ) : null}
+          <ClayButton variant="secondary" size="sm" icon={<Save />} disabled={dirty.size === 0} loading={busy} onClick={save}>
+            Save {dirty.size || ""} change{dirty.size === 1 ? "" : "s"}
+          </ClayButton>
+        </div>
       </div>
       <div className="max-h-[560px] overflow-auto">
         <table className="data-table">

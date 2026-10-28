@@ -24,6 +24,8 @@ export interface DeviceRow {
   partner: string | null;
   volunteer: string | null;
   updated_at: string;
+  /** The sanitization report ID the volunteer recorded (staff only). */
+  reportRef?: string | null;
 }
 
 /** OPS-05: flat table, multi-select, dark floating bulk-action pill. Shortcuts: "/" search, "v" verify selected. */
@@ -197,6 +199,7 @@ export function DeviceTable({ rows, volunteers }: { rows: DeviceRow[]; volunteer
       <VerifyDialog
         ids={pendingSel.map((r) => r.id)}
         keepRecorded
+        devices={pendingSel.map((r) => ({ code: r.passport_code, reportRef: r.reportRef ?? null }))}
         open={verifyOpen}
         onOpenChange={setVerifyOpen}
         onDone={() => {

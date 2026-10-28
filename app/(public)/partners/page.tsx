@@ -4,6 +4,7 @@ import { ClayButton, EmptyState } from "@/components/clay";
 import { PartnerTile } from "@/components/public/partner-tile";
 import { createPublicClient } from "@/lib/supabase/public";
 import { logoUrl } from "@/lib/queries/common";
+import { listedOnWall } from "@/lib/partner-wall";
 import { labels, type PartnerTier } from "@/lib/domain";
 
 export const metadata: Metadata = { title: "Partner Wall", description: "Toronto businesses whose retired laptops now help students, newcomers and families." };
@@ -15,7 +16,7 @@ export const revalidate = 60;
 export default async function PartnersPage() {
   const supabase = createPublicClient();
   const { data } = await supabase.rpc("partner_wall");
-  const partners = data ?? [];
+  const partners = listedOnWall(data);
   const tiers: PartnerTier[] = ["champion", "impact", "community"];
   const total = partners.reduce((s, p) => s + Number(p.devices_reused), 0);
   return (

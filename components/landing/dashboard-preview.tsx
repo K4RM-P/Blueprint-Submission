@@ -76,7 +76,7 @@ export function DashboardPreview() {
     { label: "Devices received", value: 128, delta: "+24 this month", series: RECEIVED },
     { label: "Wiped & verified", value: 120, delta: "Every wipe staff-verified", series: [3, 7, 10, 15, 18, 24, 27, 33] },
     { label: "Back in use", value: BACK_IN_USE, delta: "+11 this month", series: REUSED, accent: true },
-    { label: "Kept out of landfill", value: 276, suffix: "kg", delta: "est. 2.3 kg / device", series: [4, 9, 12, 20, 24, 33, 38, 46] },
+    { label: "Kept out of landfill", value: 233, suffix: "kg", delta: "est. 2.1 kg per laptop", series: [4, 9, 12, 20, 24, 33, 38, 46] },
   ];
   const helpsMax = Math.max(...HELPS.map((h) => h.n));
 
@@ -106,7 +106,7 @@ export function DashboardPreview() {
           <div className="mb-3 rounded-xl border border-line/80 bg-white/70 px-3 py-2.5">
             <p className="text-[0.8125rem] font-semibold leading-tight">Northwind Legal</p>
             <p className="mt-0.5 flex items-center gap-1 text-[0.6875rem] text-loop-deep">
-              <Award className="size-3" aria-hidden /> Community Partner
+              <Award className="size-3" aria-hidden /> Impact Partner
             </p>
           </div>
           {NAV.map(({ icon: Icon, label, active, badge }) => (

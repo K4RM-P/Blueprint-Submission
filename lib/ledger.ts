@@ -21,7 +21,9 @@ export function validateTx(tx: FundTx): string | null {
 /** Can the fund cover a subsidy of `subsidyCents` without going negative? */
 export function canApplySubsidy(balanceCents: number, subsidyCents: number, priceCents: number | null): string | null {
   if (!Number.isInteger(subsidyCents) || subsidyCents <= 0) return "Enter a subsidy greater than $0.";
-  if (priceCents !== null && subsidyCents > priceCents) return "The subsidy can't be more than the device price.";
+  // No price means no cap to check against: a subsidy needs FGT's price first (public promise: never more than the price).
+  if (priceCents === null) return "Set the device's price before applying a subsidy.";
+  if (subsidyCents > priceCents) return "The subsidy can't be more than the device price.";
   if (subsidyCents > balanceCents) return `The fund only has ${formatCents(balanceCents)} available.`;
   return null;
 }

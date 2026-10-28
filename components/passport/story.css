@@ -282,6 +282,9 @@
   color: transparent;
   -webkit-text-stroke: 1.5px var(--shape-strong);
   font-variant-numeric: tabular-nums;
+  /* sits behind the copy as texture, never competing with it on a phone */
+  opacity: 0.45;
+  z-index: 0;
 }
 
 /* Ticker tape: a tilted band of mono text that never stops moving. */
@@ -323,20 +326,10 @@
   top: 48%;
 }
 /* Story ambients play for roughly the length of a slide and then rest (UI §12.9: nothing loops for attention).
-   One slow pass per visit, never a looping marquee (UI §12.9); a slide is gone long before it ends. */
+   The ticker tapes are static labels laid across the slide, never a marquee. */
 .story-ticker-track {
   display: inline-block;
-  animation: story-marquee 28s linear 1 both;
 }
-.story-ticker[data-reverse="true"] .story-ticker-track {
-  animation-direction: reverse;
-}
-@keyframes story-marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 /* Rings that drift and breathe. */
 .story-ring {
   position: absolute;
@@ -487,10 +480,11 @@
 }
 .story-sparkles span {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  /* soft round specks of light, not sparkle stars (UI §12.6) */
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
   background: #f6f3ec;
-  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
   opacity: 0;
   animation: story-twinkle 2.6s ease-in-out 4;
   animation-delay: calc(var(--i) * 0.37s);

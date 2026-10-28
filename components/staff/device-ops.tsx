@@ -33,7 +33,8 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
   const [price, setPriceVal] = useState(priceCents ? String(priceCents / 100) : "");
   const priceValue = Number(price.replace(/[$,\s]/g, ""));
   const priceError = price.trim() === "" ? "Enter a price." : !Number.isFinite(priceValue) || priceValue <= 0 ? "Enter a price in dollars, like 180." : null;
-  const [sale, setSale] = useState({ soldAt: new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" }), channel: "in_store" as SaleChannel, recipient: "" as RecipientCategory | "", subsidy: "" });
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
+  const [sale, setSale] = useState({ soldAt: today, channel: "in_store" as SaleChannel, recipient: "" as RecipientCategory | "", subsidy: "" });
   const [reason, setReason] = useState("");
   const [drive, setDrive] = useState<DriveHandling | "">("");
   // Before staff verify the wipe, recycling must record what happened to the drive.
@@ -149,7 +150,14 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
             <DialogDescription>Recipient category is optional and never shows a person — only a category like “Student”.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Sale date">{({ id: fid }) => <Input id={fid} type="date" value={sale.soldAt} onChange={(e) => setSale({ ...sale, soldAt: e.target.value })} />}</Field>
+            {priceCents ? null : (
+              <p role="alert" className="text-small font-medium text-danger-ink sm:col-span-2">
+                Set the price first (Free Geek Toronto sets every price), then record the sale.
+              </p>
+            )}
+            <Field label="Sale date">
+              {({ id: fid }) => <Input id={fid} type="date" max={today} value={sale.soldAt} onChange={(e) => setSale({ ...sale, soldAt: e.target.value })} />}
+            </Field>
             <Field label="Channel">
               {({ id: fid }) => (
                 <Select id={fid} value={sale.channel} onChange={(e) => setSale({ ...sale, channel: e.target.value as SaleChannel })}>
@@ -183,6 +191,7 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
             <ClayButton
               variant="primary"
               loading={busy}
+              disabled={!priceCents || sale.soldAt > today}
               onClick={async () => {
                 setBusy(true);
                 done(

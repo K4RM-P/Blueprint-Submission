@@ -257,3 +257,80 @@ Severity: **C** Critical · **H** High · **M** Medium · **L** Low. Status: ✅
 | L-10 | L | D2 | Repetition | ⏳ |
 
 **C5 after iteration-3 fixes** (median of 5): landing 79, Become a Partner 86, passport story 79, partner dashboard 83. **Tests:** 63/63 e2e, 122/122 unit.
+
+## Iteration 4 (audit of the iteration-3 build, `iter-3`)
+
+**Evidence collected:** `audit/iter-4/` screenshots. A fourth independent reviewer (fresh agent, `@geekloop.test` accounts only) walked F1–F6 in the real UI, tried invalid inputs (no-price sale, future sale date, script in a report ID), signed up a fresh organization, ran Lighthouse (2–3 runs per page) and followed DEMO_SCRIPT end to end. Self scores are for the build after the fixes below; reviewer scores are for the build they audited; the lower one stands.
+
+| Item | Self | Reviewer | Final | Evidence (short) |
+|---|---|---|---|---|
+| A1 Problem identification | 8 | 8 | **8** | Sourced "Why Relay exists" directly under the hero |
+| A2 Solution clarity | 7 | 7 | **7** | Landing still long (13 sections) |
+| A3 Feasibility | 7 | 6 | **6** | Large-batch copy now honest (N weeks, staff plan it); receiving fewer than declared still not possible |
+| A4 Presentation | 8 | 7 | **7** | Per-batch label sheet; DEMO_SCRIPT step 9 updated; PDF hyphenation fixed |
+| A5 Technical execution | 8 | 7 | **7** | Sale needs a price and a non-future date; wallet hours wait on a migration push |
+| B1 One change | 8 | 8 | **8** | Every core screen serves the partner pipeline |
+| B2 Target-user fit | 8 | 7 | **7** | Verify dialog lists each code and report ID |
+| B3 Mission | 9 | 8 | **8** | Subsidy can't apply without a price; "Who buys" includes small businesses |
+| B4 Differentiation | 8 | 8 | **8** | 7-row comparison on `/become-a-partner` |
+| B5 Measurable value | 7 | 7 | **7** | kg rounding consistent; seeded round-ups ≤ $5; wallet hours need `pnpm db:push` |
+| B6 Honesty | 8 | 7 | **7** | FAQ, Champion day, mock tier and kg, stamps and story copy fixed |
+| B7 FGT-specificity | 9 | 9 | **9** | Address, orientation, FGT's own software, case figures |
+| C1 Functional completeness | 8 | 7 | **7** | Partners link to their batches; certificate tile opens a ready batch |
+| C2 Robustness | 7 | 6 | **6** | Sale/subsidy guards; report-ID format; shared demo DB remains |
+| C3 Security | 7 | 7 | **7** | Partner Wall lists only orgs with a received device; CSP still allows inline scripts |
+| C4 Tests | 8 | 7 | **7** | New unit tests: partner wall, report ID, subsidy without price |
+| C5 Performance | 5 | 5 | **5** | Medians below; landing still under 90 |
+| C6 Code & docs | 8 | 7 | **7** | Leg logic single-sourced; ADMIN_GUIDE corrected |
+| D1 5-second test | 8 | 8 | **8** | Staff header shortened |
+| D2 Hierarchy | 7 | 7 | **7** | Empty partner dashboard no longer shows zero tiles; landing gaps remain |
+| D3 Consistency | 8 | 8 | **8** | One certificate name; "Back in use (sold)" filter label |
+| D4 Not vibe-coded / §12 | 7 | 6 | **6** | Tickers static, specks round; glass on header/dock is a recorded team decision |
+| D5 Motion & craft | 8 | 8 | **8** | Numerals behind copy at 0.45; PDF wrap fixed |
+| D6 Copy | 8 | 8 | **8** | Wizard success header, "No room", settings toggles text |
+| D7 Friction | 8 | 7 | **7** | Batch rows clickable, filters apply on change, labels from the batch page |
+| D8 Responsive | 9 | 8 | **8** | `/styleguide` overflow fixed (390: 405 → 390 px) |
+
+### Issues found in iteration 4 and what happened to them
+
+| # | Sev | Item | Issue | Status |
+|---|---|---|---|---|
+| 1 | H | A3/C1 | "Split across two weeks" promise false for > 20 devices | ✅ copy says "about N weeks of bench time; staff will plan the drop-off with you" (N = ⌈qty ÷ capacity⌉). No automatic split (would be new scheduling behaviour) |
+| 2 | H | C2/B3 | Sale with no price, future date; subsidy uncapped without a price | ✅ `recordSale` requires a price and a date ≤ today (Toronto); `canApplySubsidy` refuses without a price (unit test); dialog shows "Set the price first" and disables submit |
+| 3 | H | A4/C1/D7 | Label sheet mixed batches | ✅ "Print QR labels for these N" on the batch page (`/staff/labels?batch=`); default sheet is the 30 most recently received |
+| 4 | H | C3/B6 | Anyone could appear on the public Partner Wall | ✅ wall lists only orgs with at least one received device (`lib/partner-wall.ts`, unit test). 🔒 email confirmation is a Supabase project setting for the team |
+| 5 | M | B5/C6 | Wallet hours doubled | 🔒 migration `20261028000003` needs `pnpm db:push` |
+| 6 | M | A3/C2 | Can't receive fewer than declared | ⏳ not done this iteration |
+| 7 | M | B2/C1 | Bulk verify dialog hides codes and report IDs | ✅ lists each code with its report ID; `REPORT_ID` format on both volunteer and staff actions (unit test) |
+| 8 | M | B6/A2 | Landing mock tier and kg factor | ✅ "Impact Partner", 2.1 kg per laptop |
+| 9 | M | B6 | FAQ "see the student or family" | ✅ "who each laptop helps, by category" |
+| 10 | M | B6 | Champion volunteer day unlabelled | ✅ "(to be confirmed by Free Geek Toronto)" in the single tier copy source |
+| 11 | M | C5 | Lighthouse < 90 | ⏳ see below |
+| 12 | M | D4 | Glass beyond dialogs | ⛔ recorded team decision (PROGRESS Stage 3); unchanged |
+| 13 | M | D4 | Marquee tickers and sparkles | ✅ tickers are static; specks are round |
+| 14 | M | C6/D6 | Full passport leg disagrees with story | ✅ uses `story.leg`; "Being refurbished by" while in progress |
+| 15 | M | C3 | Shared public demo staff account | 🔒 nightly reseed or a separate project is the team's ops call; database re-seeded after this review |
+| 16 | M | A3/D7 | "Certificates to issue" tile opens a mixed list | ✅ links to the first ready batch |
+| 17 | L | A4/D5 | PDF hyphenation | ✅ hyphenation off in certificate and report PDFs |
+| 18 | L | B6 | 63% stat timeframe | ✅ source line reformatted; "in the past year" kept because that is the case's survey wording |
+| 19 | L | B6 | "CERTIFIED · RELAY" | ✅ "CERTIFIED · FREE GEEK TORONTO" |
+| 20 | L | B6 | Absolute slide-4 copy | ✅ reworded |
+| 21 | L | B3 | "Who buys" omits businesses | ✅ added |
+| 22 | L | B5 | Passport-view inflation | ⏳ metric already labelled a target; dedupe not done |
+| 23 | L | B5 | 150.7 vs 151 kg | ✅ whole kg on the staff Overview |
+| 24 | L | B5 | Seeded $10 round-ups | ✅ round-ups seeded at $1–$5 |
+| 25 | L | D6 | Settings toggle copy | ✅ |
+| 26 | L | D6 | Wizard header after success | ✅ header hidden once the batch is sent |
+| 27 | L | D6 | "Full" for a week with room | ✅ partner wizard says "No room" |
+| 28 | L | D6 | Three certificate names | ✅ "certificate of data sanitization" |
+| 29 | L | D6 | "0 wipes waiting" on batch detail | ✅ "N devices still on the bench, not yet wiped and verified." |
+| 30 | L | D2 | Empty partner dashboard repeats itself | ✅ zero tiles hidden until a device is received; hero says "Nothing donated yet." |
+| 31 | L | D2 | Landing gaps, duplicate strip | ⏳ |
+| 32 | L | D3/D7 | Staff tables | ✅ whole batch row opens the batch; selects apply on change (Apply stays for no-JS); "Back in use (sold)" filter |
+| 33 | L | C1 | Partners don't link to batches | ✅ batch count links to `/staff/batches?status=all&org=` (new `org` filter) |
+| 34 | L | C6 | ADMIN_GUIDE inaccuracies | ✅ labels from the batch page; Devices CSV / Batches CSV |
+| 35 | L | C3 | `unsafe-inline` CSP | ⏳ nonces would make every page dynamic and drop ISR on `/`, `/impact`, `/partners` |
+| 36 | L | D8 | `/styleguide` overflow | ✅ StampSequence demo card clipped |
+| 37 | L | D5 | Outline numerals over copy | ✅ opacity lowered |
+
+**C5 after iteration-4 fixes** (median of 5, simulated mobile on this shared container): landing 71 and 74 in two runs (iteration-4 landing changes are copy only, so this is run-to-run noise against iteration 3's 79), Become a Partner 89. **Tests:** 63/63 e2e, 124/124 unit.

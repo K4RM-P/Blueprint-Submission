@@ -16,7 +16,7 @@ export default async function StaffDevices({ searchParams }: { searchParams: Pro
   const { supabase } = await requireRole("staff");
   let q = supabase
     .from("devices")
-    .select("id, passport_code, make, model, category, status, source, updated_at, assigned_volunteer_id, donation_batches(organizations(name))")
+    .select("id, passport_code, make, model, category, status, source, updated_at, assigned_volunteer_id, wipe_report_ref, donation_batches(organizations(name))")
     .order("updated_at", { ascending: false })
     .limit(300);
   if (sp.status && (DEVICE_STATUSES as readonly string[]).includes(sp.status)) q = q.eq("status", sp.status as (typeof DEVICE_STATUSES)[number]);
@@ -37,6 +37,7 @@ export default async function StaffDevices({ searchParams }: { searchParams: Pro
     updated_at: d.updated_at,
     partner: d.donation_batches?.organizations?.name ?? null,
     volunteer: d.assigned_volunteer_id ? (vName.get(d.assigned_volunteer_id) ?? "Volunteer") : null,
+    reportRef: d.wipe_report_ref,
   }));
 
   return (
@@ -57,7 +58,7 @@ export default async function StaffDevices({ searchParams }: { searchParams: Pro
       <FilterBar
         action="/staff/devices"
         filters={[
-          { name: "status", label: "Status", value: sp.status ?? "", options: [{ value: "", label: "All statuses" }, ...DEVICE_STATUSES.map((s) => ({ value: s, label: labels.deviceStatus[s] }))] },
+          { name: "status", label: "Status", value: sp.status ?? "", options: [{ value: "", label: "All statuses" }, ...DEVICE_STATUSES.map((s) => ({ value: s, label: s === "sold" ? "Back in use (sold)" : labels.deviceStatus[s] }))] },
           { name: "category", label: "Category", value: sp.category ?? "", options: [{ value: "", label: "All categories" }, ...DEVICE_CATEGORIES.map((c) => ({ value: c, label: labels.category[c] }))] },
         ]}
       >

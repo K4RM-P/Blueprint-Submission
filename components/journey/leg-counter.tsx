@@ -16,13 +16,14 @@ export interface Leg {
  * through the stamps. Completed legs settle liquid-green; legs still to come stay
  * dashed. It only sticks while the journey section is on screen.
  */
-export function LegCounter({ legs, status, children }: { legs: Leg[]; status: string; children: ReactNode }) {
+export function LegCounter({ legs, status, current: currentLeg, children }: { legs: Leg[]; status: string; current?: number; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const { reduced } = useMotionPrefs();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 80%", "end 70%"] });
   const p = useSpring(scrollYProgress, { stiffness: 90, damping: 20, mass: 1.2 });
   const doneCount = legs.filter((l) => l.done).length;
-  const current = Math.min(legs.length, Math.max(1, doneCount));
+  // The story's leg (lib/passport-story) wins when given, so the passport and its story never disagree.
+  const current = currentLeg ?? Math.min(legs.length, Math.max(1, doneCount));
 
   return (
     <div ref={ref} className="relative">

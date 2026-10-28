@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useFieldArray, useForm, useWatch, type FieldPath } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,9 +37,11 @@ interface BatchWizardProps {
   weights: ScoreWeights;
   maxAgeYears: number;
   editing?: { id: string; values: BatchInput };
+  /** Page header, hidden once the batch is sent so the thank-you stands alone. */
+  header?: ReactNode;
 }
 
-export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: BatchWizardProps) {
+export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing, header }: BatchWizardProps) {
   const router = useRouter();
   const { reduced, t } = useMotionPrefs();
   const [step, setStep] = useState(0);
@@ -131,6 +133,8 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
   const selectedWeek = batchCalendar.find((w) => w.week === week);
 
   return (
+    <>
+    {header}
     <form
       onSubmit={(ev) => {
         if (step < STEPS.length - 1) {
@@ -272,7 +276,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                       Preferred week
                     </p>
                     <p className="mb-4 text-small text-ink-2">Each glass shows how full our bench is that week. Weeks without room for your {totalQty} {totalQty === 1 ? "device" : "devices"} are closed.</p>
-                    <CapacityGlasses label="Preferred week" weeks={batchCalendar} value={week} onSelect={(w) => setValue("preferredWeek", w, { shouldValidate: true })} />
+                    <CapacityGlasses label="Preferred week" fullText="No room" weeks={batchCalendar} value={week} onSelect={(w) => setValue("preferredWeek", w, { shouldValidate: true })} />
                     {e.preferredWeek ? (
                       <p role="alert" className="mt-3 text-small font-medium text-danger-ink">
                         {e.preferredWeek.message}
@@ -280,7 +284,9 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
                     ) : selectedWeek ? (
                       <p className="mt-3 text-small text-ink-2" aria-live="polite">
                         Week of <span className="font-semibold text-ink">{selectedWeek.label}</span>: {selectedWeek.load} of {selectedWeek.capacity} bench spots booked.
-                        {totalQty > selectedWeek.capacity ? " A batch this size is split across two weeks; staff will confirm." : ""}
+                        {totalQty > selectedWeek.capacity
+                          ? ` A batch this size needs about ${Math.ceil(totalQty / selectedWeek.capacity)} weeks of bench time; Free Geek Toronto staff will plan the drop-off with you.`
+                          : ""}
                       </p>
                     ) : null}
                   </div>
@@ -418,6 +424,7 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing }: B
         </dl>
       </aside>
     </form>
+    </>
   );
 }
 

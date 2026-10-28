@@ -31,7 +31,7 @@ export function CertificateCard({ cert, verifiedCount, total }: { cert: Cert | n
   return (
     <ClayCard tint="sky" className="flex flex-col gap-5">
       <div className="flex items-center gap-4">
-        <Seal rim="CERTIFIED · RELAY · CERTIFIED · " icon={<ShieldCheck />} size={76} tilt={-8} inView />
+        <Seal rim="CERTIFIED · FREE GEEK TORONTO · " icon={<ShieldCheck />} size={76} tilt={-8} inView />
         <div>
           <p className="font-semibold text-ink">Certificate issued</p>
           <p className="text-small text-ink-2 tnum">{longDate(cert.issued_at)}</p>

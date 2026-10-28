@@ -68,13 +68,13 @@ export function OrgSettingsForm({ initial, logoUrl, welcome }: { initial: Organi
       <ClayCard className="flex flex-col gap-6">
         <div>
           <h2 className="text-title font-semibold">Public recognition</h2>
-          <p className="mt-1 text-ink-2">Both are off until you turn them on. You can change your mind any time.</p>
+          <p className="mt-1 text-ink-2">Both start off. You can change them any time.</p>
         </div>
         <Controller
           control={control}
           name="wallOptIn"
           render={({ field }) => (
-            <ClayToggle checked={field.value} onCheckedChange={field.onChange} label="Show us on the Partner Wall" description="Your name, logo and devices reused appear on the public /partners page." />
+            <ClayToggle checked={field.value} onCheckedChange={field.onChange} label="Show us on the Partner Wall" description="Your name, logo and devices back in use appear on the public /partners page once Free Geek Toronto has received your first batch." />
           )}
         />
         <Controller

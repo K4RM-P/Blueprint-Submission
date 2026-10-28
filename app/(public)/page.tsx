@@ -21,6 +21,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { env } from "@/lib/env";
 import { getPublicImpact } from "@/lib/queries/impact";
 import { logoUrl } from "@/lib/queries/common";
+import { listedOnWall } from "@/lib/partner-wall";
 import type { PartnerTier } from "@/lib/domain";
 import { SHOWCASE_PASSPORTS } from "@/lib/showcase-passports";
 
@@ -44,7 +45,7 @@ const REASONS = [
 const WHY = [
   { value: "0", label: "corporate partners or sponsors today" },
   { value: "77%", label: "of Free Geek Toronto's 2025 revenue came from sales" },
-  { value: "63%", label: "of Canadians bought refurbished, open-box or traded-in tech last year" },
+  { value: "63%", label: "of Canadians bought refurbished, open-box or traded-in tech in the past year" },
 ];
 
 // Public numbers only: cached and refreshed every minute (ISR), so visitors never wait on the database.
@@ -55,7 +56,7 @@ export default async function Landing() {
   const [impact, { data: wall }] = await Promise.all([getPublicImpact(supabase), supabase.rpc("partner_wall")]);
   const t = impact.totals;
   // Lead with partners whose devices are already back in use; newcomers fill the rest.
-  const ranked = [...(wall ?? [])].sort((a, b) => Number(b.devices_reused) - Number(a.devices_reused));
+  const ranked = [...listedOnWall(wall)].sort((a, b) => Number(b.devices_reused) - Number(a.devices_reused));
   // Five fills the featured 1 + 2×2 wall layout.
   const partners = ranked.slice(0, 5);
 
@@ -109,7 +110,7 @@ export default async function Landing() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[0.8125rem] text-ink-3">Source: Free Geek Toronto case, FUSE Blueprint 2026 (Best Buy Canada / Angus Reid 2026 survey for the 63%).</p>
+          <p className="mt-3 text-[0.8125rem] text-ink-3">Source: Free Geek Toronto case, FUSE Blueprint 2026 (Best Buy Canada / Angus Reid, 2026, for the 63%).</p>
         </Reveal>
       </section>
 

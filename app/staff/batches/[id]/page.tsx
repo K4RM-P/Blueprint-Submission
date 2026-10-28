@@ -68,7 +68,7 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
       <div className={list.length > 0 ? "mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]" : "mt-6 max-w-3xl"}>
         <div className="min-w-0">
           {list.length > 0 ? (
-            <SerialGrid devices={list} />
+            <SerialGrid devices={list} labelsHref={`/staff/labels?batch=${batch.id}`} />
           ) : (
             <FlatCard>
               <h2 className="font-semibold">What the partner is sending</h2>
@@ -97,7 +97,7 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
         </div>
         {list.length > 0 ? (
           <div className="flex min-w-0 flex-col gap-6">
-            <CertificatePanel batchId={batch.id} certificate={batch.certificates} canIssue={canIssue} pendingWipes={pendingWipes} total={list.length} />
+            <CertificatePanel batchId={batch.id} certificate={batch.certificates} canIssue={canIssue} pendingWipes={pendingWipes} notReady={list.filter((d) => !batchCanIssueCertificate([d.status])).length} total={list.length} />
             {notes}
           </div>
         ) : null}

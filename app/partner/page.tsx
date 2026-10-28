@@ -60,8 +60,10 @@ export default async function PartnerDashboard() {
                 </>
               ) : t.devicesReceived > 0 ? (
                 "Your laptops are on the bench."
+              ) : batches.length > 0 ? (
+                "Your first batch is on its way."
               ) : (
-                "Send your first batch."
+                "Nothing donated yet."
               )}
             </p>
             <div className="mt-5">
@@ -81,15 +83,17 @@ export default async function PartnerDashboard() {
             <p className="text-ink-2">When your first device is sold, you&apos;ll see who it helps here — students, newcomers, seniors — never names.</p>
           )}
         </ClayCard>
+        {t.devicesReceived > 0 ? (
         <StatGroup
           label="Your impact in numbers"
           items={[
             { label: "devices donated", value: t.devicesReceived },
             { label: "being refurbished now", value: t.devicesInProgress, note: t.devicesRecycled > 0 ? `${t.devicesRecycled} recycled responsibly` : undefined },
-            { label: `data-wipe certificate${certificates === 1 ? "" : "s"} issued`, value: certificates },
+            { label: `certificate${certificates === 1 ? "" : "s"} of data sanitization`, value: certificates },
             { label: "kept out of landfill", value: t.kgDiverted.toLocaleString("en-CA", { maximumFractionDigits: 1 }), unit: "kg" },
           ]}
         />
+        ) : null}
       </div>
 
       <section className="mt-10" aria-labelledby="recent">

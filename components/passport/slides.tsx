@@ -188,7 +188,7 @@ function Erased({ story }: SlideProps) {
         <Seal rim="DATA WIPED · VERIFIED · TORONTO · " icon={<ShieldCheck />} size={200} tilt={-8} />
       </Hero>
       <MonoChip className="self-start">VERIFIED · {storyDate(story.dates.wipeVerified).toUpperCase()}</MonoChip>
-      <Sub delay={0.9}>The drive was wiped at the bench, then verified by Free Geek Toronto staff before the laptop could be refurbished or sold. Nothing from its first job came along{story.donor.household ? "" : ", and the business gets a certificate that lists it"}.</Sub>
+      <Sub delay={0.9}>The drive was wiped at the bench, then verified by Free Geek Toronto staff before the laptop could be refurbished or sold{story.donor.household ? "" : ", and the business gets a certificate that lists it"}.</Sub>
     </>
   );
 }

@@ -16,6 +16,7 @@ export function VerifyDialog({
   onDone,
   defaultReference,
   keepRecorded,
+  devices,
 }: {
   ids: string[];
   open: boolean;
@@ -24,6 +25,8 @@ export function VerifyDialog({
   defaultReference?: string | null;
   /** From the device table: every device keeps the report ID its volunteer recorded. */
   keepRecorded?: boolean;
+  /** Shown read-only so staff can cross-check each one against the sanitization report. */
+  devices?: { code: string; reportRef: string | null }[];
 }) {
   const [method, setMethod] = useState(DEFAULT_WIPE_METHOD);
   const [reference, setReference] = useState(defaultReference ?? "");
@@ -60,9 +63,22 @@ export function VerifyDialog({
           {({ id }) => <Input id={id} value={method} onChange={(e) => setMethod(e.target.value)} />}
         </Field>
         {bulk ? (
-          <p className="text-small text-ink-2">
-            {ids.length > 1 ? "Each device keeps the report ID its volunteer recorded." : "The device keeps the report ID its volunteer recorded."} Devices without one are skipped.
-          </p>
+          <>
+            <p className="text-small text-ink-2">
+              {ids.length > 1 ? "Each device keeps the report ID its volunteer recorded." : "The device keeps the report ID its volunteer recorded."} Check each against your sanitization
+              report. Devices without one are skipped.
+            </p>
+            {devices?.length ? (
+              <ul className="max-h-48 overflow-auto rounded-[var(--r-sm)] border border-line font-mono text-[0.8125rem]" aria-label="Devices and their recorded report IDs">
+                {devices.map((d) => (
+                  <li key={d.code} className="flex justify-between gap-4 border-b border-line px-3 py-1.5 last:border-b-0">
+                    <span>{d.code}</span>
+                    <span className={d.reportRef ? "text-ink" : "text-danger-ink"}>{d.reportRef ?? "no report ID"}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </>
         ) : (
           <Field label="Report / reference ID" hint="From the sanitization software." required>
             {({ id }) => <Input id={id} className="font-mono" value={reference} onChange={(e) => setReference(e.target.value)} />}

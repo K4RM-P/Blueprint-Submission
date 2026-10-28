@@ -52,6 +52,9 @@ export const EMPLOYEE_RANGES = ["1-10", "11-50", "51-200", "201-500", "500+"] as
  * What Relay records as the wipe method until staff type FGT's own: it names the tool FGT already
  * uses and says the standard is unconfirmed. Relay never defaults to a named standard (PRD §19).
  */
+/** Sanitization report / reference IDs: whatever FGT's software prints, but plain characters only. */
+export const REPORT_ID = /^[A-Za-z0-9][A-Za-z0-9 ._/#:-]{0,119}$/;
+
 export const DEFAULT_WIPE_METHOD = "FGT data-sanitization software (standard to be confirmed)";
 
 /** What staff record about the drive when a device is recycled before its wipe was verified. */

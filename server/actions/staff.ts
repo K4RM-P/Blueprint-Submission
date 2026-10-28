@@ -12,7 +12,7 @@ import { isMonday } from "@/lib/dates";
 import { nextOpenWeek, wouldExceed } from "@/lib/capacity";
 import { validateBreakdown } from "@/lib/pricing";
 import { canApplySubsidy } from "@/lib/ledger";
-import { PIF_ELIGIBLE_RECIPIENTS } from "@/lib/domain";
+import { PIF_ELIGIBLE_RECIPIENTS, REPORT_ID } from "@/lib/domain";
 
 const staff = () => assertRole("staff");
 const uuid = z.uuid();
@@ -177,7 +177,7 @@ async function walkTo(db: Awaited<ReturnType<typeof staff>>["supabase"], id: str
 const verifySchema = z.object({
   ids: z.array(uuid).min(1).max(500),
   method: z.string().trim().min(3, "Enter the sanitization method.").max(120),
-  reference: z.string().trim().max(120).optional(),
+  reference: z.string().trim().max(120).regex(REPORT_ID, "Use the report ID as the software shows it: letters, numbers and - _ . / # :").optional(),
 });
 
 /** OPS-07: staff-only wipe verification (single or bulk). Devices whose OS/QA were already done advance automatically. */
@@ -272,6 +272,9 @@ export async function recordSale(input: unknown): Promise<ActionResult<null>> {
     const s = await staff();
     const d = await loadDevice(s.supabase, id);
     if (d.status !== "ready" && d.status !== "listed") return fail("Only ready or listed devices can be sold.");
+    if (d.price_cents == null) return fail("Set the device's price first. Free Geek Toronto sets every price.");
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
+    if (soldAt > today) return fail("The sale date can't be in the future.", { soldAt: "Choose today or an earlier date." });
     if (subsidyCents > 0) {
       if (!recipient || !PIF_ELIGIBLE_RECIPIENTS.includes(recipient)) return fail("Pay-It-Forward subsidies are only for digital-inclusion recipients.");
       const { data: summary } = await s.supabase.rpc("public_fund_summary");

@@ -22,12 +22,12 @@ How the time splits: about **75%** on the core (the Reuse Partner pipeline and t
 ### 0:40 – 1:10 · F1: a Reuse Partner sends a batch (Partner)
 4. `/demo` → **Partner** (Priya at Maple Ledger Accounting).
 5. **Donate a batch** → Dell · Latitude 5420 · 2021 · quantity **20** · Working. The **Batch Value Score** vessel rises to **Excellent**. Read the tip: uniform batches are the fastest to refurbish.
-6. Continue → **drop-off**, pick an **Open** week from the capacity glasses (Full weeks have a lid). Continue → tick the data-handling box → **Submit**. The vessel fills (the one celebration). **Back to dashboard**: the batch shows **Submitted**.
+6. Continue → **drop-off**, pick an **Open** week from the capacity glasses (weeks with no room for this batch have a lid). Continue → tick the data-handling box → **Submit**. The vessel fills (the one celebration). **Back to dashboard**: the batch shows **Submitted**.
 
 ### 1:10 – 1:40 · F2: staff run intake (Staff)
 7. **Staff** → Overview: the four partner-pipeline tiles and the capacity glasses.
 8. **Batches** (open batches, best score first) → Maple Ledger's batch for the week you just picked (the seed has another 20 × Dell batch from Maple Ledger for a different week; either works) → **Approve & schedule** → pick a week → **Receive & add 20 devices**. Each gets its own `FGT-` Device Passport code.
-9. **QR labels** → the 30-up sheet. *"Each laptop gets its passport sticker."*
+9. On the batch page → **Print QR labels for these 20** → the 30-up sheet. *"Each laptop gets its passport sticker."*
 
 ### 1:40 – 1:55 · F3: the volunteer bench (Volunteer, on a phone)
 10. **Volunteer** (Aisha) → **Claim next device** → **Hardware test** → **hold** **Data wipe performed** (liquid fills) → **OS installed** → **Final QA**. A badge coin drops in.

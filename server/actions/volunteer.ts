@@ -5,7 +5,7 @@ import { z } from "zod";
 import { assertRole } from "@/lib/auth";
 import { fail, ok, runAction, type ActionResult } from "@/lib/action";
 import { BADGES, newBadges, type VolunteerStats } from "@/lib/badges";
-import { CHECKLIST_STEPS, DEFAULT_WIPE_METHOD } from "@/lib/domain";
+import { CHECKLIST_STEPS, DEFAULT_WIPE_METHOD, REPORT_ID } from "@/lib/domain";
 
 export interface AwardedBadge {
   slug: string;
@@ -47,7 +47,7 @@ export async function claimNextDevice(): Promise<ActionResult<{ id: string | nul
 const stepSchema = z.object({
   deviceId: z.uuid(),
   step: z.enum(CHECKLIST_STEPS),
-  reportRef: z.string().trim().max(120).optional(),
+  reportRef: z.string().trim().max(120).regex(REPORT_ID, "Use the report ID as the software shows it: letters, numbers and - _ . / # :").optional(),
   os: z.string().trim().max(80).optional(),
   openSource: z.boolean().optional(),
   note: z.string().trim().max(300).optional(),

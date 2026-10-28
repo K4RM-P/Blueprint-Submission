@@ -136,7 +136,12 @@ export function BatchOps({
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Schedule {quantity} devices</DialogTitle>
-            <DialogDescription>Partner preferred the week of {shortDate(preferredWeek)}.</DialogDescription>
+            <DialogDescription>
+              Partner preferred the week of {shortDate(preferredWeek)}.
+              {booked[0] && quantity > booked[0].capacity
+                ? ` This batch is bigger than one week of bench time (about ${Math.ceil(quantity / booked[0].capacity)} weeks): pick the drop-off week and add a note on how the work is spread.`
+                : ""}
+            </DialogDescription>
           </DialogHeader>
           <CapacityGlasses
             label="Choose a week"

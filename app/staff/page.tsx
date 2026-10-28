@@ -152,7 +152,7 @@ export default async function StaffOverview() {
     <>
       <PageHeader
         title="Overview"
-        description={`Partner pipeline: ${pending.length > 0 ? `${pending.length} batch${pending.length === 1 ? "" : "es"} to review` : "no batches waiting"} · ${wipesPending} wipe${wipesPending === 1 ? "" : "s"} to verify · ${certsToIssue.length} certificate${certsToIssue.length === 1 ? "" : "s"} to issue. ${stageCount(["received"])} waiting to start, ${stageCount(["testing", "wipe_pending_verification", "wipe_verified", "refurbishing"])} on the bench, ${stageCount(["ready", "listed"])} ready to sell.`}
+        description={`Today's partner pipeline is in the four tiles below. ${stageCount(["received"])} devices are waiting to start, ${stageCount(["testing", "wipe_pending_verification", "wipe_verified", "refurbishing"])} are on the bench and ${stageCount(["ready", "listed"])} are ready to sell.`}
         actions={
           pending.length > 0 ? (
             <ClayButton href="/staff/batches?status=submitted" variant="primary" icon={<ClipboardCheck />}>
@@ -173,7 +173,8 @@ export default async function StaffOverview() {
             { href: "#capacity", value: nextOpen ? shortDate(nextOpen.week) : "—", label: "next open bench week", note: nextOpen ? `${nextOpen.capacity - nextOpen.load} of ${nextOpen.capacity} spots free` : "Every week is full" },
             { href: "/staff/devices?status=wipe_pending_verification", value: wipesPending, label: "wipes awaiting verification", note: "Only staff can verify a wipe" },
             {
-              href: certsToIssue.length === 1 ? `/staff/batches/${certsToIssue[0].id}` : "/staff/batches?status=in_refurbishment",
+              // straight to the next batch that's ready to certify (the note names the rest)
+              href: certsToIssue.length ? `/staff/batches/${certsToIssue[0].id}` : "/staff/batches?status=in_refurbishment",
               value: certsToIssue.length,
               label: "certificates to issue",
               note: certsToIssue.length
@@ -324,7 +325,7 @@ export default async function StaffOverview() {
           <dl className="grid grid-cols-2 gap-4">
             {[
               ["devices back in use", impact.devicesReused.toLocaleString("en-CA")],
-              ["kg kept out of landfill", impact.kgDiverted.toLocaleString("en-CA")],
+              ["kg kept out of landfill", impact.kgDiverted.toLocaleString("en-CA", { maximumFractionDigits: 0 })],
               ["kg CO₂e avoided", impact.co2eAvoidedKg.toLocaleString("en-CA")],
               ["volunteer hours", impact.volunteerHours.toLocaleString("en-CA")],
             ].map(([k, v]) => (

@@ -45,6 +45,7 @@ describe("Pay-It-Forward ledger (PIF-03)", () => {
     expect(canApplySubsidy(1000, 1500, 20000)).toMatch(/only has/);
     expect(canApplySubsidy(5000, 1500, 1000)).toMatch(/more than the device price/);
     expect(canApplySubsidy(5000, 1500, 20000)).toBeNull();
+    expect(canApplySubsidy(5000, 1500, null)).toMatch(/Set the device's price/);
     expect(formatCents(123456)).toBe("$1,234.56");
   });
 });

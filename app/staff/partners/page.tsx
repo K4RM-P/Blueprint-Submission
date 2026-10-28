@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Download } from "lucide-react";
 import { ClayButton } from "@/components/clay";
 import { PageHeader } from "@/components/shell/page-header";
@@ -57,7 +58,15 @@ export default async function StaffPartners() {
                   <TierSelect orgId={o.id} tier={o.tier} name={o.name} />
                 </td>
                 <td className="text-small text-ink-2">{o.membership_expires_at ? `${longDate(o.membership_started_at)} → ${longDate(o.membership_expires_at)}` : "Free tier"}</td>
-                <td className="text-right">{o.batches}</td>
+                <td className="text-right">
+                  {o.batches > 0 ? (
+                    <Link href={`/staff/batches?status=all&org=${o.id}`} aria-label={`${o.batches} batches from ${o.name}`} className="font-semibold text-loop-deep underline-offset-4 hover:underline">
+                      {o.batches}
+                    </Link>
+                  ) : (
+                    0
+                  )}
+                </td>
                 <td className="text-right">{o.devices}</td>
                 <td className="text-right font-semibold">{o.reused}</td>
                 <td>{o.wall_opt_in ? "Yes" : "—"}</td>

@@ -173,7 +173,7 @@ export default function BecomeAPartnerPage() {
             items={[
               {
                 q: "Why donate instead of trading in?",
-                a: "A trade-in or reseller gives you a little credit and the story ends. With Relay it's free, every drive gets a certified data wipe, and you can see the Toronto student or family each laptop helps.",
+                a: "A trade-in or reseller gives you a little credit and the story ends. With Relay it's free, every drive gets a certified data wipe, and your dashboard shows who each laptop helps, by category: a student, a newcomer, a senior.",
               },
               {
                 q: "How do we know our data is destroyed?",
@@ -184,7 +184,7 @@ export default function BecomeAPartnerPage() {
               { q: "Do I need to remove or destroy the drives?", a: "Please don't. Intact drives make a laptop reusable. Free Geek Toronto wipes and verifies every drive and lists each one on your certificate." },
               { q: "What do you accept?", a: "Laptops, desktops, flat-screen monitors, tablets and accessories. Batches of 5+ identical laptops under 5 years old help the most, but every batch is welcome." },
               { q: "Does paying get my devices processed first?", a: "No. Every partner's batch is scheduled by bench capacity and Batch Value Score. Paid tiers add reporting, recognition and pickup requests, never priority or influence over prices." },
-              { q: "Who buys the devices?", a: "Students, newcomers, seniors and families who need an affordable computer. Free Geek Toronto sets every price; its vision is that access to technology reflects ability to pay." },
+              { q: "Who buys the devices?", a: "Mostly students, newcomers, seniors and families who need an affordable computer, plus non-profits, small businesses and other buyers at the same prices. Free Geek Toronto sets every price; its vision is that access to technology reflects ability to pay." },
             ]}
           />
         </div>

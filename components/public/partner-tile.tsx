@@ -32,7 +32,7 @@ export function PartnerTile({ name, logoUrl, tier, reused, featured }: { name: s
       ) : (
         <p className="mt-auto flex items-center gap-2 text-small font-medium text-ink-2">
           <span aria-hidden className="size-2 rounded-full bg-loop-light" />
-          New to the relay · first batch on its way
+          New to the relay · first laptops on the bench
         </p>
       )}
     </div>
