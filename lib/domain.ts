@@ -96,3 +96,10 @@ export function recipientNoun(category: RecipientCategory, n: number): string {
   if (n === 1) return one;
   return /(s|sh|ch|x)$/.test(one) ? `${one}es` : `${one}s`;
 }
+
+/** "Now helping a student." for the partner's own laptops (only ever a category, never a person). */
+export function helpingLine(category: RecipientCategory | null | undefined): string {
+  if (!category || category === "undisclosed" || category === "general") return "In a new home";
+  const noun = labels.recipient[category].toLowerCase();
+  return `Now helping ${/^[aeiou]/.test(noun) ? "an" : "a"} ${noun}`;
+}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DemoDataNote } from "@/components/shell/demo-data-note";
 import { StatPebble } from "@/components/clay";
 import { createClient } from "@/lib/supabase/server";
 import { getPublicImpact } from "@/lib/queries/impact";
@@ -19,6 +20,7 @@ export default async function ImpactPage() {
       <p className="eyebrow">Impact</p>
       <h1 className="font-display mt-3 max-w-3xl text-[2.75rem] leading-[0.98] sm:text-display-l">Real numbers, honest math.</h1>
       <p className="measure mt-5 text-body-l text-ink-2">These update live from Free Geek Toronto&apos;s refurbishment records. Every formula and factor is below.</p>
+      <DemoDataNote className="mt-4" />
 
       <div className="mt-12 grid gap-5 md:grid-cols-4">
         <StatPebble className="md:col-span-2 md:row-span-2" size="lg" tint="mint" label="Devices back in use" value={t.devicesReused} caption={`${t.devicesReceived} received · ${t.devicesRecycled} recycled responsibly`} />

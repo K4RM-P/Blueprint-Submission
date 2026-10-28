@@ -13,10 +13,21 @@ import { nextOpenWeek, wouldExceed } from "@/lib/capacity";
 import { validateBreakdown } from "@/lib/pricing";
 import { canApplySubsidy } from "@/lib/ledger";
 import { PIF_ELIGIBLE_RECIPIENTS } from "@/lib/domain";
+import { SHOWCASE_PASSPORTS } from "@/lib/showcase-passports";
+import { env } from "@/lib/env";
 
 const staff = () => assertRole("staff");
 const uuid = z.uuid();
 const refresh = (...paths: string[]) => paths.forEach((p) => revalidatePath(p, "layout"));
+
+// Demo mode: several judges share one staff account, so the four showcase Device Passports
+// are read-only. Their stories stay intact for every visitor; everything else works normally.
+const SHOWCASE_LOCKED = "This is a showcase Device Passport. It's locked in demo mode so every visitor sees the same story.";
+async function showcaseIds(db: Awaited<ReturnType<typeof staff>>["supabase"], ids: string[]): Promise<Set<string>> {
+  if (!env.demoMode || ids.length === 0) return new Set();
+  const { data } = await db.from("devices").select("id").in("id", ids).in("passport_code", SHOWCASE_PASSPORTS.map((p) => p.code));
+  return new Set((data ?? []).map((d) => d.id));
+}
 
 // ---------------------------------------------------------------- batches (OPS-03, OPS-04)
 
@@ -127,8 +138,12 @@ const deviceEdit = z.object({
 });
 
 export async function saveDeviceSpecs(input: unknown): Promise<ActionResult<null>> {
-  return runAction(z.object({ rows: z.array(deviceEdit).min(1).max(500) }), input, async ({ rows }) => {
+  return runAction(z.object({ rows: z.array(deviceEdit).min(1).max(500) }), input, async (input) => {
+    let rows = input.rows;
     const s = await staff();
+    const locked = await showcaseIds(s.supabase, rows.map((r) => r.id));
+    rows = rows.filter((r) => !locked.has(r.id));
+    if (rows.length === 0) return fail(SHOWCASE_LOCKED);
     for (const r of rows) {
       const { error } = await s.supabase
         .from("devices")
@@ -171,7 +186,12 @@ export async function verifyWipes(input: unknown): Promise<ActionResult<{ verifi
     const s = await staff();
     let verified = 0;
     const skipped: string[] = [];
+    const locked = await showcaseIds(s.supabase, ids);
     for (const id of ids) {
+      if (locked.has(id)) {
+        skipped.push(id);
+        continue;
+      }
       const d = await loadDevice(s.supabase, id);
       if (d.status !== "wipe_pending_verification") {
         skipped.push(id);
@@ -200,7 +220,12 @@ export async function changeStatus(input: unknown): Promise<ActionResult<{ chang
     if (to === "sold") return fail("Use “Record sale” so the sale details are recorded.");
     let changed = 0;
     const errors: string[] = [];
+    const locked = await showcaseIds(s.supabase, ids);
     for (const id of ids) {
+      if (locked.has(id)) {
+        errors.push(SHOWCASE_LOCKED);
+        continue;
+      }
       const d = await loadDevice(s.supabase, id);
       const check = canTransitionDevice(d.status, to, { actor: "staff", wipeVerifiedAt: d.wipe_verified_at, recycledReason: reason });
       if (!check.ok) {
@@ -218,8 +243,13 @@ export async function changeStatus(input: unknown): Promise<ActionResult<{ chang
 }
 
 export async function assignVolunteer(input: unknown): Promise<ActionResult<null>> {
-  return runAction(z.object({ ids: z.array(uuid).min(1).max(500), volunteerId: uuid.nullable() }), input, async ({ ids, volunteerId }) => {
+  return runAction(z.object({ ids: z.array(uuid).min(1).max(500), volunteerId: uuid.nullable() }), input, async (input) => {
+    let { ids } = input;
+    const { volunteerId } = input;
     const s = await staff();
+    const locked = await showcaseIds(s.supabase, ids);
+    ids = ids.filter((i) => !locked.has(i));
+    if (ids.length === 0) return fail(SHOWCASE_LOCKED);
     const { error } = await s.supabase.from("devices").update({ assigned_volunteer_id: volunteerId }).in("id", ids);
     if (error) throw error;
     refresh("/staff");
@@ -230,6 +260,7 @@ export async function assignVolunteer(input: unknown): Promise<ActionResult<null
 export async function setPrice(input: unknown): Promise<ActionResult<null>> {
   return runAction(z.object({ id: uuid, priceCents: z.number().int().min(0).max(1_000_000) }), input, async ({ id, priceCents }) => {
     const s = await staff();
+    if ((await showcaseIds(s.supabase, [id])).size) return fail(SHOWCASE_LOCKED);
     const { error } = await s.supabase.from("devices").update({ price_cents: priceCents }).eq("id", id);
     if (error) throw error;
     refresh("/staff");
@@ -249,6 +280,7 @@ const saleSchema = z.object({
 export async function recordSale(input: unknown): Promise<ActionResult<null>> {
   return runAction(saleSchema, input, async ({ id, soldAt, channel, recipient, subsidyCents }) => {
     const s = await staff();
+    if ((await showcaseIds(s.supabase, [id])).size) return fail(SHOWCASE_LOCKED);
     const d = await loadDevice(s.supabase, id);
     if (d.status !== "ready" && d.status !== "listed") return fail("Only ready or listed devices can be sold.");
     if (subsidyCents > 0) {
@@ -360,6 +392,34 @@ const settingsSchema = z.object({
     }),
   ),
 });
+
+const certificateSettingsSchema = z.object({
+  standard: z.string().trim().max(120, "Keep the standard under 120 characters."),
+  process: z.string().trim().min(20, "Describe the process in a sentence or two (20+ characters).").max(800),
+  disclaimer: z.string().trim().min(10, "Add a short disclaimer (10+ characters).").max(400),
+  storeUrl: z
+    .string()
+    .trim()
+    .max(400)
+    .refine((v) => v === "" || /^https?:\/\/\S+$/.test(v), "Enter a full link starting with https://"),
+});
+
+/** Certificate wording + FGT's store link. An empty standard is stored as null and never shown. */
+export async function saveCertificateSettings(input: unknown): Promise<ActionResult<null>> {
+  return runAction(certificateSettingsSchema, input, async (d) => {
+    const s = await staff();
+    const { error } = await s.supabase
+      .from("settings")
+      .update({ sanitization_standard: d.standard || null, sanitization_process: d.process, certificate_disclaimer: d.disclaimer, store_url: d.storeUrl || null })
+      .eq("id", 1);
+    if (error) {
+      if (/column|schema cache/i.test(error.message)) return fail("The database needs the latest migration first (pnpm db:push).");
+      throw error;
+    }
+    revalidatePath("/", "layout");
+    return ok(null, "Saved. New certificates and passports use this wording.");
+  });
+}
 
 export async function saveSettings(input: unknown): Promise<ActionResult<null>> {
   return runAction(settingsSchema, input, async (d) => {

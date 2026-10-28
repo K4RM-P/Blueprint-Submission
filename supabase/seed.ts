@@ -9,6 +9,7 @@ import { createClient } from "@supabase/supabase-js";
 import { computeBatchScore } from "../lib/batch-score";
 import { BADGES, evaluateBadges, type VolunteerStats } from "../lib/badges";
 import { formatCertificateNumber } from "../lib/certificate-number";
+import { DEFAULT_CERTIFICATE_DISCLAIMER, DEFAULT_SANITIZATION_PROCESS, DEFAULT_WIPE_METHOD } from "../lib/certificate-wording";
 import { DEFAULT_ACCEPTED_ITEMS } from "../lib/checker";
 import { addDays, mondayOf, toISODate } from "../lib/dates";
 import type { DeviceCategory, DeviceCondition, DeviceStatus, PartnerTier, RecipientCategory, SaleChannel } from "../lib/domain";
@@ -75,6 +76,17 @@ const SETTINGS = {
   ],
   price_breakdown_confirmed: false,
   accepted_items: DEFAULT_ACCEPTED_ITEMS,
+};
+
+/**
+ * Certificate wording + store link (migration 20261027000001). No sanitization standard
+ * until FGT confirms one. The store link is FGT's public site [TO VERIFY: the exact store page].
+ */
+const ALIGNMENT_SETTINGS = {
+  sanitization_standard: null,
+  sanitization_process: DEFAULT_SANITIZATION_PROCESS,
+  certificate_disclaimer: DEFAULT_CERTIFICATE_DISCLAIMER,
+  store_url: "https://www.freegeektoronto.org/",
 };
 
 // [ASSUMPTION] placeholders — replace with cited values before submission (PRD §9.6).
@@ -312,6 +324,8 @@ async function reset() {
     page++;
   }
   await must("reset orgs", db.from("organizations").delete().in("slug", ORGS.map((o) => o.slug)));
+  // Organizations created by e2e sign-ups (their users are deleted above) would otherwise linger on the Partner Wall.
+  await must("reset test orgs", db.from("organizations").delete().like("contact_email", `%${DOMAIN}`));
   const { data: files } = await db.storage.from("certificates").list("", { limit: 1000 });
   for (const f of files ?? []) {
     const { data: inner } = await db.storage.from("certificates").list(f.name, { limit: 1000 });
@@ -324,6 +338,10 @@ async function main() {
 
   console.log("Settings, impact factors, badges…");
   await must("settings", db.from("settings").upsert(SETTINGS));
+  {
+    const { error } = await db.from("settings").update(ALIGNMENT_SETTINGS).eq("id", 1);
+    if (error) console.warn(`  Skipped certificate wording + store link (${error.message}). Run \`pnpm db:push\` to apply migration 20261027000001.`);
+  }
   await must("factors", db.from("impact_factors").insert(FACTORS.map((f) => ({ ...f, source_title: "TO VERIFY", source_url: null, last_reviewed: null }))));
   const badges = await must(
     "badges",
@@ -517,7 +535,8 @@ async function main() {
     let stepNo = 0;
     // Keep every timeline in the past.
     const step = () => {
-      const h = sc ? (sc.stepHours[stepNo++] ?? 24) : between(6, 60);
+      // Uniform partner batches move faster than one-off household donations (identical models share one process).
+      const h = sc ? (sc.stepHours[stepNo++] ?? 24) : d.source === "partner" ? between(4, 40) : between(12, 84);
       t = Math.min(t + hours(h), NOW.getTime() - hours(2));
       return new Date(t).toISOString();
     };
@@ -554,7 +573,7 @@ async function main() {
         ev({ actor_id: d.volunteer, event_type: "status_change", from_status: prev, to_status: next, created_at: at });
         ev({ actor_id: d.volunteer, event_type: "step_completed", step: "hardware_test", created_at: at });
       } else if (next === "wipe_pending_verification") {
-        Object.assign(row, { wipe_report_ref: `BL-${between(100000, 999999)}`, wipe_method: "NIST 800-88 Purge (software overwrite)", wipe_performed_by: d.volunteer, wipe_performed_at: at });
+        Object.assign(row, { wipe_report_ref: `BL-${between(100000, 999999)}`, wipe_method: DEFAULT_WIPE_METHOD, wipe_performed_by: d.volunteer, wipe_performed_at: at });
         ev({ actor_id: d.volunteer, event_type: "status_change", from_status: prev, to_status: next, created_at: at });
         ev({ actor_id: d.volunteer, event_type: "step_completed", step: "wipe_performed", metadata: { report_recorded: true }, created_at: at });
       } else if (next === "wipe_verified") {
@@ -593,7 +612,9 @@ async function main() {
       ev({ actor_id: staffId, event_type: "status_change", from_status: prev, to_status: "recycled", note: reason, created_at: at });
     }
     row.updated_at = new Date(t).toISOString();
-    if (d.status === "sold") row.passport_views = between(0, 4);
+    // Partner laptops' passports get shared by the business; household ones mostly by their buyer.
+    if (d.status === "sold") row.passport_views = d.source === "partner" ? between(2, 14) : between(0, 4);
+    else if (d.source === "partner" && (d.status === "ready" || d.status === "listed")) row.passport_views = between(0, 3);
     devices.push(row);
   }
 

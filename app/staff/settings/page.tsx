@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/shell/page-header";
 import { SettingsForm } from "@/components/staff/settings-form";
+import { CertificateSettingsForm } from "@/components/staff/certificate-settings-form";
 import { requireRole } from "@/lib/auth";
 import { getFactors, getSettings } from "@/lib/queries/common";
 
@@ -11,7 +12,10 @@ export default async function StaffSettings() {
   const [s, factors] = await Promise.all([getSettings(supabase), getFactors(supabase)]);
   return (
     <>
-      <PageHeader eyebrow="Staff Console" title="Settings" description="Capacity, score weights, impact factors, price transparency and household rules." />
+      <PageHeader eyebrow="Staff Console" title="Settings" description="Certificate wording, store link, capacity, score weights, impact factors, price transparency and household rules." />
+      <div className="mb-6">
+        <CertificateSettingsForm ready={s.alignmentColumns} initial={{ standard: s.certificate.standard ?? "", process: s.certificate.process, disclaimer: s.certificate.disclaimer, storeUrl: s.storeUrl ?? "" }} />
+      </div>
       <SettingsForm
         initial={{
           weeklyCapacity: s.weeklyCapacity,

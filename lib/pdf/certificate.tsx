@@ -1,8 +1,12 @@
-import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
+import { Document, Font, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
+import { DEFAULT_CERTIFICATE_DISCLAIMER, DEFAULT_SANITIZATION_PROCESS, standardLine, type CertificateWording } from "@/lib/certificate-wording";
 
 /**
  * Data-sanitization certificate (CI-01). Flat, formal, print-professional:
  * white, ink text, loop-green rules, no clay, no gradients (UI §9.8).
+ * It DOCUMENTS that each listed device went through Free Geek Toronto's data
+ * sanitization process (method, reference ID, verification date, verifying staff
+ * member). A standard is named only when staff set one in Settings.
  */
 
 export interface CertificateDevice {
@@ -10,7 +14,11 @@ export interface CertificateDevice {
   makeModel: string;
   serial: string | null;
   method: string | null;
+  /** Report/reference ID from FGT's sanitization software (partner's private copy only). */
+  reference: string | null;
   verifiedAt: string | null;
+  /** Staff member who checked the report. */
+  verifiedBy: string | null;
   outcome: "Reused" | "Recycled" | "In refurbishment";
 }
 
@@ -24,7 +32,11 @@ export interface CertificateData {
   devices: CertificateDevice[];
   verifyUrl: string;
   qrDataUrl: string;
+  wording?: CertificateWording;
 }
+
+// Never hyphenate words across lines ("Lap-top"); wrap whole words instead.
+Font.registerHyphenationCallback((word) => [word]);
 
 const INK = "#17201C";
 const INK2 = "#4A544F";
@@ -44,22 +56,33 @@ const s = StyleSheet.create({
   value: { fontSize: 10, marginTop: 2 },
   sectionTitle: { fontSize: 11, fontFamily: "Helvetica-Bold", marginTop: 22, marginBottom: 6 },
   th: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: INK, paddingBottom: 4, fontFamily: "Helvetica-Bold", fontSize: 8 },
-  tr: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: LINE, paddingVertical: 4, fontSize: 8 },
-  c1: { width: "6%" },
-  c2: { width: "24%" },
-  c3: { width: "16%", fontFamily: "Courier" },
-  c4: { width: "28%" },
-  c5: { width: "14%" },
-  c6: { width: "12%" },
-  statement: { marginTop: 20, fontSize: 9, color: INK2 },
+  tr: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: LINE, paddingVertical: 4, fontSize: 7.5 },
+  c1: { width: "4%" },
+  c2: { width: "19%", paddingRight: 6 },
+  c3: { width: "13%", fontFamily: "Courier", paddingRight: 6 },
+  c4: { width: "21%", paddingRight: 6 },
+  c5: { width: "14%", fontFamily: "Courier", paddingRight: 6 },
+  c6: { width: "18%", paddingRight: 6 },
+  c7: { width: "11%" },
+  lead: { marginTop: 8, fontSize: 9.5, color: INK2 },
+  statement: { marginTop: 18, fontSize: 9, color: INK2 },
   footer: { position: "absolute", bottom: 32, left: 44, right: 44, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", borderTopWidth: 1, borderTopColor: LINE, paddingTop: 10 },
 });
+
+/** "Marcus Bennett" → "Marcus B." so the column stays narrow. */
+const shortName = (name: string | null) => {
+  if (!name) return null;
+  const [first, ...rest] = name.trim().split(/\s+/);
+  return rest.length ? `${first} ${rest[rest.length - 1].charAt(0)}.` : first;
+};
 
 const fmt = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("en-CA", { year: "numeric", month: "long", day: "numeric", timeZone: "America/Toronto" }) : "—");
 
 export function CertificateDocument({ data }: { data: CertificateData }) {
+  const wording = data.wording ?? { standard: null, process: DEFAULT_SANITIZATION_PROCESS, disclaimer: DEFAULT_CERTIFICATE_DISCLAIMER };
+  const standard = standardLine(wording);
   return (
-    <Document title={`Data-Sanitization Certificate ${data.number}`} author="Free Geek Toronto" creator="Relay">
+    <Document title={`Data Sanitization Certificate ${data.number}`} author="Free Geek Toronto" creator="Relay">
       <Page size="LETTER" style={s.page}>
         <View style={s.header}>
           <View>
@@ -72,8 +95,12 @@ export function CertificateDocument({ data }: { data: CertificateData }) {
           </View>
         </View>
 
-        <Text style={s.title}>Certificate of Data Sanitization</Text>
+        <Text style={s.title}>Data Sanitization Certificate</Text>
         <Text style={s.number}>{data.number}</Text>
+        <Text style={s.lead}>
+          This certificate documents that the devices listed below went through Free Geek Toronto&apos;s data sanitization process, as recorded in Relay&apos;s chain of custody.
+        </Text>
+        {standard ? <Text style={[s.lead, { color: INK }]}>{standard}</Text> : null}
 
         <View style={s.grid}>
           {[
@@ -94,37 +121,36 @@ export function CertificateDocument({ data }: { data: CertificateData }) {
         <Text style={s.sectionTitle}>Devices</Text>
         <View style={s.th} fixed>
           <Text style={s.c1}>#</Text>
-          <Text style={s.c2}>Device</Text>
-          <Text style={s.c3}>Serial</Text>
-          <Text style={s.c4}>Sanitization method</Text>
-          <Text style={s.c5}>Verified</Text>
-          <Text style={s.c6}>Outcome</Text>
+          <Text style={s.c2}>Device (laptop unless noted)</Text>
+          <Text style={[s.c3, { fontFamily: "Helvetica-Bold" }]}>Serial</Text>
+          <Text style={s.c4}>Method</Text>
+          <Text style={[s.c5, { fontFamily: "Helvetica-Bold" }]}>Reference ID</Text>
+          <Text style={s.c6}>Verified (date, staff)</Text>
+          <Text style={s.c7}>Outcome</Text>
         </View>
         {data.devices.map((d, i) => (
           <View key={i} style={s.tr} wrap={false}>
             <Text style={s.c1}>{i + 1}</Text>
             <Text style={s.c2}>
-              {d.makeModel} ({d.category})
+              {d.makeModel}
+              {d.category !== "Laptop" ? ` (${d.category})` : ""}
             </Text>
             <Text style={s.c3}>{d.serial ?? "not recorded"}</Text>
-            <Text style={s.c4}>{d.method ?? (d.outcome === "Recycled" ? "Physically recycled" : "—")}</Text>
-            <Text style={s.c5}>{d.verifiedAt ? fmt(d.verifiedAt) : "—"}</Text>
-            <Text style={s.c6}>{d.outcome}</Text>
+            <Text style={s.c4}>{d.method ?? (d.outcome === "Recycled" ? "Recycled (not wiped for reuse)" : "—")}</Text>
+            <Text style={d.reference ? s.c5 : [s.c5, { fontFamily: "Helvetica", color: INK2 }]}>{d.reference ?? (d.verifiedAt ? "On file at FGT" : "—")}</Text>
+            <Text style={s.c6}>{d.verifiedAt ? [fmt(d.verifiedAt), shortName(d.verifiedBy)].filter(Boolean).join(", ") : "—"}</Text>
+            <Text style={s.c7}>{d.outcome}</Text>
           </View>
         ))}
 
-        <Text style={s.statement}>
-          Statement of process: each storage device listed above was received with its drive intact and sanitized by Free Geek Toronto using its data-sanitization software, which
-          produces a report for every device. A Free Geek Toronto staff member verified each sanitization report before the device could be refurbished, sold or recycled. Devices
-          that could not be reused were recycled responsibly. Every step is recorded in an append-only chain of custody. Relay records sanitization; Free Geek Toronto&apos;s
-          sanitization software remains the system of record. [Process wording to be confirmed by Free Geek Toronto.]
-        </Text>
+        <Text style={s.statement}>Process: {wording.process}</Text>
+        <Text style={[s.statement, { marginTop: 8, fontSize: 8.5 }]}>{wording.disclaimer}</Text>
 
         <View style={s.footer} fixed>
           <View style={{ maxWidth: 380 }}>
             <Text style={s.small}>Verify this certificate at</Text>
             <Text style={{ fontSize: 9, fontFamily: "Courier", color: LOOP }}>{data.verifyUrl}</Text>
-            <Text style={[s.small, { marginTop: 4 }]}>The public page confirms the partner, device count and issue date — never serial numbers.</Text>
+            <Text style={[s.small, { marginTop: 4 }]}>The public page confirms the partner, device count and issue date. Never serial numbers or reference IDs.</Text>
           </View>
           {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop */}
           <Image src={data.qrDataUrl} style={{ width: 64, height: 64 }} />

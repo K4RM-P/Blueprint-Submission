@@ -108,6 +108,11 @@ export interface PassportStory {
   leg: 1 | 2 | 3;
   persona: Persona;
   slides: StorySlide[];
+  /**
+   * Set only when the signed-in viewer is the Reuse Partner that donated this device:
+   * the story opens and ends with them. Public viewers never get this.
+   */
+  owner?: { orgName: string } | null;
 }
 
 /** The device's "personality", Wrapped-style. Derived only from real story data. */
@@ -152,7 +157,7 @@ const BASE: Record<SlideKey, Omit<StorySlide, "key">> = {
   cover: { tint: "porcelain", durationMs: null, title: "This laptop has a story" },
   origin: { tint: "apricot", durationMs: 6000, title: "Its first job" },
   handoff: { tint: "porcelain", durationMs: 6000, title: "The handoff" },
-  erased: { tint: "sky", durationMs: 6500, title: "Every byte erased" },
+  erased: { tint: "sky", durationMs: 6500, title: "Data wipe on the record" },
   bench: { tint: "butter", durationMs: 7500, title: "Back to life" },
   speed: { tint: "mint", durationMs: 5500, title: "Ready, fast" },
   software: { tint: "porcelain", durationMs: 5500, title: "Open source" },
@@ -309,8 +314,31 @@ export function slideIndexFromParam(raw: string | string[] | undefined, count: n
   return Math.min(Math.max(n, 1), count) - 1;
 }
 
+/** The owning partner's view of its own laptop's story (DP-02 personalized). Pure: adds the owner, changes nothing else. */
+export function personalizeForOwner(s: PassportStory, orgName: string): PassportStory {
+  const name = orgName.trim();
+  return name ? { ...s, owner: { orgName: name } } : s;
+}
+
+/** Opening line of the cover. */
+export function coverLine(s: PassportStory): string {
+  return s.owner ? `This was one of your laptops, *${s.owner.orgName.replace(/\*/g, "")}.*` : "This laptop has a *story.*";
+}
+
+/** Thank-you at the end, for the owning partner only. */
+export function ownerThanks(s: PassportStory): string | null {
+  if (!s.owner) return null;
+  if (s.stage === "sold") return `Thank you, ${s.owner.orgName}. Your laptop is helping someone in Toronto now.`;
+  if (s.stage === "recycled") return `Thank you, ${s.owner.orgName}. Even when a laptop can't be reused, it stays out of landfill.`;
+  return `Thank you, ${s.owner.orgName}. Your laptop is on its way to someone in Toronto.`;
+}
+
 /** Share copy. No private fields; the donor appears only when opted in. */
 export function shareText(s: PassportStory): string {
+  if (s.owner) {
+    if (s.stage === "sold") return "One of our retired laptops is helping someone in Toronto now. Its Device Passport shows its certified data wipe and its second life with Free Geek Toronto.";
+    return "We passed our retired laptops on to Free Geek Toronto. Follow this one's Device Passport: its certified data wipe, the volunteer who rebuilt it, and who it helps next.";
+  }
   if (s.stage === "recycled") return `This ${s.deviceName} was donated to Free Geek Toronto and recycled responsibly. Every device deserves a second leg. Pass it on.`;
   if (s.stage === "sold") return "My laptop has had 3 lives. Every device deserves a second leg. Pass it on.";
   return `This ${s.deviceName} is on its second leg at Free Geek Toronto. Every device deserves a second leg. Pass it on.`;

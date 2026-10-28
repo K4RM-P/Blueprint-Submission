@@ -852,9 +852,10 @@ html[data-reduced-motion="true"] :is(.laptop-lid, .laptop-lane-fill, .laptop-bat
   animation: hero-hand 1s var(--ease-spring) var(--d, 0ms) both;
 }
 /* words are handed in from the left, one after another, like a baton */
+/* Start at a near-zero but visible opacity: the text counts as painted on the first frame (LCP), same motion. */
 @keyframes hero-hand {
   from {
-    opacity: 0;
+    opacity: 0.01;
     transform: translate(-0.18em, 0.28em) rotate(-2deg);
   }
   40% {
@@ -867,7 +868,7 @@ html[data-reduced-motion="true"] :is(.laptop-lid, .laptop-lane-fill, .laptop-bat
 }
 @keyframes hero-rise {
   from {
-    opacity: 0;
+    opacity: 0.01;
     transform: translateY(18px);
   }
   to {

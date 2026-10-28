@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPoi
 import { LoopMark } from "@/components/shell/logo";
 import { LiquidBlob } from "@/components/liquid";
 import { useMotionPrefs } from "@/lib/motion";
-import type { PassportStory } from "@/lib/passport-story";
+import { ownerThanks, type PassportStory } from "@/lib/passport-story";
 import { cn } from "@/lib/utils";
 import { LiquidTransition } from "./liquid-transition";
 import { Eyebrow, Hero } from "./slide-primitives";
@@ -28,7 +28,7 @@ const SWIPE_PX = 48;
  * advance (paused when the tab is hidden), deep links via ?s=N, and anonymous
  * start/complete/drop-off analytics. Reduced motion: no auto-advance, crossfades.
  */
-export function StoryPlayer({ story, initialIndex = 0 }: { story: PassportStory; initialIndex?: number }) {
+export function StoryPlayer({ story, initialIndex = 0, storeUrl = null }: { story: PassportStory; initialIndex?: number; storeUrl?: string | null }) {
   const { reduced, lowPower } = useMotionPrefs();
   const slides = story.slides;
   const last = slides.length - 1;
@@ -183,7 +183,8 @@ export function StoryPlayer({ story, initialIndex = 0 }: { story: PassportStory;
 
   const finale = (
     <div className="flex h-full flex-col">
-      <Eyebrow>{story.stage === "sold" ? "Your laptop's story" : "This laptop's story"}</Eyebrow>
+      <Eyebrow>{story.owner ? "One of your laptops" : story.stage === "sold" ? "Your laptop's story" : "This laptop's story"}</Eyebrow>
+      {ownerThanks(story) ? <p className="mt-2 text-[0.9375rem] font-semibold leading-snug text-ink">{ownerThanks(story)}</p> : null}
       <Hero className="py-[2cqh]">
         <WrappedCard story={story} className="w-full max-w-[360px]" />
       </Hero>
@@ -208,7 +209,7 @@ export function StoryPlayer({ story, initialIndex = 0 }: { story: PassportStory;
               <section className="story-slide" data-tint={slide.tint} data-slide={slide.key} aria-label={`Slide ${index + 1} of ${slides.length}: ${slide.title}`}>
                 <SlideBackdrop k={slide.key} index={index} />
                 <div className="story-content">
-                  <SlideContent k={slide.key} story={story} finale={finale} onBegin={next} />
+                  <SlideContent k={slide.key} story={story} finale={finale} onBegin={next} storeUrl={storeUrl} />
                 </div>
               </section>
             </LiquidTransition>

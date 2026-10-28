@@ -11,7 +11,7 @@ export function DevicesAreaChart({ data, label }: { data: { month: string; recei
     <figure aria-label={label}>
       <div className="h-60" aria-hidden>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: -18 }}>
+          <AreaChart accessibilityLayer={false} data={data} margin={{ top: 8, right: 4, bottom: 0, left: -18 }}>
             <defs>
               <linearGradient id="reusedFill" x1="0" x2="0" y1="0" y2="1">
                 <stop offset="0" stopColor="#2FBF8A" stopOpacity={0.55} />

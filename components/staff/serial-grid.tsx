@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Save } from "lucide-react";
+import { ClipboardPaste, Save } from "lucide-react";
 import { toast } from "sonner";
 import { ClayButton } from "@/components/clay";
 import { DeviceStatusChip } from "@/components/journey/status";
 import type { DeviceStatus } from "@/lib/domain";
 import { saveDeviceSpecs } from "@/server/actions/staff";
+import { matchInOrder, parseList } from "@/lib/bulk-entry";
 
 interface Row {
   id: string;
@@ -24,7 +25,7 @@ interface Row {
 
 const cell = "h-10 w-full rounded-[10px] border border-transparent bg-[#f7f4ee] px-2.5 text-[0.875rem] shadow-[inset_2px_2px_5px_rgba(90,75,55,.1)] focus-visible:border-loop";
 
-/** OPS-04: edit serials/specs for many devices at once after bulk-add. */
+/** OPS-04: edit serials/specs for many devices at once after bulk-add, or paste/scan every serial in one go. */
 export function SerialGrid({ devices }: { devices: Row[] }) {
   const router = useRouter();
   const [rows, setRows] = useState(devices);
@@ -33,6 +34,27 @@ export function SerialGrid({ devices }: { devices: Row[] }) {
   const set = (id: string, patch: Partial<Row>) => {
     setRows((r) => r.map((x) => (x.id === id ? { ...x, ...patch } : x)));
     setDirty((d) => new Set(d).add(id));
+  };
+  const [paste, setPaste] = useState("");
+  const pasted = parseList(paste);
+  // Pasted serials fill the devices that don't have one yet, top to bottom.
+  const open = rows.filter((r) => !r.serial_number);
+  const plan = matchInOrder(open, pasted);
+  const applyPaste = async () => {
+    if (plan.assigned.length === 0) return;
+    setBusy(true);
+    const byId = new Map(plan.assigned.map((a) => [a.item.id, a.value]));
+    const next = rows.map((r) => (byId.has(r.id) ? { ...r, serial_number: byId.get(r.id)! } : r));
+    const res = await saveDeviceSpecs({
+      rows: next.filter((r) => byId.has(r.id) || dirty.has(r.id)).map((r) => ({ id: r.id, serial: r.serial_number ?? "", cpu: r.cpu ?? "", ramGb: r.ram_gb, storageGb: r.storage_gb })),
+    });
+    setBusy(false);
+    if (!res.ok) return toast.error(res.error);
+    setRows(next);
+    setDirty(new Set());
+    setPaste("");
+    toast.success(`${plan.assigned.length} serial${plan.assigned.length === 1 ? "" : "s"} saved${plan.extra.length ? ` · ${plan.extra.length} extra ignored` : ""}.`);
+    router.refresh();
   };
   const num = (v: string) => (v === "" ? null : Math.max(0, Math.round(Number(v)) || 0));
   const save = async () => {
@@ -57,6 +79,30 @@ export function SerialGrid({ devices }: { devices: Row[] }) {
           Save {dirty.size || ""} change{dirty.size === 1 ? "" : "s"}
         </ClayButton>
       </div>
+      {open.length > 0 ? (
+        <div className="border-t border-line px-5 py-4">
+          <label htmlFor="serial-paste" className="text-[0.9375rem] font-medium">
+            Paste or scan serials
+          </label>
+          <p id="serial-paste-hint" className="text-small text-ink-2">
+            One per line, in the order of the list below. A barcode scanner works too: each scan ends with Enter. They fill the {open.length} device{open.length === 1 ? "" : "s"} without a serial, top to bottom.
+          </p>
+          <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start">
+            <textarea id="serial-paste" aria-describedby="serial-paste-hint" rows={3} className="field-input min-h-24 flex-1 font-mono text-[0.875rem]" value={paste} onChange={(e) => setPaste(e.target.value)} placeholder={"5CD1234ABC\n5CD1234ABD\n…"} />
+            <ClayButton variant="secondary" size="sm" icon={<ClipboardPaste />} disabled={plan.assigned.length === 0} loading={busy} onClick={applyPaste}>
+              {plan.assigned.length > 0 ? `Save ${plan.assigned.length} serial${plan.assigned.length === 1 ? "" : "s"}` : "Save serials"}
+            </ClayButton>
+          </div>
+          {pasted.length > 0 ? (
+            <p className="mt-2 text-small text-ink-2" aria-live="polite">
+              {plan.assigned.length} matched
+              {plan.missing.length ? ` · ${plan.missing.length} device${plan.missing.length === 1 ? "" : "s"} still without a serial` : ""}
+              {plan.extra.length ? ` · ${plan.extra.length} extra will be ignored` : ""}
+              {plan.duplicates.length ? ` · scanned twice: ${plan.duplicates.join(", ")}` : ""}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       <div className="max-h-[560px] overflow-auto">
         <table className="data-table">
           <thead>

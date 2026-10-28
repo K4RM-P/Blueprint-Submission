@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, PackagePlus, QrCode } from "lucide-react";
+import { ArrowRight, Eye, PackagePlus, QrCode } from "lucide-react";
 import { ClayButton, ClayCard, EmptyState, FlatCard, StatGroup } from "@/components/clay";
 import { PageHeader } from "@/components/shell/page-header";
+import { DemoDataNote } from "@/components/shell/demo-data-note";
 import { BatchCard } from "@/components/partner/batch-card";
 import { PeoplePebbles } from "@/components/partner/people-pebbles";
 import { getPartnerContext, listBatches } from "@/lib/queries/partner";
 import { getPartnerImpact } from "@/lib/queries/impact";
-import { labels, recipientNoun, type DeviceStatus, type RecipientCategory } from "@/lib/domain";
+import { helpingLine, labels, recipientNoun, type DeviceStatus, type RecipientCategory } from "@/lib/domain";
 import { hasFullDashboard } from "@/lib/pricing";
 import { DevicesAreaChart } from "@/components/charts/area";
 import { lastMonths, monthlySeries } from "@/lib/impact";
+import { shortDate } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -19,14 +21,20 @@ const PASSPORT_ORDER: DeviceStatus[] = ["sold", "listed", "ready", "refurbishing
 
 export default async function PartnerDashboard() {
   const { supabase, org, profile } = await getPartnerContext();
-  const [batches, impact] = await Promise.all([listBatches(supabase, org.id), getPartnerImpact(supabase)]);
+  const [batches, impact, views] = await Promise.all([
+    listBatches(supabase, org.id),
+    getPartnerImpact(supabase),
+    // Aggregate count only (DP-06). Null until migration 20261027000001 is applied.
+    supabase.rpc("partner_passport_views").then((r) => (r.error ? null : Number(r.data ?? 0))),
+  ]);
   const t = impact.totals;
   const people = t.devicesReused;
   const recipients = (Object.entries(t.recipients) as [RecipientCategory, number][]).filter(([k]) => k !== "undisclosed").sort((a, b) => b[1] - a[1]);
   const full = hasFullDashboard(org.tier);
   const certificates = batches.filter((b) => b.certificates).length;
   // The partner's own laptops, each linking to its Device Passport.
-  const passports = [...impact.devices].sort((a, b) => PASSPORT_ORDER.indexOf(a.status) - PASSPORT_ORDER.indexOf(b.status)).slice(0, 6);
+  const laptops = [...impact.devices].sort((a, b) => PASSPORT_ORDER.indexOf(a.status) - PASSPORT_ORDER.indexOf(b.status));
+  const batchOf = new Map(batches.map((b) => [b.id, b]));
   const firstName = profile.display_first_name;
 
   return (
@@ -40,6 +48,7 @@ export default async function PartnerDashboard() {
           </ClayButton>
         }
       />
+      <DemoDataNote className="-mt-2 mb-5" />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
         <ClayCard tint="mint" size="lg" className="flex flex-col justify-between gap-6">
@@ -102,53 +111,58 @@ export default async function PartnerDashboard() {
           </ul>
         )}
       </section>
-      <section className="mt-10" aria-labelledby="passports">
+      <section className="mt-10" aria-labelledby="laptops">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 id="passports" className="text-title font-semibold">
-              Your laptops&apos; Device Passports
+            <h2 id="laptops" className="text-title font-semibold">
+              Your laptops
             </h2>
-            <p className="mt-1 text-small text-ink-2">Every laptop you donate gets its own public story. Open one to see its certified data wipe, its volunteer and who it helps.</p>
+            <p className="mt-1 text-small text-ink-2">Every laptop you donated, with its Device Passport: its certified data wipe, its volunteer and who it helps now. Your proof of impact.</p>
           </div>
-          {batches.length > 0 ? (
-            <ClayButton href="/partner/batches" variant="ghost" size="sm">
-              Every device, by batch
-            </ClayButton>
+          {views !== null && laptops.length > 0 ? (
+            <p className="inline-flex items-center gap-2 text-small text-ink-2">
+              <Eye className="size-4 text-loop-deep" aria-hidden />
+              Passports viewed <span className="font-semibold text-ink tnum">{views.toLocaleString("en-CA")}</span> time{views === 1 ? "" : "s"}
+            </p>
           ) : null}
         </div>
-        {passports.length === 0 ? (
+        {laptops.length === 0 ? (
           <FlatCard className="mt-4">
             <p className="text-ink-2">When Free Geek Toronto receives your first batch, each laptop gets a QR label and a Device Passport. They appear here.</p>
           </FlatCard>
         ) : (
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {passports.map((d) => (
-              <li key={d.id}>
-                <Link href={`/p/${d.passport_code}`} className="flat lift group flex h-full items-center gap-4 p-4" aria-label={`Open the Device Passport for ${d.make} ${d.model}, ${d.passport_code}`}>
-                  <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-[14px] bg-mint text-loop-deep">
-                    <QrCode className="size-5" strokeWidth={1.75} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-semibold">
-                      {d.make} {d.model}
+          <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {laptops.map((d) => {
+              const b = d.batch_id ? batchOf.get(d.batch_id) : undefined;
+              return (
+                <li key={d.id} className="min-w-0">
+                  <Link href={`/p/${d.passport_code}`} className="flat lift group flex h-full items-center gap-4 p-4">
+                    <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-[14px] bg-mint text-loop-deep">
+                      <QrCode className="size-5" strokeWidth={1.75} />
                     </span>
-                    <span className="block font-mono text-[0.8125rem] text-ink-2">{d.passport_code}</span>
-                    <span className="block text-[0.8125rem] text-ink-2">
-                      {d.status === "sold" ? (d.recipient_category && d.recipient_category !== "undisclosed" ? `In a new home · ${labels.recipient[d.recipient_category]}` : "In a new home") : labels.deviceStatus[d.status]}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-semibold">
+                        {d.make} {d.model}
+                      </span>
+                      <span className="block text-[0.8125rem] text-ink">{d.status === "sold" ? helpingLine(d.recipient_category) : labels.deviceStatus[d.status]}</span>
+                      <span className="block truncate font-mono text-[0.75rem] text-ink-2">
+                        {d.passport_code}
+                        {b ? ` · batch of ${shortDate(b.created_at)}` : ""}
+                      </span>
                     </span>
-                  </span>
-                  <ArrowRight aria-hidden className="size-4 shrink-0 text-loop-deep transition-transform group-hover:translate-x-0.5" />
-                </Link>
-              </li>
-            ))}
+                    <ArrowRight aria-hidden className="size-4 shrink-0 text-loop-deep transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
 
       {full ? (
-        <section aria-labelledby="esg" className="flat mt-10 p-6">
+        <section aria-labelledby="over-time" className="flat mt-10 p-6">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <h2 id="esg" className="font-semibold">
+            <h2 id="over-time" className="font-semibold">
               Devices over time
             </h2>
             <p className="text-small text-ink-2">
@@ -176,7 +190,7 @@ export default async function PartnerDashboard() {
 
       {!full ? (
         <p className="mt-10 border-t border-line pt-5 text-small text-ink-2">
-          Your batches, certificates and Device Passports are free on the Community tier. Want a live ESG dashboard, an annual report and a LinkedIn card for your board?{" "}
+          Your batches, certificates and Device Passports are free on the Community tier. Want an annual report and a community impact story you can share with your team and clients? Those are optional extras.{" "}
           <Link href="/partner/membership" className="font-semibold text-loop-deep underline-offset-4 hover:underline">
             Compare optional memberships
           </Link>

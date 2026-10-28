@@ -138,7 +138,7 @@ export function DashboardPreview({ totals }: { totals: PreviewTotals }) {
               <p className="font-display mt-1 text-[1.5rem] font-semibold leading-none tracking-[-0.04em] sm:text-[1.875rem]">Hi Maya.</p>
             </div>
             <div className="hidden items-center gap-2 sm:flex">
-              <span className="rounded-full border border-line bg-white px-3.5 py-2 text-[0.75rem] font-semibold text-ink-2">Export ESG report</span>
+              <span className="rounded-full border border-line bg-white px-3.5 py-2 text-[0.75rem] font-semibold text-ink-2">Share impact story</span>
               <span className="inline-flex items-center gap-1 rounded-full bg-ink px-3.5 py-2 text-[0.75rem] font-semibold text-white">
                 <Plus className="size-3.5" aria-hidden /> New batch
               </span>

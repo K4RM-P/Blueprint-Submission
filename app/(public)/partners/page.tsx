@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DemoDataNote } from "@/components/shell/demo-data-note";
 import { ClayButton, EmptyState } from "@/components/clay";
 import { PartnerTile } from "@/components/public/partner-tile";
 import { createClient } from "@/lib/supabase/server";
@@ -20,6 +21,7 @@ export default async function PartnersPage() {
         <div className="md:col-span-8">
           <p className="eyebrow">Partner Wall</p>
           <h1 className="font-display mt-3 text-[2.75rem] leading-[0.98] sm:text-display-l">The businesses passing their laptops on.</h1>
+          <DemoDataNote className="mt-4" />
         </div>
         <p className="text-ink-2 md:col-span-4">
           <span className="font-display block text-[3.5rem] leading-none text-ink tnum">{total}</span>

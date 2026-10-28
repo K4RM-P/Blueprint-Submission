@@ -25,7 +25,7 @@ export function CertificatePreview({ className }: { className?: string }) {
         <span className="font-mono text-[0.625rem] tracking-[0.06em] text-ink-3">GL-2026-0131</span>
       </div>
       <p className="mt-5 font-mono text-[0.5625rem] uppercase tracking-[0.16em] text-ink-3">Certificate of</p>
-      <p className="font-display text-[1.375rem] font-semibold leading-tight tracking-[-0.035em]">Data destruction</p>
+      <p className="font-display text-[1.375rem] font-semibold leading-tight tracking-[-0.035em]">Data sanitization</p>
       <p className="mt-1 text-[0.6875rem] text-ink-2">Issued to Northwind Legal · Oct 14, 2026</p>
       <dl className="mt-4 border-t border-line">
         {ROWS.map(([k, v]) => (

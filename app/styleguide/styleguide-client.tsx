@@ -502,7 +502,7 @@ function WrappedKit() {
           <div className="relative h-56 overflow-hidden rounded-[20px] [container-type:size]" style={{ background: "#F4F0E9" }}>
             <LiquidTransition dir={run === 0 ? 0 : 1} tint={tint} reduced={false}>
               <div className="story-slide !p-6" data-tint={tint}>
-                <p className="font-display text-[1.75rem] leading-none">Every byte erased.</p>
+                <p className="font-display text-[1.75rem] leading-none">Its data wipe, on the record.</p>
               </div>
             </LiquidTransition>
           </div>

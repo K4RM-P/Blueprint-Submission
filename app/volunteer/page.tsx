@@ -4,7 +4,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { ClayCard, EmptyState } from "@/components/clay";
 import { DeviceStatusChip } from "@/components/journey/status";
 import { PageHeader } from "@/components/shell/page-header";
-import { ClaimButton } from "@/components/volunteer/claim-button";
+import { ClaimButton, ClaimSetButton } from "@/components/volunteer/claim-button";
 import { requireRole } from "@/lib/auth";
 import { nextStep, stepsDone } from "@/lib/queries/volunteer";
 import { CHECKLIST_STEPS, labels } from "@/lib/domain";
@@ -29,14 +29,43 @@ export default async function VolunteerBench() {
   const waitingOnStaff = devices.filter((d) => nextStep(done.get(d.id)) === null);
   const waiting = queue?.length ?? 0;
   const top = queue?.[0];
+  // Identical devices on the bench can be worked as a set (one tap per step).
+  const sets = [...active.reduce((m, d) => m.set(`${d.make}\u0000${d.model}`, [...(m.get(`${d.make}\u0000${d.model}`) ?? []), d]), new Map<string, typeof active>()).values()].filter((g) => g.length >= 2);
 
   return (
     <>
       <PageHeader
         title="My Bench"
         description={`${profile.display_first_name ? `Hi ${profile.display_first_name}. ` : ""}${active.length ? `You have ${active.length} device${active.length === 1 ? "" : "s"} in progress.` : "Claim a laptop to start refurbishing it."} Every step you finish is stamped on the laptop's Device Passport.`}
-        actions={<div className="hidden lg:block"><ClaimButton waiting={waiting} /></div>}
+        actions={
+          <div className="hidden items-center gap-2 lg:flex">
+            <ClaimSetButton waiting={waiting} />
+            <ClaimButton waiting={waiting} />
+          </div>
+        }
       />
+      {sets.length > 0 ? (
+        <section aria-labelledby="sets" className="mb-8">
+          <h2 id="sets" className="sr-only">
+            Work as a set
+          </h2>
+          <ul className="flex flex-col gap-3">
+            {sets.map((g) => (
+              <li key={`${g[0].make}-${g[0].model}`}>
+                <ClayCard href={`/volunteer/set?make=${encodeURIComponent(g[0].make)}&model=${encodeURIComponent(g[0].model)}`} tint="mint" className="flex items-center justify-between gap-4" aria-label={`Work on all ${g.length} ${g[0].make} ${g[0].model} together`}>
+                  <span>
+                    <span className="block text-lg font-semibold">
+                      Work on all {g.length} {g[0].make} {g[0].model} together
+                    </span>
+                    <span className="block text-small text-ink-2">Same model, same steps: one tap per step. Each data wipe still gets its own reference.</span>
+                  </span>
+                  <ArrowRight className="size-5 shrink-0" aria-hidden />
+                </ClayCard>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       {active.length === 0 ? (
         <EmptyState title="Your bench is clear." tone="butter" art="baton">
           {top ? (
@@ -107,6 +136,9 @@ export default async function VolunteerBench() {
         </section>
       ) : null}
       <div aria-hidden className="h-20 lg:hidden" />
+      <div className="mb-4 flex justify-center lg:hidden">
+        <ClaimSetButton waiting={waiting} />
+      </div>
       <div className="lg:hidden">
         <ClaimButton waiting={waiting} floating />
       </div>

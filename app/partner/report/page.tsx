@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ArrowRight, FileDown } from "lucide-react";
 import { ClayButton, ClayCard, StatPebble } from "@/components/clay";
 import { PageHeader } from "@/components/shell/page-header";
+import { DemoDataNote } from "@/components/shell/demo-data-note";
 import { ShareCard } from "@/components/partner/share-card";
 import { getPartnerContext } from "@/lib/queries/partner";
 import { getAnnualImpact } from "@/lib/queries/report";
@@ -50,6 +51,7 @@ export default async function PartnerReportPage() {
           </ClayButton>
         }
       />
+      <DemoDataNote className="-mt-2 mb-5" />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatPebble tint="mint" label="Devices back in use" value={t.devicesReused} />

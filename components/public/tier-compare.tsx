@@ -8,7 +8,7 @@ import { labels, type PartnerTier } from "@/lib/domain";
 
 const PITCH: Record<PartnerTier, string> = {
   community: "Everything the core needs: certified data wipe, a certificate for every batch, a Device Passport for every laptop and your impact summary.",
-  impact: "Optional: a live ESG dashboard, annual report and LinkedIn card for your team, clients and board.",
+  impact: "Optional: an annual report and a community impact story you can share with your team and clients.",
   champion: "Optional: everything in Impact, plus a team day at the bench and laptops sponsored for families.",
 };
 

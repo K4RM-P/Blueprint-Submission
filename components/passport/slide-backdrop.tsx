@@ -48,7 +48,7 @@ function shapes(k: SlideKey) {
       return (
         <>
           <span className="story-scan" />
-          <Ticker text="0 0 0 0 0 0 0 0 · ERASED · VERIFIED · " className="story-ticker-bottom" />
+          <Ticker text="0 0 0 0 0 0 0 0 · WIPED · VERIFIED · " className="story-ticker-bottom" />
         </>
       );
     case "bench":

@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { Seal } from "@/components/clay/seal";
 import { ClayLaptop } from "@/components/illustrations/clay-laptop";
 import { PassportBooklet } from "@/components/journey/passport-booklet";
-import { storyDate, type BenchStep, type PassportStory, type Persona, type SlideKey } from "@/lib/passport-story";
+import { coverLine, storyDate, type BenchStep, type PassportStory, type Persona, type SlideKey } from "@/lib/passport-story";
 import { cn } from "@/lib/utils";
 import { BatonSprite } from "./baton-sprite";
 import { OdometerDigits } from "./odometer-digits";
@@ -24,6 +24,8 @@ export interface SlideProps {
   /** Finale actions (share, download…) rendered by the player. */
   finale?: ReactNode;
   onBegin?: () => void;
+  /** FGT's existing online store (staff setting); shown on ready/listed devices. */
+  storeUrl?: string | null;
 }
 
 export function SlideContent({ k, ...props }: SlideProps & { k: SlideKey }) {
@@ -81,7 +83,7 @@ function Cover({ story, onBegin }: SlideProps) {
           </div>
         </PassportBooklet>
       </Hero>
-      <KineticLine as="h1" text="This laptop has a *story.*" delay={reduced ? 0 : 1.5} className="mt-[3cqh]" />
+      <KineticLine as="h1" text={coverLine(story)} size={story.owner ? "sm" : "lg"} delay={reduced ? 0 : 1.5} className="mt-[3cqh]" />
       <motion.button
         type="button"
         onClick={onBegin}
@@ -180,12 +182,12 @@ function Erased({ story }: SlideProps) {
   return (
     <>
       <Eyebrow>Certified data wipe</Eyebrow>
-      <KineticLine text="Every byte *erased.*" className="mt-3" />
+      <KineticLine text="Its data wipe, *on the record.*" className="mt-3" />
       <Hero>
         <Seal rim="DATA WIPED · VERIFIED · TORONTO · " icon={<ShieldCheck />} size={200} tilt={-8} />
       </Hero>
       <MonoChip className="self-start">VERIFIED · {storyDate(story.dates.wipeVerified).toUpperCase()}</MonoChip>
-      <Sub delay={0.9}>The drive was wiped, then verified by Free Geek Toronto staff before anyone else touched it. Nothing from its first job came along{story.donor.household ? "" : ", and the business gets a certificate that lists it"}.</Sub>
+      <Sub delay={0.9}>Its drive went through Free Geek Toronto&apos;s data sanitization process, and staff checked the sanitization report before anyone else touched it{story.donor.household ? "" : ". The business gets a certificate documenting it"}.</Sub>
     </>
   );
 }
@@ -388,7 +390,7 @@ function Why() {
 }
 
 /* 11 · Your turn: the baton lands with the viewer. */
-function YourTurn({ story }: SlideProps) {
+function YourTurn({ story, storeUrl }: SlideProps) {
   const sold = story.stage === "sold";
   return (
     <>
@@ -398,6 +400,11 @@ function YourTurn({ story }: SlideProps) {
         <Landing />
       </Hero>
       <Sub delay={1.4}>{sold ? "When you're done with it, bring it back to Free Geek Toronto and its relay keeps going." : "Find it, and computers like it, at Free Geek Toronto."}</Sub>
+      {!sold && storeUrl ? (
+        <a href={storeUrl} target="_blank" rel="noopener noreferrer" data-no-tap className="mt-3 inline-flex h-11 items-center self-start rounded-full bg-ink px-5 text-[0.9375rem] font-semibold text-white">
+          Find laptops like this at Free Geek Toronto
+        </a>
+      ) : null}
     </>
   );
 }
