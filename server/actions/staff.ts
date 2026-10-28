@@ -80,10 +80,16 @@ export async function scheduleBatch(input: unknown): Promise<ActionResult<{ warn
 }
 
 /** OPS-04: mark received and bulk-add N devices per line item, each with a unique passport code. */
+const receiveInput = z.object({
+  id: uuid,
+  /** What actually arrived per line, when fewer than declared. Omitted lines arrived in full. */
+  received: z.array(z.object({ lineId: uuid, count: z.number().int().min(0).max(500) })).max(100).optional(),
+});
+
 export async function receiveBatch(input: unknown): Promise<ActionResult<{ added: number }>> {
-  return runAction(z.object({ id: uuid }), input, async ({ id }) => {
+  return runAction(receiveInput, input, async ({ id, received }) => {
     const s = await staff();
-    const { data: b } = await s.supabase.from("donation_batches").select("status, batch_line_items(*)").eq("id", id).single();
+    const { data: b } = await s.supabase.from("donation_batches").select("status, notes, batch_line_items(*)").eq("id", id).single();
     if (!b) return fail("Batch not found.");
     if (b.status === "received") {
       // Recovery: a receive whose device insert failed part-way can be finished (adding is a top-up, never a duplicate).
@@ -95,11 +101,27 @@ export async function receiveBatch(input: unknown): Promise<ActionResult<{ added
       const { error } = await s.supabase.from("donation_batches").update({ status: "scheduled" }).eq("id", id).eq("status", "approved");
       if (error) throw error;
     } else if (b.status !== "scheduled") return fail("Only approved or scheduled batches can be received.");
+    const counts = new Map((received ?? []).map((r) => [r.lineId, r.count]));
+    const short = b.batch_line_items.filter((l) => counts.has(l.id) && counts.get(l.id)! < l.quantity);
+    if (b.batch_line_items.reduce((n, l) => n + Math.min(l.quantity, counts.get(l.id) ?? l.quantity), 0) === 0) return fail("At least one device has to arrive. Decline the batch instead if none did.");
     // Conditional on the status, so two people pressing Receive at once can't both add devices.
     const { data: won, error } = await s.supabase.from("donation_batches").update({ status: "received" }).eq("id", id).eq("status", "scheduled").select("id");
     if (error) throw error;
     if (!won?.length) return fail("Someone else just received this batch.");
-    const added = await addDevicesForLines(s.supabase, id, b.batch_line_items);
+    let lines = b.batch_line_items;
+    if (short.length > 0) {
+      // The batch records what arrived (score, certificate, impact); the declared count stays in the notes.
+      for (const l of short) {
+        const got = counts.get(l.id)!;
+        const { error: e } = got > 0 ? await s.supabase.from("batch_line_items").update({ quantity: got }).eq("id", l.id) : await s.supabase.from("batch_line_items").delete().eq("id", l.id);
+        if (e) throw e;
+      }
+      const record = `Intake: ${short.map((l) => `${l.quantity} × ${l.make} ${l.model} declared, ${counts.get(l.id)} arrived`).join("; ")}.`;
+      const { error: e } = await s.supabase.from("donation_batches").update({ notes: b.notes ? `${b.notes}\n${record}` : record }).eq("id", id);
+      if (e) throw e;
+      lines = lines.flatMap((l) => (counts.has(l.id) && counts.get(l.id)! < l.quantity ? (counts.get(l.id)! > 0 ? [{ ...l, quantity: counts.get(l.id)! }] : []) : [l]));
+    }
+    const added = await addDevicesForLines(s.supabase, id, lines);
     refresh("/staff");
     return ok({ added }, `Received. ${added} devices added with passport codes.`);
   });

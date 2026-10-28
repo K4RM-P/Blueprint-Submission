@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CalendarClock, Check, PackageCheck, X } from "lucide-react";
 import { toast } from "sonner";
-import { ClayButton, Field, Textarea } from "@/components/clay";
+import { ClayButton, Field, Input, Textarea } from "@/components/clay";
 import { CapacityGlasses } from "@/components/liquid";
 import { calendarForBatch } from "@/lib/capacity";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -20,6 +20,7 @@ export function BatchOps({
   preferredWeek,
   scheduledWeek,
   quantity,
+  lines = [],
   calendar: booked,
 }: {
   id: string;
@@ -27,6 +28,8 @@ export function BatchOps({
   preferredWeek: string;
   scheduledWeek?: string | null;
   quantity: number;
+  /** Declared line items, for recording what actually arrived. */
+  lines?: { id: string; label: string; quantity: number }[];
   calendar: CapacityWeek[];
 }) {
   // Weeks as this batch sees them, the same rule partners see (lib/capacity calendarForBatch): its own
@@ -38,7 +41,14 @@ export function BatchOps({
   );
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
-  const [dialog, setDialog] = useState<"decline" | "schedule" | null>(null);
+  const [dialog, setDialog] = useState<"decline" | "schedule" | "receive" | null>(null);
+  const [arrived, setArrived] = useState<Record<string, string>>({});
+  const arrivedCount = (l: { id: string; quantity: number }) => {
+    const n = Number(arrived[l.id] ?? l.quantity);
+    return Number.isInteger(n) && n >= 0 && n <= l.quantity ? n : null;
+  };
+  const arrivedValid = lines.every((l) => arrivedCount(l) !== null);
+  const arrivedTotal = lines.reduce((n, l) => n + (arrivedCount(l) ?? 0), 0);
   const [reason, setReason] = useState("");
   const [week, setWeek] = useState<string>(calendar.some((w) => w.week === preferredWeek) ? preferredWeek : (calendar[0]?.week ?? ""));
   const [warning, setWarning] = useState<{ text: string; suggestion: string | null } | null>(null);
@@ -97,6 +107,11 @@ export function BatchOps({
           Receive &amp; add {quantity} devices
         </ClayButton>
       ) : null}
+      {(status === "approved" || status === "scheduled") && lines.length > 0 ? (
+        <ClayButton variant="ghost" onClick={() => setDialog("receive")}>
+          Fewer arrived?
+        </ClayButton>
+      ) : null}
       {status === "scheduled" ? (
         <ClayButton variant="ghost" onClick={() => setDialog("schedule")}>
           Reschedule
@@ -121,6 +136,47 @@ export function BatchOps({
               }}
             >
               Decline batch
+            </ClayButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={dialog === "receive"} onOpenChange={(o) => setDialog(o ? "receive" : null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Record what arrived</DialogTitle>
+            <DialogDescription>Only the devices that arrived get passports. The declared numbers stay in the batch notes, and the partner sees both.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3">
+            {lines.map((l) => (
+              <Field key={l.id} label={l.label} hint={`${l.quantity} declared`} error={arrivedCount(l) === null ? `A whole number from 0 to ${l.quantity}.` : undefined}>
+                {({ id: fid, describedBy }) => (
+                  <Input
+                    id={fid}
+                    aria-describedby={describedBy}
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    max={l.quantity}
+                    value={arrived[l.id] ?? String(l.quantity)}
+                    onChange={(e) => setArrived((a) => ({ ...a, [l.id]: e.target.value }))}
+                  />
+                )}
+              </Field>
+            ))}
+          </div>
+          <DialogFooter>
+            <ClayButton
+              variant="primary"
+              icon={<PackageCheck />}
+              loading={busy === "receive"}
+              disabled={!arrivedValid || arrivedTotal === 0}
+              onClick={async () => {
+                const received = lines.map((l) => ({ lineId: l.id, count: arrivedCount(l) ?? l.quantity }));
+                if (await run("receive", () => receiveBatch({ id, received }))) setDialog(null);
+              }}
+            >
+              Receive &amp; add {arrivedTotal} devices
             </ClayButton>
           </DialogFooter>
         </DialogContent>

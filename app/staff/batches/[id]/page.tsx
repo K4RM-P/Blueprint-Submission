@@ -60,7 +60,7 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
       />
       <ClayCard material="glass" className="flex flex-col gap-6">
         <JourneyTimeline orientation="horizontal" steps={batchSteps(batch).map((s) => ({ ...s, icon: null }))} label="Batch status" />
-        <BatchOps id={batch.id} status={batch.status} preferredWeek={batch.preferred_week} scheduledWeek={batch.scheduled_week} quantity={qty} calendar={calendar} />
+        <BatchOps id={batch.id} status={batch.status} preferredWeek={batch.preferred_week} scheduledWeek={batch.scheduled_week} quantity={qty} lines={batch.batch_line_items.map((l) => ({ id: l.id, label: `${l.make} ${l.model}`, quantity: l.quantity }))} calendar={calendar} />
         {batch.schedule_override_note ? <p className="text-small text-ink-2">Capacity override note: {batch.schedule_override_note}</p> : null}
         {batch.decline_reason ? <p className="text-small text-ink-2">Decline reason: {batch.decline_reason}</p> : null}
       </ClayCard>

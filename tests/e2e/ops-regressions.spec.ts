@@ -78,3 +78,17 @@ test("VW-02 — a volunteer flags a failed hardware test and staff see it on the
   await expect(staff.getByRole("heading", { name: "Flagged by volunteers" })).toBeVisible();
   await expect(staff.getByText("Screen stays black on power-up")).toBeVisible();
 });
+
+test("OPS-04 — when fewer laptops arrive than declared, only those get passports and the declared count is kept", async ({ page }) => {
+  const w = watchErrors(page);
+  await signInAs(page, "staff");
+  await page.goto("/staff/batches?status=approved");
+  await page.getByRole("link", { name: "Annex Architecture Studio" }).first().click();
+  await page.getByRole("button", { name: "Fewer arrived?" }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("HP ZBook 15 G5").fill("13");
+  await dialog.getByRole("button", { name: "Receive & add 13 devices" }).click();
+  await expect(page.getByText("Received. 13 devices added with passport codes.")).toBeVisible();
+  await expect(page.getByRole("main")).toContainText("15 × HP ZBook 15 G5 declared, 13 arrived");
+  w.assertClean();
+});
