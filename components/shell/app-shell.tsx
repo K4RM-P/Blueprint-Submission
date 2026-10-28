@@ -117,6 +117,8 @@ export function AppShell({ role, userName, orgName, children }: AppShellProps) {
         </header>
         <main id="main" className={cn("mx-auto w-full flex-1 px-4 pb-32 pt-6 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10", role === "staff" ? "max-w-[1320px]" : "max-w-[1200px]")}>
           {children}
+          {/* AUTH-06: the role apps carry the same quiet demo note as the public footer. */}
+          {process.env.NEXT_PUBLIC_DEMO_MODE === "true" ? <p className="no-print mt-16 text-center text-[0.8125rem] text-ink-3">Demo environment: fictional data.</p> : null}
         </main>
       </div>
 

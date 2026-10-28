@@ -7,7 +7,7 @@ import { BatchCard } from "@/components/partner/batch-card";
 import { PeoplePebbles } from "@/components/partner/people-pebbles";
 import { getPartnerContext, listBatches } from "@/lib/queries/partner";
 import { getPartnerImpact } from "@/lib/queries/impact";
-import { labels, recipientNoun, type DeviceStatus, type RecipientCategory } from "@/lib/domain";
+import { labels, recipientNoun, type DeviceStatus, type RecipientCategory, plural } from "@/lib/domain";
 import { hasFullDashboard } from "@/lib/pricing";
 import { DevicesAreaChart } from "@/components/charts/lazy";
 import { lastMonths, runningTotals } from "@/lib/impact";
@@ -35,7 +35,7 @@ export default async function PartnerDashboard() {
     <>
       <PageHeader
         title="Your donations"
-        description={`${firstName ? `Hi ${firstName}. ` : ""}${t.devicesReceived > 0 ? `Here is where ${org.name}'s ${t.devicesReceived} devices are now.` : "Send your first batch and follow it here."}`}
+        description={`${firstName ? `Hi ${firstName}. ` : ""}${t.devicesReceived > 0 ? `Here is where ${org.name}'s ${plural(t.devicesReceived, "device")} ${t.devicesReceived === 1 ? "is" : "are"} now.` : batches.length > 0 ? "Follow your batch here as it moves through Free Geek Toronto." : "Send your first batch and follow it here."}`}
         actions={
           <ClayButton href="/partner/batches/new" variant="primary" icon={<PackagePlus />}>
             Donate a batch

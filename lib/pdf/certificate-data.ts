@@ -37,7 +37,8 @@ export async function buildCertificateData(
       serial: d.serial_number,
       method: d.wipe_method,
       verifiedAt: d.wipe_verified_at,
-      outcome: d.status === "recycled" ? "Recycled" : d.status === "sold" ? "Reused" : "In refurbishment",
+      // Every device on a certificate is wiped and verified (or recycled): the rest are headed for reuse (CI-01).
+      outcome: d.status === "recycled" ? "Recycled" : d.status === "sold" ? "Reused" : "For reuse",
     })),
   };
 }

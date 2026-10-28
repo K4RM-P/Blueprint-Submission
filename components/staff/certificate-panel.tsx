@@ -2,6 +2,7 @@ import { ShieldCheck } from "lucide-react";
 import { ClayButton, ClayCard, IconTile } from "@/components/clay";
 import { longDate } from "@/lib/dates";
 import { IssueCertificateButton } from "./issue-certificate-button";
+import { plural } from "@/lib/domain";
 
 /** OPS-08: issue only when every device is verified-or-later or recycled. */
 export function CertificatePanel({
@@ -30,7 +31,7 @@ export function CertificatePanel({
           <div>
             <p className="font-mono text-lg">{certificate.certificate_number}</p>
             <p className="text-small text-ink-2">
-              Issued {longDate(certificate.issued_at)} · {certificate.device_count} devices
+              Issued {longDate(certificate.issued_at)} · {plural(certificate.device_count, "device")}
             </p>
           </div>
           <ClayButton href={`/api/certificates/${certificate.certificate_number}`} variant="secondary" size="sm" prefetch={false}>

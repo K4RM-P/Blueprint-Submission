@@ -2,6 +2,7 @@ import { Download, ShieldCheck } from "lucide-react";
 import { ClayButton, ClayCard, IconTile } from "@/components/clay";
 import { Seal } from "@/components/clay/seal";
 import { longDate } from "@/lib/dates";
+import { plural } from "@/lib/domain";
 
 interface Cert {
   certificate_number: string;
@@ -22,7 +23,7 @@ export function CertificateCard({ cert, verifiedCount, total }: { cert: Cert | n
           <p className="mt-1 text-ink-2">
             {total === 0
               ? "Your certificate is issued once your devices arrive and every drive is wiped and verified."
-              : `${verifiedCount} of ${total} devices verified so far. Your numbered certificate appears here when every drive is wiped and verified.`}
+              : `${verifiedCount} of ${plural(total, "device")} verified so far. Your numbered certificate appears here when every drive is wiped and verified.`}
           </p>
         </div>
       </ClayCard>
@@ -39,7 +40,7 @@ export function CertificateCard({ cert, verifiedCount, total }: { cert: Cert | n
       </div>
       <div>
         <p className="font-mono text-xl text-ink">{cert.certificate_number}</p>
-        <p className="mt-1 text-ink-2">Covers {cert.device_count} devices. Anyone can confirm it at the public verification page.</p>
+        <p className="mt-1 text-ink-2">Covers {plural(cert.device_count, "device")}. Anyone can confirm it at the public verification page.</p>
       </div>
       <div className="flex flex-wrap gap-3">
         <ClayButton href={`/api/certificates/${cert.certificate_number}`} variant="secondary" size="sm" icon={<Download />} prefetch={false}>

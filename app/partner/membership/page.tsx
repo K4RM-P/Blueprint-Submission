@@ -7,7 +7,7 @@ import { getPartnerContext } from "@/lib/queries/partner";
 import { longDate } from "@/lib/dates";
 import { formatCents, CHAMPION_SPONSORED_LAPTOPS } from "@/lib/ledger";
 import { daysRemaining, isMembershipActive, purchasableTiers, type PaidTier } from "@/lib/membership";
-import { TIER_BENEFITS, TIER_PRICE_CENTS, tierRank } from "@/lib/pricing";
+import { TIER_BENEFITS, TIER_PRICE_CENTS } from "@/lib/pricing";
 import { labels, type PartnerTier } from "@/lib/domain";
 import { cn } from "@/lib/utils";
 
@@ -26,8 +26,7 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
   const active = isMembershipActive(tier, expires);
   const days = daysRemaining(expires);
   const options = purchasableTiers(tier);
-  // One primary per view: the next tier up; renewing the current tier is secondary.
-  const upgradeTo = options.find((t) => tierRank(t) > tierRank(tier));
+  // Paid tiers are optional (the free tier is the program), so no payment button is the page's primary.
   const justPaid = paid === "impact" || paid === "champion" ? (paid as PaidTier) : null;
 
   return (
@@ -72,7 +71,7 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
           </ul>
           {options.includes(tier as PaidTier) ? (
             <div className="mt-auto pt-2">
-              <UpgradeButton tier={tier as PaidTier} label={active ? "Renew for another year" : "Renew membership"} variant={upgradeTo ? "secondary" : "primary"} />
+              <UpgradeButton tier={tier as PaidTier} label={active ? "Renew for another year" : "Renew membership"} variant="secondary" />
             </div>
           ) : null}
         </ClayCard>
@@ -101,7 +100,7 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
                       </li>
                     ))}
                 </ul>
-                <UpgradeButton tier={t} label={`Upgrade to ${labels.tier[t].replace(" Partner", "")}`} variant={t === upgradeTo ? "primary" : "secondary"} />
+                <UpgradeButton tier={t} label={`Upgrade to ${labels.tier[t].replace(" Partner", "")}`} variant="secondary" />
               </section>
             ))}
           {options.length === 1 && options[0] === tier ? (

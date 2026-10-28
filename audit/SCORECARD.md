@@ -334,3 +334,56 @@ Severity: **C** Critical · **H** High · **M** Medium · **L** Low. Status: ✅
 | 37 | L | D5 | Outline numerals over copy | ✅ opacity lowered |
 
 **C5 after iteration-4 fixes** (median of 5, simulated mobile on this shared container): landing 71 and 74 in two runs (iteration-4 landing changes are copy only, so this is run-to-run noise against iteration 3's 79), Become a Partner 89. **Tests:** 63/63 e2e, 124/124 unit.
+
+## Iteration 5 (audit of the iteration-4 build plus "Fewer arrived?", `07a855f`)
+
+**Evidence collected:** `audit/iter-5/` screenshots. A fifth independent reviewer (fresh agent, `@geekloop.test` account "Judge Five Consulting") walked the whole loop in the real UI including "Fewer arrived?" (20 declared, 18 received), a certificate and a subsidised sale; tried invalid inputs, cross-role and cross-tenant routes, read-only RLS probes and two concurrency races; checked about 70 page × width combinations (no overflow, no console errors); ran Lighthouse (3 runs per page). Self scores are for the build after the fixes below.
+
+| Item | Self | Reviewer | Final | Evidence (short) |
+|---|---|---|---|---|
+| A1 Problem identification | 8 | 8 | **8** | Sourced problem block under the hero; problem line under the hero is small |
+| A2 Solution clarity | 7 | 7 | **7** | Landing ~10,000 px, 12 sections |
+| A3 Feasibility | 8 | 8 | **8** | "Fewer arrived?"; capacity-aware weeks; cost table |
+| A4 Presentation | 8 | 8 | **8** | DEMO_SCRIPT matches the UI |
+| A5 Technical execution | 8 | 8 | **8** | Wizard click, score drift fixed; sale+subsidy not atomic (🔒 RPC) |
+| B1 One change | 9 | 8 | **8** | `/about` and membership primaries fixed after review |
+| B2 Target-user fit | 8 | 8 | **8** | Data-wipe worry answered first |
+| B3 Mission | 9 | 9 | **9** | Prices never set by Relay; subsidies server-enforced |
+| B4 Differentiation | 8 | 8 | **8** | Comparison only on `/become-a-partner` |
+| B5 Measurable value | 8 | 7 | **7** | Scores now agree; views labelled approximate; CO₂e prominence |
+| B6 Honesty | 8 | 8 | **8** | Certificate outcome "For reuse" instead of "In refurbishment" |
+| B7 FGT-specificity | 9 | 9 | **9** | No invented FGT facts found |
+| C1 Functional completeness | 8 | 8 | **8** | Demo note in role apps (AUTH-06) |
+| C2 Robustness | 7 | 7 | **7** | Inline sale-date error; atomic sale needs a DB function |
+| C3 Security | 8 | 8 | **8** | Anonymous and cross-tenant reads blocked; volunteer can read serials of own devices (documented) |
+| C4 Tests | 8 | 8 | **8** | New e2e: fewer arrived, wizard checkbox, demo note; unit: `plural` |
+| C5 Performance | 5 | 5 | **5** | Landing 78, Become a Partner 88, story 74 (medians of 5) |
+| C6 Code & docs | 8 | 8 | **8** | ADMIN_GUIDE serial wording corrected |
+| D1 5-second test | 8 | 8 | **8** | Staff overview dense |
+| D2 Hierarchy | 7 | 7 | **7** | Landing long; staff overview dense |
+| D3 Consistency | 9 | 9 | **9** | Check bullets replace document icons |
+| D4 Not vibe-coded / §12 | 8 | 8 | **8** | No bans found |
+| D5 Motion & craft | 8 | 8 | **8** | OG word spacing |
+| D6 Copy | 8 | 7 | **7** | Plurals and greeting fixed after review |
+| D7 Friction | 8 | 8 | **8** | 9 clicks, 8 fields, 1 checkbox to a submitted batch |
+| D8 Responsive | 9 | 9 | **9** | Zero overflow at 390–1920 |
+
+### Issues found in iteration 5 and what happened to them
+
+| # | Sev | Item | Issue | Status |
+|---|---|---|---|---|
+| 1 | M | A5/C2/D7 | Wizard swallows the first Continue after ticking the box itself | ✅ the box re-validates on change; e2e ticks the checkbox (not its label) |
+| 2 | M | B5/C1 | Partner and staff scores disagree after "Fewer arrived?" | ✅ partner page uses `scoreFromLines`; receive stores the recomputed score |
+| 3 | M | C5 | Lighthouse < 90 | ⏳ the hero already animates transform only (no fade); LCP render delay not resolved |
+| 4 | L–M | C2/D6 | Record sale silently disabled for a future date | ✅ inline "Choose today or an earlier date." |
+| 5 | L–M | C2/C3 | Sale and subsidy not atomic | 🔒 needs a Postgres function (migration push); the fund's no-negative guard stays in the DB |
+| 6 | L | D6 | "1 devices"; stale greeting | ✅ `plural()` (unit test) on every count; greeting follows batches |
+| 7 | L | B6 | Certificate outcome "In refurbishment" for Ready devices | ✅ "For reuse" (wiped and verified, heading for reuse) |
+| 8 | L | B1/B3 | Tier-3 / paid primaries | ✅ `/about` primary is "Become a Reuse Partner"; membership has no payment primary |
+| 9 | L | C3/C6 | ADMIN_GUIDE overstates serial privacy | ✅ wording corrected. 🔒 column-level restriction needs a migration |
+| 10 | L | C3 | Seeded handle contains a surname | ✅ `/v/aisha`, `/v/jordan`; hint "not your surname" |
+| 11 | L | D2 | Community features listed three times | ⏳ hero list kept as the headline offer (bullets now checks) |
+| 12 | L | C1 | No demo note in role apps; cross-tenant 200 | ✅ "Demo environment: fictional data." in role apps (e2e). ⛔ `notFound()` already runs; the 200 comes from the streamed `loading.tsx` boundary, which the loading-state rule requires |
+| 13 | L | C3 | Sign-up reveals existing emails | ⛔ Supabase sign-up itself reports it; vague wording would confuse a real business |
+
+**C5 after iteration-5 fixes** (median of 5): landing 78, Become a Partner 88, passport story 74. **Tests:** 66/66 e2e, 125/125 unit.

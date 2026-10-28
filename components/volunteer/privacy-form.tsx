@@ -38,7 +38,7 @@ export function PrivacyForm({ initial }: { initial: { displayFirstName: string; 
         description="A page with your first name, badges and devices refurbished — for your résumé. Off by default."
       />
       {v.publicProfileOptIn ? (
-        <Field label="Profile link" hint={`Your page will be at /v/${v.handle || "your-name"}`} error={errors.handle}>
+        <Field label="Profile link" hint={`Your page will be at /v/${v.handle || "your-first-name"}. Use your first name or a nickname, not your surname.`} error={errors.handle}>
           {({ id, describedBy, invalid }) => <Input id={id} value={v.handle} onChange={(e) => setV({ ...v, handle: e.target.value.toLowerCase() })} aria-describedby={describedBy} aria-invalid={invalid} />}
         </Field>
       ) : null}

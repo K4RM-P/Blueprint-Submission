@@ -11,7 +11,8 @@ import { batchSteps } from "@/lib/batch-timeline";
 import { batchTitle, getBatch, getPartnerContext } from "@/lib/queries/partner";
 import { longDate, shortDate } from "@/lib/dates";
 import { labels } from "@/lib/domain";
-import { scoreLabel } from "@/lib/batch-score";
+import { scoreFromLines, scoreLabel } from "@/lib/batch-score";
+import { getSettings } from "@/lib/queries/common";
 import { VERIFIED_OR_LATER } from "@/lib/status-machine";
 
 export const metadata: Metadata = { title: "Batch" };
@@ -19,7 +20,9 @@ export const metadata: Metadata = { title: "Batch" };
 export default async function BatchDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase } = await getPartnerContext();
-  const { batch, devices } = await getBatch(supabase, id);
+  const [{ batch, devices }, settings] = await Promise.all([getBatch(supabase, id), getSettings(supabase)]);
+  // The same formula staff see, from the line items as they stand (e.g. after "Fewer arrived?").
+  const score = scoreFromLines(batch.batch_line_items, settings);
   const cert = batch.certificates ?? null;
   const reused = devices.filter((d) => d.status === "sold").length;
   const recycled = devices.filter((d) => d.status === "recycled").length;
@@ -143,7 +146,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
               ))}
             </ul>
             <p className="mt-4 text-small text-ink-2">
-              Batch Value Score <span className="font-semibold text-ink tnum">{batch.value_score}</span> · {scoreLabel(batch.value_score)} ·{" "}
+              Batch Value Score <span className="font-semibold text-ink tnum">{score}</span> · {scoreLabel(score)} ·{" "}
               {batch.logistics === "pickup" ? "Pickup" : "Drop-off"}
             </p>
             {batch.notes ? <p className="mt-3 text-small text-ink-2">Notes: {batch.notes}</p> : null}

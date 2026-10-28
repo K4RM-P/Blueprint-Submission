@@ -99,6 +99,11 @@ export const labels = {
   step: { hardware_test: "Hardware test", wipe_performed: "Data wipe performed", os_installed: "OS installed", final_qa: "Final QA" } satisfies Record<ChecklistStep, string>,
 };
 
+/** "1 device", "18 devices": a count with its noun, singular when the count is 1. */
+export function plural(n: number, one: string, many = `${one}s`): string {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
 /** "1 student", "6 small businesses", "5 low-income households" — lower-case, correctly pluralised. */
 export function recipientPhrase(category: RecipientCategory, n: number): string {
   return `${n} ${recipientNoun(category, n)}`;

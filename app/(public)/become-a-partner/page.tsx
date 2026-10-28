@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CalendarCheck, ClipboardList, FileCheck2, HardDrive, HeartHandshake, ShieldCheck } from "lucide-react";
+import { CalendarCheck, Check, ClipboardList, FileCheck2, HardDrive, HeartHandshake, ShieldCheck } from "lucide-react";
 import { ClayButton, ClayCard, IconTile } from "@/components/clay";
 import { Faq } from "@/components/public/faq";
 import { TierCompare } from "@/components/public/tier-compare";
@@ -58,7 +58,7 @@ export default function BecomeAPartnerPage() {
           <ul className="mt-4 flex flex-col gap-2 text-ink">
             {["Certified data wipe for every drive", "A numbered certificate for every batch", "Your impact dashboard", "Your name on the Partner Wall, if you opt in"].map((t) => (
               <li key={t} className="flex gap-2.5">
-                <FileCheck2 className="mt-0.5 size-5 shrink-0 text-loop-deep" aria-hidden />
+                <Check className="mt-0.5 size-5 shrink-0 text-loop-deep" aria-hidden />
                 {t}
               </li>
             ))}

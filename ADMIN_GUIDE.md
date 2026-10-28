@@ -37,7 +37,7 @@ The partner sees every change on their dashboard straight away.
 ## 2. Drop-off day: receive the batch
 
 1. Open the batch and press **Receive & add N devices**. Relay creates one device record per laptop, each with its own **Device Passport** code (`FGT-XXXXXXXX`).
-2. Optional: type serial numbers into the grid. Serials are private; only staff and the owning partner ever see them, and they appear on the partner's certificate.
+2. Optional: type serial numbers into the grid. Serials are private: they never appear on a public page, the app shows them only to staff and the owning partner, and they appear on the partner's certificate. (A volunteer's database access covers the devices assigned to them, serials included.)
 3. On the batch page, under the serials, click **Print QR labels for these N** and print the sheet (Avery 5160, 30 labels per page). Stick one label on each laptop. (**QR labels** in the menu prints the 30 most recently received devices; on **Devices** you can also select rows and choose **Labels**.)
 
 **Household donations** (not from a partner): **Devices** → **Household intake**. They follow the same steps, without a partner or certificate.
@@ -122,7 +122,7 @@ The device's Device Passport now tells its story to the buyer, and the partner's
 | Claim a device, record test, wipe, OS install, QA | | ✓ (own devices) | |
 | **Verify a wipe** | | | ✓ only |
 | Issue a certificate, set a price, record a sale | | | ✓ |
-| See serial numbers | Own batches | | ✓ |
+| See serial numbers | Own batches | Devices assigned to them (the app doesn't show it; the database allows it) | ✓ |
 | Change settings, invite people | | | ✓ |
 
 These rules are enforced in the database (row-level security), so they hold even if someone bypasses the screens.

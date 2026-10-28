@@ -56,7 +56,7 @@ export function SerialGrid({ devices, labelsHref }: { devices: Row[]; labelsHref
         <div className="flex flex-wrap gap-2.5">
           {labelsHref ? (
             <ClayButton href={labelsHref} variant="ghost" size="sm" icon={<QrCode />}>
-              Print QR labels for these {rows.length}
+              {rows.length === 1 ? "Print the QR label for this device" : `Print QR labels for these ${rows.length}`}
             </ClayButton>
           ) : null}
           <ClayButton variant="secondary" size="sm" icon={<Save />} disabled={dirty.size === 0} loading={busy} onClick={save}>

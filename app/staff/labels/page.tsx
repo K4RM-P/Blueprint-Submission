@@ -35,7 +35,7 @@ export default async function LabelsPage({ searchParams }: { searchParams: Promi
           title="QR labels"
           description={
             batch
-              ? `All ${labels.length} devices in this batch.`
+              ? labels.length === 1 ? "The one device in this batch." : `All ${labels.length} devices in this batch.`
               : ids.length
                 ? `${labels.length} selected devices.`
                 : "The 30 most recently received devices. Print a whole batch from its page, or select devices in the Devices table."

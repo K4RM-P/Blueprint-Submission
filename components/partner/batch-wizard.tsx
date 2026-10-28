@@ -310,7 +310,10 @@ export function BatchWizard({ tier, calendar, weights, maxAgeYears, editing, hea
                       label="Our devices will arrive with their drives intact, and Free Geek Toronto will sanitize them."
                       description="Please don't remove or destroy drives yourself — intact drives make devices reusable."
                       aria-invalid={Boolean(e.dataHandlingAck)}
-                      {...register("dataHandlingAck")}
+                      {...register("dataHandlingAck", {
+                        // clear the "please confirm" message as soon as the box is ticked, so the next Continue moves on
+                        onChange: () => void (formState.errors.dataHandlingAck && trigger("dataHandlingAck")),
+                      })}
                     />
                     {e.dataHandlingAck ? (
                       <p role="alert" className="ml-10 mt-2 text-small font-medium text-danger-ink">

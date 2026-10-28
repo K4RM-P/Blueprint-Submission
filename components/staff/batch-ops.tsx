@@ -9,7 +9,7 @@ import { CapacityGlasses } from "@/components/liquid";
 import { calendarForBatch } from "@/lib/capacity";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { CapacityWeek } from "@/lib/capacity";
-import type { BatchStatus } from "@/lib/domain";
+import { plural, type BatchStatus } from "@/lib/domain";
 import { shortDate } from "@/lib/dates";
 import { approveBatch, declineBatch, receiveBatch, scheduleBatch } from "@/server/actions/staff";
 
@@ -104,7 +104,7 @@ export function BatchOps({
       ) : null}
       {status === "approved" || status === "scheduled" ? (
         <ClayButton variant={status === "scheduled" ? "primary" : "secondary"} icon={<PackageCheck />} loading={busy === "receive"} onClick={() => run("receive", () => receiveBatch({ id }))}>
-          Receive &amp; add {quantity} devices
+          Receive &amp; add {plural(quantity, "device")}
         </ClayButton>
       ) : null}
       {(status === "approved" || status === "scheduled") && lines.length > 0 ? (
@@ -176,7 +176,7 @@ export function BatchOps({
                 if (await run("receive", () => receiveBatch({ id, received }))) setDialog(null);
               }}
             >
-              Receive &amp; add {arrivedTotal} devices
+              Receive &amp; add {plural(arrivedTotal, "device")}
             </ClayButton>
           </DialogFooter>
         </DialogContent>
@@ -191,7 +191,7 @@ export function BatchOps({
       >
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Schedule {quantity} devices</DialogTitle>
+            <DialogTitle>Schedule {plural(quantity, "device")}</DialogTitle>
             <DialogDescription>
               Partner preferred the week of {shortDate(preferredWeek)}.
               {booked[0] && quantity > booked[0].capacity

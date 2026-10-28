@@ -11,7 +11,7 @@ import { CertificatePanel } from "@/components/staff/certificate-panel";
 import { requireRole } from "@/lib/auth";
 import { getCalendar, getSettings } from "@/lib/queries/common";
 import { batchSteps } from "@/lib/batch-timeline";
-import { labels } from "@/lib/domain";
+import { labels, plural } from "@/lib/domain";
 import { daysAgo, longDate, shortDate } from "@/lib/dates";
 import { scoreFromLines, scoreLabel } from "@/lib/batch-score";
 import { batchCanIssueCertificate } from "@/lib/status-machine";
@@ -55,7 +55,7 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
       <PageHeader
         eyebrow={batch.organizations ? labels.tier[batch.organizations.tier] : undefined}
         title={batch.organizations?.name ?? "Batch"}
-        description={`${qty} devices · score ${score} (${scoreLabel(score)}) · submitted ${longDate(batch.created_at)} · ${batch.logistics === "pickup" ? `pickup at ${batch.pickup_address}` : "drop-off"}, ${batch.scheduled_week ? "scheduled" : "preferred"} week of ${shortDate(batch.scheduled_week ?? batch.preferred_week)}`}
+        description={`${plural(qty, "device")} · score ${score} (${scoreLabel(score)}) · submitted ${longDate(batch.created_at)} · ${batch.logistics === "pickup" ? `pickup at ${batch.pickup_address}` : "drop-off"}, ${batch.scheduled_week ? "scheduled" : "preferred"} week of ${shortDate(batch.scheduled_week ?? batch.preferred_week)}`}
         actions={<BatchStatusChip status={batch.status} />}
       />
       <ClayCard material="glass" className="flex flex-col gap-6">

@@ -39,3 +39,9 @@ for (const [role, routes] of Object.entries(ROLE_ROUTES) as [keyof typeof ROLE_R
     w.assertClean();
   });
 }
+
+test("AUTH-06 — the demo note also shows inside the role apps", async ({ page }) => {
+  await signInAs(page, "partner");
+  await page.goto("/partner");
+  await expect(page.getByText("Demo environment: fictional data.")).toBeVisible();
+});

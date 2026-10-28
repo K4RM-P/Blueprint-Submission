@@ -15,7 +15,7 @@ export interface CertificateDevice {
   serial: string | null;
   method: string | null;
   verifiedAt: string | null;
-  outcome: "Reused" | "Recycled" | "In refurbishment";
+  outcome: "Reused" | "Recycled" | "For reuse";
 }
 
 export interface CertificateData {

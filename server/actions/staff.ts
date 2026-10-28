@@ -8,11 +8,12 @@ import { generateUniqueCodes } from "@/lib/passport-code";
 import { canTransitionBatch, canTransitionDevice, devicePath } from "@/lib/status-machine";
 import { DEVICE_CATEGORIES, DEVICE_STATUSES, DRIVE_HANDLING, PARTNER_TIERS, RECIPIENT_CATEGORIES, SALE_CHANNELS, type DeviceStatus } from "@/lib/domain";
 import { getCalendar, getSettings } from "@/lib/queries/common";
+import { scoreFromLines } from "@/lib/batch-score";
 import { isMonday } from "@/lib/dates";
 import { nextOpenWeek, wouldExceed } from "@/lib/capacity";
 import { validateBreakdown } from "@/lib/pricing";
 import { canApplySubsidy } from "@/lib/ledger";
-import { PIF_ELIGIBLE_RECIPIENTS, REPORT_ID } from "@/lib/domain";
+import { PIF_ELIGIBLE_RECIPIENTS, REPORT_ID, plural } from "@/lib/domain";
 
 const staff = () => assertRole("staff");
 const uuid = z.uuid();
@@ -117,13 +118,14 @@ export async function receiveBatch(input: unknown): Promise<ActionResult<{ added
         if (e) throw e;
       }
       const record = `Intake: ${short.map((l) => `${l.quantity} × ${l.make} ${l.model} declared, ${counts.get(l.id)} arrived`).join("; ")}.`;
-      const { error: e } = await s.supabase.from("donation_batches").update({ notes: b.notes ? `${b.notes}\n${record}` : record }).eq("id", id);
-      if (e) throw e;
       lines = lines.flatMap((l) => (counts.has(l.id) && counts.get(l.id)! < l.quantity ? (counts.get(l.id)! > 0 ? [{ ...l, quantity: counts.get(l.id)! }] : []) : [l]));
+      const value_score = scoreFromLines(lines, await getSettings(s.supabase));
+      const { error: e } = await s.supabase.from("donation_batches").update({ notes: b.notes ? `${b.notes}\n${record}` : record, value_score }).eq("id", id);
+      if (e) throw e;
     }
     const added = await addDevicesForLines(s.supabase, id, lines);
     refresh("/staff");
-    return ok({ added }, `Received. ${added} devices added with passport codes.`);
+    return ok({ added }, `Received. ${plural(added, "device")} added with passport codes.`);
   });
 }
 

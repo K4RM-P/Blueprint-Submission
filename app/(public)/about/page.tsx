@@ -77,11 +77,11 @@ export default function AboutPage() {
       </div>
 
       <div className="mt-16 flex flex-wrap gap-4">
-        <ClayButton href="/donate" variant="primary">
-          Can I donate my device?
+        <ClayButton href="/become-a-partner" variant="primary">
+          Become a Reuse Partner
         </ClayButton>
-        <ClayButton href="/become-a-partner" variant="secondary">
-          Partner as a business
+        <ClayButton href="/donate" variant="secondary">
+          Can I donate my device?
         </ClayButton>
       </div>
     </main>

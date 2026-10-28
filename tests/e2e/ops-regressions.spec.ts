@@ -92,3 +92,20 @@ test("OPS-04 — when fewer laptops arrive than declared, only those get passpor
   await expect(page.getByRole("main")).toContainText("15 × HP ZBook 15 G5 declared, 13 arrived");
   w.assertClean();
 });
+
+test("PP-03 — ticking the checkbox itself (not its label) clears the error, and one Continue moves on", async ({ page }) => {
+  await signInAs(page, "partner");
+  await page.goto("/partner/batches/new");
+  await page.getByLabel("Make").fill("Dell");
+  await page.getByLabel("Model").fill("Latitude 5420");
+  await page.getByLabel("Approx. year").fill("2021");
+  await page.getByLabel("Quantity").fill("4");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByText("Please confirm so we can wipe the drives for you.")).toBeVisible();
+  await page.getByRole("checkbox", { name: /drives intact/ }).click();
+  await expect(page.getByText("Please confirm so we can wipe the drives for you.")).toBeHidden();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByRole("cell", { name: /Dell Latitude 5420/ })).toBeVisible();
+});

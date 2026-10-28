@@ -5,6 +5,7 @@ import { batchSteps } from "@/lib/batch-timeline";
 import { batchQuantity, batchTitle, type PartnerBatch } from "@/lib/queries/partner";
 import { longDate, shortDate } from "@/lib/dates";
 import { cn } from "@/lib/utils";
+import { plural } from "@/lib/domain";
 
 /** Openable clay row for a batch: what it is, where it is, and a quiet segmented progress bar (§9.4). */
 export function BatchCard({ batch }: { batch: PartnerBatch }) {
@@ -19,7 +20,7 @@ export function BatchCard({ batch }: { batch: PartnerBatch }) {
           <BatchStatusChip status={batch.status} />
         </div>
         <p className="mt-1 text-small text-ink-2">
-          {batchQuantity(batch)} devices · submitted {longDate(batch.created_at)}
+          {plural(batchQuantity(batch), "device")} · submitted {longDate(batch.created_at)}
           {batch.status === "submitted" || batch.status === "approved" || batch.status === "scheduled" ? ` · drop-off week of ${shortDate(week)}` : ""}
         </p>
         <div className="mt-3 flex max-w-md items-center gap-1" role="img" aria-label={`Step ${done} of ${steps.length}`}>

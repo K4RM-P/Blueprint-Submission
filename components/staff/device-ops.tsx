@@ -155,8 +155,8 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
                 Set the price first (Free Geek Toronto sets every price), then record the sale.
               </p>
             )}
-            <Field label="Sale date">
-              {({ id: fid }) => <Input id={fid} type="date" max={today} value={sale.soldAt} onChange={(e) => setSale({ ...sale, soldAt: e.target.value })} />}
+            <Field label="Sale date" error={!sale.soldAt ? "Choose the sale date." : sale.soldAt > today ? "Choose today or an earlier date." : undefined}>
+              {({ id: fid, describedBy, invalid }) => <Input id={fid} type="date" max={today} value={sale.soldAt} aria-describedby={describedBy} aria-invalid={invalid} onChange={(e) => setSale({ ...sale, soldAt: e.target.value })} />}
             </Field>
             <Field label="Channel">
               {({ id: fid }) => (
@@ -191,7 +191,7 @@ export function DeviceOps({ id, status, priceCents, reportRef, assignedId, volun
             <ClayButton
               variant="primary"
               loading={busy}
-              disabled={!priceCents || sale.soldAt > today}
+              disabled={!priceCents || !sale.soldAt || sale.soldAt > today}
               onClick={async () => {
                 setBusy(true);
                 done(
