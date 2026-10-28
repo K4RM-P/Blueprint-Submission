@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { FullPassport } from "@/components/passport/full-passport";
+import { PrintOnly } from "@/components/passport/print-only";
 import { StoryPlayer } from "@/components/passport/story-player";
 import { getPassportStory } from "@/lib/queries/passport";
 import { buildPassportStory, shareText, slideIndexFromParam } from "@/lib/passport-story";
@@ -44,9 +45,9 @@ export default async function PassportPage({ params, searchParams }: { params: P
   return (
     <>
       <StoryPlayer story={story} initialIndex={slideIndexFromParam(q.s, story.slides.length)} />
-      <div className="story-print-only">
+      <PrintOnly>
         <FullPassport p={p} story={story} printOnly />
-      </div>
+      </PrintOnly>
     </>
   );
 }

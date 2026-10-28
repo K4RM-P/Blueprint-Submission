@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeBatchScore, scoreLabel, scoreTip, type ScoreLineItem } from "@/lib/batch-score";
+import { computeBatchScore, scoreFromLines, scoreLabel, scoreTip, type ScoreLineItem } from "@/lib/batch-score";
 
 const item = (p: Partial<ScoreLineItem>): ScoreLineItem => ({ category: "laptop", make: "Dell", model: "Latitude 5420", approxYear: 2021, quantity: 1, ...p });
 const Y = 2026;
@@ -58,5 +58,13 @@ describe("Batch Value Score (PRD §9.3)", () => {
   it("gives a tip", () => {
     expect(scoreTip(computeBatchScore([], { currentYear: Y }))).toMatch(/Add the devices/);
     expect(scoreTip(computeBatchScore([item({ quantity: 2 }), item({ quantity: 2, model: "X" })], { currentYear: Y }))).toMatch(/identical|20/);
+  });
+});
+
+describe("staff ranking ignores the stored score (PRD §6.6: no bought or forged priority)", () => {
+  it("recomputes from stored line items exactly as the wizard does", () => {
+    const rows = [{ category: "laptop" as const, make: "Dell", model: "Latitude 5420", approx_year: 2021, quantity: 20 }];
+    const fromWizard = computeBatchScore([{ category: "laptop", make: "Dell", model: "Latitude 5420", approxYear: 2021, quantity: 20 }], { currentYear: 2026 }).score;
+    expect(scoreFromLines(rows, { currentYear: 2026 })).toBe(fromWizard);
   });
 });

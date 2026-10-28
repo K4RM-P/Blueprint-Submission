@@ -14,7 +14,7 @@ import { toImpactRows } from "@/lib/queries/impact";
 import { computeImpact } from "@/lib/impact";
 import { DEVICE_STATUSES, labels } from "@/lib/domain";
 import { daysAgo, longDate, shortDate } from "@/lib/dates";
-import { scoreLabel } from "@/lib/batch-score";
+import { scoreFromLines, scoreLabel } from "@/lib/batch-score";
 import { batchCanIssueCertificate } from "@/lib/status-machine";
 import { fundBalance } from "@/lib/ledger";
 import { PROGRAM_TARGETS, programMetrics } from "@/lib/program-metrics";
@@ -43,7 +43,7 @@ export default async function StaffOverview() {
     getCalendar(supabase, settings.weeklyCapacity, 4),
     getFactors(supabase),
     supabase.from("devices").select("status, source, batch_id, category, weight_kg, recipient_category, created_at, refurbished_at, sold_at, price_cents, passport_views, batch_line_items(quantity)"),
-    supabase.from("donation_batches").select("id, created_at, value_score, preferred_week, organizations(name, tier), batch_line_items(quantity, make, model)").eq("status", "submitted").order("value_score", { ascending: false }),
+    supabase.from("donation_batches").select("id, created_at, value_score, preferred_week, organizations(name, tier), batch_line_items(quantity, make, model, category, approx_year)").eq("status", "submitted"),
     supabase.from("membership_payments").select("amount_cents").gte("created_at", since),
     supabase.from("fund_transactions").select("amount_cents, type, created_at"),
     supabase.from("organizations").select("id, donation_batches(status)"),
@@ -59,7 +59,10 @@ export default async function StaffOverview() {
   const engagement = (engagementRaw as { starts: number; completions: number; shares: number; drops: { slide: string; count: number }[] } | null) ?? { starts: 0, completions: 0, shares: 0, drops: [] };
   const topDrop = engagement.drops[0];
   const devices = devicesRes.data ?? [];
-  const pending = pendingRes.data ?? [];
+  // Ranked by the score recomputed from line items (see lib/batch-score scoreFromLines).
+  const pending = (pendingRes.data ?? [])
+    .map((b) => ({ ...b, value_score: scoreFromLines(b.batch_line_items, settings) }))
+    .sort((a, z) => z.value_score - a.value_score || a.created_at.localeCompare(z.created_at));
   const impact = computeImpact(
     toImpactRows(devices.map((d) => ({ ...d, line_quantity: d.batch_line_items?.quantity ?? null }))),
     factors,

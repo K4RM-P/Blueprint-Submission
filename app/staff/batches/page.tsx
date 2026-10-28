@@ -6,7 +6,8 @@ import { BatchStatusChip } from "@/components/journey/status";
 import { FilterBar } from "@/components/staff/filter-bar";
 import { requireRole } from "@/lib/auth";
 import { BATCH_STATUSES, PARTNER_TIERS, labels } from "@/lib/domain";
-import { scoreLabel } from "@/lib/batch-score";
+import { scoreFromLines, scoreLabel } from "@/lib/batch-score";
+import { getSettings } from "@/lib/queries/common";
 import { daysAgo, shortDate } from "@/lib/dates";
 import { upcomingWeeks } from "@/lib/capacity";
 
@@ -17,7 +18,7 @@ export default async function StaffBatches({ searchParams }: { searchParams: Pro
   const { supabase } = await requireRole("staff");
   let q = supabase
     .from("donation_batches")
-    .select("id, status, value_score, preferred_week, scheduled_week, logistics, created_at, organizations!inner(name, tier), batch_line_items(quantity, make, model)")
+    .select("id, status, value_score, preferred_week, scheduled_week, logistics, created_at, organizations!inner(name, tier), batch_line_items(quantity, make, model, category, approx_year)")
     .order("value_score", { ascending: false })
     .order("created_at", { ascending: true });
   // Default view is the work still open; "all" includes completed and declined batches.
@@ -26,8 +27,11 @@ export default async function StaffBatches({ searchParams }: { searchParams: Pro
   else if ((BATCH_STATUSES as readonly string[]).includes(status)) q = q.eq("status", status as (typeof BATCH_STATUSES)[number]);
   if (sp.tier && (PARTNER_TIERS as readonly string[]).includes(sp.tier)) q = q.eq("organizations.tier", sp.tier as (typeof PARTNER_TIERS)[number]);
   if (sp.week && /^\d{4}-\d{2}-\d{2}$/.test(sp.week)) q = q.or(`scheduled_week.eq.${sp.week},and(scheduled_week.is.null,preferred_week.eq.${sp.week})`);
-  const { data } = await q;
-  const batches = data ?? [];
+  const [{ data }, settings] = await Promise.all([q, getSettings(supabase)]);
+  // Rank by the score recomputed from the line items, never the stored value alone.
+  const batches = (data ?? [])
+    .map((b) => ({ ...b, value_score: scoreFromLines(b.batch_line_items, settings) }))
+    .sort((a, z) => z.value_score - a.value_score || a.created_at.localeCompare(z.created_at));
   const weeks = upcomingWeeks(daysAgo(14), 10);
 
   return (

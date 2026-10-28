@@ -75,6 +75,9 @@ export function Hero({ devicesReused, backdrop, shot }: { devicesReused: number;
           </ClayButton>
         </div>
         <p className="hero-in mt-4 text-[0.8125rem] text-ink-3 [--d:540ms]">Free for businesses · Certified data wipe for every batch · No price rise for the people Free Geek Toronto serves</p>
+        <a href="#why" className="hero-in mt-3 inline-block text-[0.875rem] font-medium text-ink-2 underline decoration-line underline-offset-4 hover:decoration-ink [--d:580ms]">
+          Why it matters: good business laptops rarely reach Free Geek Toronto, which has no corporate partners yet.
+        </a>
 
         {/* the product shot */}
         <div ref={shotRef} className="hero-in relative mt-16 [perspective:2000px] md:mt-24 [--d:620ms]">

@@ -83,26 +83,8 @@ export default async function Landing() {
         shot={<DashboardPreview />}
       />
 
-      {/* Reuse Partner strip directly under the hero: who's already running */}
-      {ranked.length ? (
-        <section aria-label="Reuse Partners in the relay" className="mt-16 md:mt-24">
-          <Rule />
-          <div className="mx-auto grid max-w-[1200px] grid-cols-2 sm:grid-cols-3 lg:grid-cols-[auto_repeat(6,minmax(0,1fr))]">
-            <p className="col-span-2 flex items-center px-4 py-5 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3 sm:col-span-3 sm:px-6 lg:col-span-1 lg:pr-8">{env.demoMode ? "Demo Reuse Partners" : "Reuse Partners"}</p>
-            {ranked.slice(0, 6).map((p) => (
-              <p key={p.slug} className="flex min-h-[72px] items-center border-line/70 px-4 py-4 font-display text-[1.0625rem] leading-tight tracking-[-0.02em] text-ink-2 max-lg:border-t sm:px-6 lg:border-l lg:px-5">
-                {p.name}
-              </p>
-            ))}
-          </div>
-          <Rule />
-        </section>
-      ) : null}
-
-      <Pour className="mt-10" />
-
       {/* 1b · Why Relay exists: the supply problem, in the case's own numbers */}
-      <section aria-labelledby="why-title" className="mx-auto max-w-[1200px] px-4 pb-8 pt-16 sm:px-6 md:pb-12 md:pt-24">
+      <section id="why" aria-labelledby="why-title" className="mx-auto max-w-[1200px] scroll-mt-28 px-4 pb-16 pt-16 sm:px-6 md:pb-24 md:pt-24">
         <Reveal>
           <SectionHead
             id="why-title"
@@ -130,6 +112,24 @@ export default async function Landing() {
           <p className="mt-3 text-[0.8125rem] text-ink-3">Source: Free Geek Toronto case, FUSE Blueprint 2026 (Best Buy Canada / Angus Reid 2026 survey for the 63%).</p>
         </Reveal>
       </section>
+
+      {/* Reuse Partner strip after the problem: who is already in the relay (demo) */}
+      {ranked.length ? (
+        <section aria-label="Reuse Partners in the relay">
+          <Rule />
+          <div className="mx-auto grid max-w-[1200px] grid-cols-2 sm:grid-cols-3 lg:grid-cols-[auto_repeat(6,minmax(0,1fr))]">
+            <p className="col-span-2 flex items-center px-4 py-5 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink-3 sm:col-span-3 sm:px-6 lg:col-span-1 lg:pr-8">{env.demoMode ? "Demo Reuse Partners" : "Reuse Partners"}</p>
+            {ranked.slice(0, 6).map((p) => (
+              <p key={p.slug} className="flex min-h-[72px] items-center border-line/70 px-4 py-4 font-display text-[1.0625rem] leading-tight tracking-[-0.02em] text-ink-2 max-lg:border-t sm:px-6 lg:border-l lg:px-5">
+                {p.name}
+              </p>
+            ))}
+          </div>
+          <Rule />
+        </section>
+      ) : null}
+
+      <Pour className="mt-10" />
 
       {/* 2 · The relay (pinned, scroll-linked): business → certified wipe → bench → passport → impact back */}
       <BatonRun

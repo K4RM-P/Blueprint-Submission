@@ -99,3 +99,18 @@ export const UNIFORM_MIN_QUANTITY = 5;
 export function isUniformQuantity(quantity: number | null | undefined): boolean {
   return (quantity ?? 0) >= UNIFORM_MIN_QUANTITY;
 }
+
+/**
+ * The score straight from a batch's stored line items. Staff screens rank by this rather than the
+ * stored `value_score`, so a score written by anything other than the server action can't move a
+ * batch up the queue (tiers and partners never buy priority).
+ */
+export function scoreFromLines(
+  lines: { category: ScoreLineItem["category"]; make: string; model: string; approx_year: number | null; quantity: number }[],
+  opts: { weights?: ScoreWeights; maxAgeYears?: number; currentYear?: number } = {},
+): number {
+  return computeBatchScore(
+    lines.map((l) => ({ category: l.category, make: l.make, model: l.model, approxYear: l.approx_year, quantity: l.quantity })),
+    opts,
+  ).score;
+}

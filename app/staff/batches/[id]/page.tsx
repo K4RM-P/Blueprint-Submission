@@ -13,7 +13,7 @@ import { getCalendar, getSettings } from "@/lib/queries/common";
 import { batchSteps } from "@/lib/batch-timeline";
 import { labels } from "@/lib/domain";
 import { daysAgo, longDate, shortDate } from "@/lib/dates";
-import { scoreLabel } from "@/lib/batch-score";
+import { scoreFromLines, scoreLabel } from "@/lib/batch-score";
 import { batchCanIssueCertificate } from "@/lib/status-machine";
 
 export const metadata: Metadata = { title: "Batch" };
@@ -33,6 +33,7 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
     supabase.from("devices").select("id, passport_code, make, model, status, serial_number, cpu, ram_gb, storage_gb").eq("batch_id", id).order("passport_code"),
   ]);
   const qty = batch.batch_line_items.reduce((s, l) => s + l.quantity, 0);
+  const score = scoreFromLines(batch.batch_line_items, settings);
   const list = devices ?? [];
   const canIssue = !batch.certificates && batchCanIssueCertificate(list.map((d) => d.status));
   const pendingWipes = list.filter((d) => d.status === "wipe_pending_verification").length;
@@ -54,7 +55,7 @@ export default async function StaffBatchPage({ params }: { params: Promise<{ id:
       <PageHeader
         eyebrow={batch.organizations ? labels.tier[batch.organizations.tier] : undefined}
         title={batch.organizations?.name ?? "Batch"}
-        description={`${qty} devices · score ${batch.value_score} (${scoreLabel(batch.value_score)}) · submitted ${longDate(batch.created_at)} · ${batch.logistics === "pickup" ? `pickup at ${batch.pickup_address}` : "drop-off"}, ${batch.scheduled_week ? "scheduled" : "preferred"} week of ${shortDate(batch.scheduled_week ?? batch.preferred_week)}`}
+        description={`${qty} devices · score ${score} (${scoreLabel(score)}) · submitted ${longDate(batch.created_at)} · ${batch.logistics === "pickup" ? `pickup at ${batch.pickup_address}` : "drop-off"}, ${batch.scheduled_week ? "scheduled" : "preferred"} week of ${shortDate(batch.scheduled_week ?? batch.preferred_week)}`}
         actions={<BatchStatusChip status={batch.status} />}
       />
       <ClayCard material="glass" className="flex flex-col gap-6">
